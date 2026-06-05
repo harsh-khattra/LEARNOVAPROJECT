@@ -1,0 +1,19 @@
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  flex-shrink: 0;
+}
+
+.sm  { width: 16px; height: 16px; border-width: 2px; }
+.md  { width: 24px; height: 24px; border-width: 2.5px; }
+.lg  { width: 36px; height: 36px; border-width: 3px; }
+
+.spinner { border-style: solid; }
+
+.default { border-color: #e0e0e0; border-top-color: #555; }
+.success { border-color: #c0dd97; border-top-color: #3B6D11; }
+.danger  { border-color: #f7c1c1; border-top-color: #A32D2D; }

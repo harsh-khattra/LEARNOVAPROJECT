@@ -1,0 +1,24 @@
+body {
+  margin: 0px;
+  padding: 0px;
+}
+
+.appLayout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100vh;
+  flex: 1;
+}
+
+.mainLayout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.content {
+   flex: 1;
+  overflow-y: auto;
+  background:  var(--bg-page);
+}

@@ -1,0 +1,116 @@
+/* ============================================
+   STEP 1: Variables define karo — Light Mode
+   ============================================ */
+/* :root {
+  --bg-page:       #f9fafb;
+  --bg-card:       #ffffff;
+  --bg-charts:     #ffffff;
+  --text-primary:  #333333;
+  --border-color:  #e5e7eb;
+  --shadow:        0 1px 4px rgba(0, 0, 0, 0.06);
+} */
+
+/* ============================================
+   STEP 2: Variables override karo — Dark Mode
+   ============================================ */
+/* :root[data-theme="dark"] {
+  --bg-page:       #111827;
+  --bg-card:       #1f2937;
+  --bg-charts:     #1f2937;
+  --text-primary:  #f3f4f6;
+  --border-color:  #374151;
+  --shadow:        0 1px 4px rgba(0, 0, 0, 0.3);
+} */
+
+/* ============================================
+   STEP 3: Classes mein var() use karo
+   Ab koi hardcoded color nahi — sab variables se
+   ============================================ */
+.dashboard {
+  padding: 24px;
+  min-height: 100vh;
+  background-color: var(--bg-page);
+  /* light: #f9fafb | dark: #111827 */
+}
+
+.cards {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.cards div {
+  flex: 1;
+  padding: 20px 24px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  /* light: #ffffff | dark: #1f2937 */
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  /* light: #333    | dark: #f3f4f6 */
+  border: 1px solid var(--border-color);
+  /* light: #e5e7eb | dark: #374151 */
+  box-shadow: var(--shadow);
+}
+
+.charts {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  background: var(--bg-charts);
+  /* light: #ffffff | dark: #1f2937 */
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  /* light: #e5e7eb | dark: #374151 */
+  box-shadow: var(--shadow);
+}
+
+/* Override PrimeReact DataTable in dark mode */
+
+html.dark .p-datatable .p-datatable-thead>tr>th {
+  background: #1f2937 !important;
+  color: #f3f4f6 !important;
+  border-color: #374151 !important;
+}
+
+html.dark .p-datatable .p-datatable-tbody>tr {
+  background: #1f2937 !important;
+  color: #f3f4f6 !important;
+}
+
+html.dark .p-datatable .p-datatable-tbody>tr:hover {
+  background: #374151 !important;
+}
+
+html.dark .p-datatable .p-datatable-tbody>tr>td {
+  border-color: #374151 !important;
+  color: #f3f4f6 !important;
+}
+
+html.dark .p-paginator {
+  background: #1f2937 !important;
+  color: #f3f4f6 !important;
+  border-color: #374151 !important;
+}
+
+html.dark .p-paginator .p-paginator-pages .p-paginator-page {
+  color: #f3f4f6 !important;
+}
+
+html.dark .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+html.dark .p-inputtext {
+  background: #111827 !important;
+  color: #f3f4f6 !important;
+  border-color: #374151 !important;
+}
+html.dark .p-dropdown {
+  background: #111827 !important;
+  color: #f3f4f6 !important;
+  border-color: #374151 !important;
+}

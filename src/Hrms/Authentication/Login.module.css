@@ -1,0 +1,126 @@
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg-page);
+}
+
+.form {
+  background: var(--bg-card);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.label {
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.input {
+  padding: 10px;
+  margin-bottom: 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: border 0.2s ease;
+}
+
+.input:focus {
+  border-color: #4caf50;
+}
+
+.button {
+  padding: 10px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s ease;
+  margin-bottom: 5px;
+}
+
+.button:hover {
+  background: #43a047;
+}
+
+.error {
+  color: #b00020;
+  background-color: #ffe5e5;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  /* margin-top: 5px; */
+  margin-bottom: 5px;
+}
+
+.ortext {
+  margin: 16px 16px;
+  text-align: center;
+}
+
+.googleBtn,
+.githubBtn,
+.facebookBtn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: white;
+  letter-spacing: 0.5px;
+  gap: 20px;
+  margin-bottom: 5px;
+}
+
+.logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  margin-right: 22px;
+}
+
+.googleBtn {
+  background: #ffffff;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.googleBtn:hover {
+  background: #f5f5f5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* GitHub */
+.githubBtn {
+  background: #24292e;
+}
+
+.githubBtn:hover {
+  background: #1b1f23;
+  box-shadow: 0 4px 12px rgba(36, 41, 46, 0.3);
+}
+
+/* Facebook */
+.facebookBtn {
+  background: #1877f2;
+}
+
+.facebookBtn:hover {
+  background: #166fe5;
+  box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+}

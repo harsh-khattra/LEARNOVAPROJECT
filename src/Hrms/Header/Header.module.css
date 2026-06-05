@@ -1,0 +1,140 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding-left: 20px;
+  padding-right: 0;
+  background: #1f2937;
+  color: #fff;
+}
+
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.userName {
+  font-weight: 500;
+}
+
+.userEmail {
+  opacity: 0.7;
+  font-size: 11px;
+}
+
+
+.navContainer {
+  display: flex;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px;
+  border-radius: 10px;
+  gap: 4px;
+}
+
+.navLink {
+  padding: 6px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #e5e7eb;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.navLink:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.active {
+  background: #4f46e5;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* RIGHT */
+.right {
+  display: flex;
+  margin-left: auto;
+  align-items: center;
+  height: 100%;
+}
+
+/* LOGOUT */
+.logoutBtnFull {
+  height: 100%;
+  width: 110px;
+  padding: 0 20px;
+  background: #dc2626;
+  border: none;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 12px;
+}
+
+.logoutBtnFull:hover {
+  background: #b91c1c;
+}
+
+/* LANGUAGE */
+.languageToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 16px;
+  font-size: 12px;
+}
+
+/* TOGGLE */
+.toggleTrack {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: #60646c;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+
+.toggleTrack input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.toggleTrack:has(input:checked) {
+  background: #4f46e5;
+}
+
+.toggleTrack:has(input:checked) .toggleThumb {
+  transform: translateX(20px);
+}

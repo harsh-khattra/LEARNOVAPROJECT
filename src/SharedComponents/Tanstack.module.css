@@ -1,0 +1,340 @@
+/* =========================
+   CONTAINER
+========================= */
+
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+}
+
+
+/* =========================
+   SEARCH INPUT
+========================= */
+
+.searchInput {
+  padding: 7px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 13px;
+  min-width: 260px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: all 0.25s ease;
+}
+
+.searchInput::placeholder {
+  color: #9ca3af;
+}
+
+.searchInput:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+  outline: none;
+}
+
+
+/* =========================
+   TABLE
+========================= */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.thead {
+  background: var(--border-color);
+}
+
+.th {
+  height: 42px;
+  padding: 10px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+.th:hover {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.tr {
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.15s ease;
+  height: 44px;
+}
+
+.tr:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.td {
+  padding: 10px;
+  font-size: 14px;
+  color: var(--text-primary);
+  height: 87px;
+  max-height: 87px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* =========================
+   PAGINATION
+========================= */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: auto;
+  padding: 5px 7px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.pagination button {
+  padding: 7px 14px;
+  background: #4f46e5;
+  color: #fff;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #4338ca;
+}
+
+.pagination button:disabled {
+  background: var(--border-color);
+  color: #9ca3af;
+}
+
+.pagination span {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.pagination div {
+  margin-left: auto;
+  min-height: 51px;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: rgba(99, 102, 241, 0.1);
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+
+/* =========================
+   FILTER BAR
+========================= */
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  padding: 6px 16px;
+  min-width: 100px;
+  min-height: 30px;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  background: var(--bg-card);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.filterBtn:hover {
+  background: var(--border-color);
+}
+
+.filterBtnActive {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #3b82f6;
+  font-weight: 600;
+}
+
+.filterBtnDate {
+  background: #8b5cf6;
+  color: #fff;
+  border-color: #8b5cf6;
+}
+
+.filterDivider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-color);
+  margin: 0 4px;
+}
+
+
+/* =========================
+   PRESET DROPDOWN
+========================= */
+
+.presetWrapper {
+  position: relative;
+}
+
+.presetDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 200;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 160px;
+}
+
+.presetItem {
+  padding: 8px 14px;
+  text-align: left;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.14s;
+  color: var(--text-primary);
+}
+
+.presetItem:hover {
+  background: var(--border-color);
+}
+
+.presetItemActive {
+  background: rgba(139, 92, 246, 0.15);
+  color: #7c3aed;
+  font-weight: 500;
+}
+
+.presetClear {
+  margin-top: 4px;
+  padding: 7px 14px;
+  text-align: left;
+  border: none;
+  border-top: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: transparent;
+  font-size: 12px;
+  color: #ef4444;
+  cursor: pointer;
+}
+
+.presetClear:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+
+/* =========================
+   DATE BADGE
+========================= */
+
+.dateBadge {
+  font-size: 11px;
+  padding: 3px 10px;
+  background: rgba(139, 92, 246, 0.15);
+  color: #6d28d9;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.emptyState {
+  margin: auto;
+  padding: 48px 20px;
+  text-align: center;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px dashed var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.emptyIcon {
+  font-size: 30px;
+  opacity: 0.6;
+}
+
+.emptyTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.emptySub {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+
+/* =========================
+   TOP BAR
+========================= */
+
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-height: 50px;
+}
+
+
+/* =========================
+   TABLE WRAPPER
+========================= */
+
+.tableWrapper {
+  min-height: 560px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+
+/* =========================
+   BUTTON SMOOTHING
+========================= */
+
+button {
+  -webkit-font-smoothing: antialiased;
+}

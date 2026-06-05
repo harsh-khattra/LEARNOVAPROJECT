@@ -1,0 +1,26 @@
+/* light mode */
+:root {
+  --bg-page:       #f9fafb;
+  --bg-card:       #ffffff;
+  --bg-charts:     #ffffff;
+  --text-primary:  #333333;
+  --border-color:  #e5e7eb;
+  --shadow:        0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* dark mode */
+:root.dark {
+  --bg-page:       #111827;
+  --bg-card:       #1f2937;
+  --bg-charts:     #1f2937;
+  --text-primary:  #f3f4f6; 
+  --border-color:  #374151;
+  --shadow:        0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* smooth transition */
+body {
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}

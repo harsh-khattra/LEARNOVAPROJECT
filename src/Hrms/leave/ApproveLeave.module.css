@@ -1,0 +1,264 @@
+/* =========================
+   CONTAINER
+========================= */
+
+.container {
+  padding: 5px;
+  background: var(--bg-card);
+ 
+  box-shadow: var(--shadow);
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  gap: 10px;
+}
+
+.title {
+  font-size: 19px;
+  font-weight: 600;
+  min-height: 32px;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+
+
+/* =========================
+   BACK BUTTON
+========================= */
+
+.backBtn {
+  width: 36px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--border-color);
+  color: var(--text-primary);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.backBtn:hover {
+  background: rgba(99, 102, 241, 0.1);
+  transform: translateX(-2px);
+}
+
+.backBtn:active {
+  transform: scale(0.95);
+}
+
+
+/* =========================
+   STATUS
+========================= */
+
+.status {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+/* Status colors (kept as semantic colors) */
+.approved {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+.rejected {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+}
+
+.pending {
+  background: rgba(249, 115, 22, 0.15);
+  color: #ea580c;
+}
+
+
+/* =========================
+   ACTIONS
+========================= */
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+
+/* =========================
+   INPUT
+========================= */
+
+.input {
+  padding: 7px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+  outline: none;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+.buttonGroup {
+  display: flex;
+  gap: 6px;
+}
+
+.approveBtn,
+.rejectBtn {
+  border: none;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Approve */
+.approveBtn {
+  background: #16a34a;
+  min-width: 70px;
+  color: #fff;
+}
+
+.approveBtn:hover:not(:disabled) {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+/* Reject */
+.rejectBtn {
+  background: #dc2626;
+  min-width: 70px;
+  color: #fff;
+}
+
+.rejectBtn:hover:not(:disabled) {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+/* Disabled */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modalContent {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  animation: fadeIn 0.2s ease;
+}
+
+.modalImage {
+  width: 100%;
+  max-height: 85vh;
+  border-radius: 12px;
+}
+
+
+/* Close button */
+.closeBtn {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: var(--shadow);
+}
+
+
+/* Download button */
+.downloadBtn {
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  background: var(--text-primary);
+  color: var(--bg-card);
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.downloadBtn:hover {
+  opacity: 0.9;
+}
+
+
+/* =========================
+   IMAGE AVATAR
+========================= */
+
+.imageavatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer !important;
+}
+
+
+/* =========================
+   ANIMATION
+========================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

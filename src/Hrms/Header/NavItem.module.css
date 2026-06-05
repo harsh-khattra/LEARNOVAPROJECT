@@ -1,0 +1,224 @@
+/* ─── Layout ──────────────────────────────────────────── */
+.sidebar {
+  position: relative;
+  width: 64px;
+  height: 100vh;
+  background: #0d1117;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 10px 20px;
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.sidebar:hover {
+  width: 210px;
+}
+
+/* ─── Logo Mark ───────────────────────────────────────── */
+.logoMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.logoIcon {
+  display: block;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.4), 0 2px 8px rgba(79, 70, 229, 0.35);
+  flex-shrink: 0;
+}
+
+/* ─── Nav ─────────────────────────────────────────────── */
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+/* ─── Nav Link ────────────────────────────────────────── */
+.navLink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  color: #edf0f3;
+  text-decoration: none;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+  white-space: nowrap;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.navLink:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+}
+
+.navLink:focus-visible {
+  box-shadow: 0 0 0 2px rgba(111, 112, 158, 0.6);
+}
+
+/* Active state */
+.navLink.active {
+  background: rgba(99, 102, 241, 0.14);
+  color: #818cf8;
+}
+
+.navLink.active:hover {
+  background: rgba(99, 102, 241, 0.18);
+}
+
+/* Active left bar indicator */
+.activeBar {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: #6366f1;
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+}
+
+.navLink.active .activeBar {
+  display: block;
+}
+
+/* ─── Icon ────────────────────────────────────────────── */
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 18px;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.navLink:hover .iconWrap {
+  transform: scale(1.08);
+}
+
+.navLink.active .iconWrap {
+  filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.5));
+}
+
+/* ─── Label ───────────────────────────────────────────── */
+.label {
+  font-size: 13.5px;
+  color: #e2e8f0;
+  font-weight: 500;
+
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+/* 👇 use parent hover via :global */
+.sidebar:hover .label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+
+/* ─── Tooltip (collapsed state) ───────────────────────── */
+.navLink::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 14px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1e293b;
+  color: #e2e8f0;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  z-index: 200;
+}
+
+/* Arrow for tooltip */
+.navLink::before {
+  content: "";
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-right-color: #1e293b;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  z-index: 200;
+}
+
+/* Show tooltip only when sidebar is NOT expanded */
+.sidebar:not(:hover) .navLink:hover::after,
+.sidebar:not(:hover) .navLink:hover::before {
+  opacity: 1;
+}
+
+/* ─── Bottom Section ──────────────────────────────────── */
+.bottomSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.userAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.18);
+  border: 1.5px solid rgba(99, 102, 241, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.userAvatar:hover {
+  background: rgba(99, 102, 241, 0.28);
+  border-color: rgba(99, 102, 241, 0.55);
+}
+
+.avatarInitials {
+  font-size: 13px;
+  font-weight: 600;
+  color: #818cf8;
+  letter-spacing: 0.02em;
+}
