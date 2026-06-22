@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { Course } from '../types/lms';
 import { formatCoursePrice, getStatusBadgeStyles } from '../utils/lmsShared';
 
-// 🔥 Interface ko bilkul aise hi verify kijiye
+// Interface ko bilkul aise hi verify kijiye
 export interface CourseCardProps {
   course: Course;
   isTeacher: boolean; // <-- Make sure this line exists!
