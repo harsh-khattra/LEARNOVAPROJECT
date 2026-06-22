@@ -6,6 +6,8 @@ import {
   FiAward,
   FiUser,
   FiMessageCircle,
+  FiUsers,
+  FiShield
 } from "react-icons/fi";
 
 import styles from "./LearningSidebar.module.css";
@@ -18,9 +20,20 @@ const LearningSidebar = () => {
       icon: <FiHome />,
     },
     {
-      name: "My Courses",
-      path: "/learning/student/courses",
+      name: "Upload Courses",
+      path: "student/courses",
+      //  Element:<CourseDashboardPage/> ,
       icon: <FiBookOpen />,
+    },
+     {
+      name: "Courses Available",
+      path: "employee/courses", 
+      icon: <FiUsers />,
+    },
+    {
+      name: "Admin Panel",
+      path: "admin/approval-desk", 
+      icon: <FiShield />,
     },
     {
       name: "Assignments",
@@ -41,7 +54,8 @@ const LearningSidebar = () => {
       name: "My Profile",
       path: "/learning/student/profile",
       icon: <FiUser />,
-    }
+    },
+   
   ];
 
   return (
