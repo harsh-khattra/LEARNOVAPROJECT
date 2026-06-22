@@ -91,3 +91,22 @@
 .activeLink .icon {
   color: #2563eb;
 }
+/* ==========================================================================
+   💼 PANEL HEADER STYLES (Matching your Light Theme)
+   ========================================================================== */
+
+.panelHeader {
+  padding: 0 24px 18px 24px;
+  border-bottom: 1px solid #e5e7eb; /* Same subtle border as your sidebar */
+  margin-bottom: 14px;
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600; /* Matching activeLink font weight */
+  color: #1e293b;   /* Modern dark text for headers */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
