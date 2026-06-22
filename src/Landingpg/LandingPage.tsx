@@ -1,7 +1,8 @@
 // src/LandingPage/LandingPage.tsx
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import "./LandingPage.css";
+import SignUp from "../Hrms/Authentication/SignUp";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const LandingPage = () => {
 
   return (
     <div className="landing-page">
-
+      <NavLink to="/signup">Signup</NavLink>
       {/* ── Navbar ── */}
       <nav className="lp-nav">
         <div className="lp-nav-logo">LEARN<span>OVA</span></div>

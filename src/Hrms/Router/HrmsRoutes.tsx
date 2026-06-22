@@ -41,11 +41,11 @@ const HrmsRoutes = () => {
 
       {/* All paths are now relative — no leading slash */}
       <Route
-        path="signup"                                   
+        path="/signup"                                   
         element={
           <ProtectedRoute allowed={permissions.management}>
             <SignUp />
-          </ProtectedRoute>
+           </ProtectedRoute>
         }
       />
       <Route

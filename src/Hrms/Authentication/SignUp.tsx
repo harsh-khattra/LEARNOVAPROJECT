@@ -4,7 +4,7 @@ import styles from "./Signup.module.css";
 import { SupabaseClient } from "../../Helper/Supabase";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import PageLoader from "../UI/PageLoader";
 
 type FormValues = {
@@ -16,11 +16,14 @@ type FormValues = {
   department: string;
   photo: File | null;
 };
+
 const SignUp = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const navigate = useNavigate();
+
   const formik = useFormik<FormValues>({
     initialValues: {
       name: "",
@@ -52,10 +55,6 @@ const SignUp = () => {
     onSubmit: async (values) => {
       setLoading(true);
       try {
-        setLoading(true);
-        const { data: sessionData } = await SupabaseClient.auth.getSession();
-        const adminSession = sessionData.session;
-
         const { data, error } = await SupabaseClient.auth.signUp({
           email: values.email,
           password: values.password,
@@ -65,33 +64,15 @@ const SignUp = () => {
           toast.error(error.message);
           return;
         }
+
         const userId = data?.user?.id;
         if (!userId) {
           toast.error("Signup failed, try again.");
           return;
         }
 
-        const { data: roleData } = await SupabaseClient.from("roles")
-          .select("id")
-          .eq("emprole", values.role)
-          .maybeSingle();
-
-        if (!roleData) {
-          toast.error("Role not found");
-          return;
-        }
-
-        const { data: deptData } = await SupabaseClient.from("departments")
-          .select("id")
-          .eq("empDepartment", values.department)
-          .maybeSingle();
-
-        if (!deptData) {
-          toast.error("Department not found");
-          return;
-        }
-
-        let imageUrl = null;
+        // Upload profile photo if provided
+        let imageUrl: string | null = null;
 
         if (values.photo) {
           const fileExt = values.photo.name.split(".").pop();
@@ -99,9 +80,7 @@ const SignUp = () => {
 
           const { error: uploadError } = await SupabaseClient.storage
             .from("profile_image")
-            .upload(fileName, values.photo, {
-              upsert: true,
-            });
+            .upload(fileName, values.photo, { upsert: true });
 
           if (uploadError) {
             toast.error("Image upload failed");
@@ -115,38 +94,68 @@ const SignUp = () => {
           imageUrl = publicUrlData.publicUrl;
         }
 
-        const { data: profileData } = await SupabaseClient.from("profiles")
-          .insert([
+        // Department UUID fetch karo
+        const { data: deptData, error: deptError } = await SupabaseClient
+          .from("departments")
+          .select("id")
+          .eq("empDepartment", values.department)
+          .single();
+
+        if (deptError || !deptData) {
+          toast.error("Department not found");
+          return;
+        }
+
+        // Role UUID fetch karo
+        const { data: roleData, error: roleError } = await SupabaseClient
+          .from("roles")
+          .select("id")
+          .eq("emprole", values.role)
+          .single();
+
+        if (roleError || !roleData) {
+          toast.error("Role not found");
+          return;
+        }
+
+        // ✅ FIX: insert ki jagah upsert use karo - duplicate issue solve
+        const { data: profileData, error: profileError } = await SupabaseClient
+          .from("profiles")
+          .upsert([
             {
               id: userId,
               full_name: values.name,
               phone: values.phoneNumber,
-              role_id: roleData.id,
+              email: values.email,
               department_id: deptData.id,
-              Email: values.email,
+              role_id: roleData.id,
               avatar_url: imageUrl,
             },
-          ])
+          ], { onConflict: 'id' })
           .select()
           .single();
-        if (!profileData) {
-          toast.error("Profile creation failed");
+
+        if (profileError || !profileData) {
+          toast.error(profileError?.message || "Profile creation failed");
           return;
         }
-        // await SupabaseClient.auth.signOut();
-        toast.success("Signup successful!");
-        formik.resetForm();
+
+        toast.success("Employee added successfully!");
+
+        // Reset preview and file input
         if (preview) {
           URL.revokeObjectURL(preview);
+          setPreview(null);
         }
-        setPreview(null);
-        if (adminSession) {
-          await SupabaseClient.auth.setSession(adminSession);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
         }
-        navigate("/signup");
+        formik.resetForm();
+
+        navigate("/dashboard");
       } catch (err) {
         console.error(err);
-        toast.error("something went wrong");
+        toast.error("Something went wrong");
       } finally {
         setLoading(false);
       }
@@ -160,6 +169,8 @@ const SignUp = () => {
       ) : (
         <form onSubmit={formik.handleSubmit} className={styles.form}>
           <h2 className={styles.title}>Add Employee</h2>
+
+          {/* Profile Photo Preview */}
           {preview && (
             <div className={styles.previewContainer}>
               <img
@@ -169,98 +180,96 @@ const SignUp = () => {
               />
             </div>
           )}
+
+          {/* Photo Upload */}
           <label className={styles.label}>Profile Photo</label>
           <input
+            ref={fileInputRef}
             type="file"
             accept="image/*"
             onChange={(e) => {
               const file = e.currentTarget.files?.[0];
               if (file) {
                 if (file.size > 2 * 1024 * 1024) {
-                toast.error("Max 2MB allowed");
-                return;
-              }
-                formik.setFieldValue("photo", file);
-                if (preview) {
-                  URL.revokeObjectURL(preview);
+                  toast.error("Max 2MB allowed");
+                  e.currentTarget.value = "";
+                  return;
                 }
-
-                const objectUrl = URL.createObjectURL(file);
-                setPreview(objectUrl);
+                formik.setFieldValue("photo", file);
+                if (preview) URL.revokeObjectURL(preview);
+                setPreview(URL.createObjectURL(file));
               }
             }}
             className={styles.input}
           />
-          <label htmlFor="name" className={styles.label}>
-            Name
-          </label>
+
+          {/* Name */}
+          <label htmlFor="name" className={styles.label}>Name</label>
           <input
             id="name"
             type="text"
             name="name"
-            placeholder="Enter your full name"
+            placeholder="Enter full name"
             value={formik.values.name}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             className={styles.input}
-          ></input>
+          />
           {formik.touched.name && formik.errors.name && (
             <div className={styles.error}>{formik.errors.name}</div>
           )}
 
-          <label htmlFor="phoneNumber" className={styles.label}>
-            Phone Number
-          </label>
+          {/* Phone Number */}
+          <label htmlFor="phoneNumber" className={styles.label}>Phone Number</label>
           <input
             id="phoneNumber"
             type="text"
             inputMode="numeric"
             name="phoneNumber"
-            placeholder="Enter your PhoneNumber"
+            placeholder="Enter phone number"
             value={formik.values.phoneNumber}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             className={styles.input}
-          ></input>
+          />
           {formik.touched.phoneNumber && formik.errors.phoneNumber && (
             <div className={styles.error}>{formik.errors.phoneNumber}</div>
           )}
-          <label htmlFor="email" className={styles.label}>
-            Email
-          </label>
+
+          {/* Email */}
+          <label htmlFor="email" className={styles.label}>Email</label>
           <input
             id="email"
             type="email"
             name="email"
-            placeholder="Enter your email"
+            placeholder="Enter email"
             value={formik.values.email}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             className={styles.input}
-          ></input>
+          />
           {formik.touched.email && formik.errors.email && (
             <div className={styles.error}>{formik.errors.email}</div>
           )}
-          <label htmlFor="password" className={styles.label}>
-            Password
-          </label>
+
+          {/* Password */}
+          <label htmlFor="password" className={styles.label}>Password</label>
           <input
             id="password"
             type="password"
             name="password"
-            placeholder="Enter your password"
+            placeholder="Enter password"
             value={formik.values.password}
             onChange={formik.handleChange}
-            className={styles.input}
             onBlur={formik.handleBlur}
-          ></input>
+            className={styles.input}
+          />
           {formik.touched.password && formik.errors.password && (
             <div className={styles.error}>{formik.errors.password}</div>
           )}
 
-          <label htmlFor="department" className={styles.label}>
-            Department
-          </label>
+          {/* Department */}
+          <label htmlFor="department" className={styles.label}>Department</label>
           <select
             id="department"
             name="department"
@@ -284,9 +293,8 @@ const SignUp = () => {
             <div className={styles.error}>{formik.errors.department}</div>
           )}
 
-          <label htmlFor="role" className={styles.label}>
-            Role
-          </label>
+          {/* Role */}
+          <label htmlFor="role" className={styles.label}>Role</label>
           <select
             id="role"
             name="role"

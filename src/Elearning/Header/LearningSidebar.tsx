@@ -17,9 +17,31 @@ const LearningSidebar = () => {
       path: "/learning/student/dashboard",
       icon: <FiHome />,
     },
+
+    {
+  name: "CourseCompletion",
+  path: "/learning/student/coursecompletion",
+  icon: <FiHome />,
+},
+{
+  name: "QuizPerformance",
+  path: "/learning/student/quizperformance",
+  icon: <FiHome />,
+},
+{
+  name: "Timesspent",
+  path: "/learning/student/timespent",
+  icon: <FiHome />,
+},
+  ,
     {
       name: "My Courses",
       path: "/learning/student/courses",
+      icon: <FiBookOpen />,
+    },
+    {
+      name: "Enroll",
+      path: "/learning/student/courseenrollment",
       icon: <FiBookOpen />,
     },
     {
