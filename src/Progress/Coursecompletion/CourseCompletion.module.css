@@ -1,0 +1,314 @@
+/* ── Design tokens ─────────────────────────────────────── */
+.container {
+  --bg: #faf8f3;
+  --card: #ffffff;
+  --border: #e8e4d9;
+  --ink: #1f1d1a;
+  --ink-soft: #5a564c;
+  --muted: #9b958c;
+
+  --pass: #0f9d6e;
+  --pass-bg: #e6f5ee;
+  --warn: #c97a2f;
+  --warn-bg: #fbeee0;
+  --neutral: #9b958c;
+  --neutral-bg: #f1efe8;
+
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  padding: 32px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ── Stat cards ────────────────────────────────────────── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.statCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.statIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--pass-bg);
+  color: var(--pass);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.statText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statValue {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.statLabel {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* ── Charts row ────────────────────────────────────────── */
+.chartsRow {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr);
+  gap: 16px;
+}
+
+.chartCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chartCardWide {
+  justify-content: flex-start;
+}
+
+.chartTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 14px 0;
+}
+
+.donutWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+.radialLegend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.legendDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legendLabel {
+  margin-right: 8px;
+}
+
+/* ── Course history ────────────────────────────────────── */
+.historySection {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 24px;
+}
+
+.historyTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 16px 0;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.courseCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg);
+}
+
+.statusIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.iconPass {
+  background: var(--pass-bg);
+  color: var(--pass);
+}
+
+.iconWarning {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+.iconNeutral {
+  background: var(--neutral-bg);
+  color: var(--neutral);
+}
+
+.courseInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.courseTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.courseCategory {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.progressBarTrack {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.progressBarFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.barPass {
+  background: var(--pass);
+}
+
+.barWarning {
+  background: var(--warn);
+}
+
+.barNeutral {
+  background: var(--neutral);
+}
+
+.progressLabel {
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 38px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.labelPass {
+  color: var(--pass);
+}
+
+.labelWarning {
+  color: var(--warn);
+}
+
+.labelNeutral {
+  color: var(--neutral);
+}
+
+/* ── Load more ─────────────────────────────────────────── */
+.loadMoreBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.loadMoreBtn:hover {
+  background: var(--neutral-bg);
+  color: var(--ink);
+}
+
+.loadMoreBtn:focus-visible {
+  outline: 2px solid var(--pass);
+  outline-offset: 2px;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .chartsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 20px;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .courseCard {
+    flex-wrap: wrap;
+  }
+
+  .progressLabel {
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progressBarFill,
+  .loadMoreBtn {
+    transition: none;
+  }
+}

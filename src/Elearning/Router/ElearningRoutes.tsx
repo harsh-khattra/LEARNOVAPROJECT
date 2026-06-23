@@ -10,10 +10,35 @@ import TeacherCourses from "../Teacher/Courses";
 
 import AdminDashboard from "../Admin/Dashboard";
 import Analytics from "../Admin/Analytics";
+import QuizPerformancePage from "../../Progress/Quiz/Quizperformance";
+import CourseCompletion from "../../Progress/Coursecompletion/Completion";
+import TimeSpentAnalytics from "../../Progress/Timespent/Timespent";
 
 const ElearningRoutes = () => {
   return (
     <Routes>
+
+{/* Progress */}
+
+ <Route
+        path="student/quiz"
+        element={<QuizPerformancePage />}
+      />
+ <Route
+        path="student/completion"
+        element={<CourseCompletion />}
+      />
+ <Route
+        path="student/timespent"
+        element={<TimeSpentAnalytics />}
+      />
+
+
+
+
+
+
+
       {/* Student */}
 
       <Route
