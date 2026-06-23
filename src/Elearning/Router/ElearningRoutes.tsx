@@ -9,15 +9,42 @@ import TeacherDashboard from "../Teacher/Dashboard";
 import TeacherCourses from "../Teacher/Courses";
 
 import Analytics from "../Admin/Analytics";
+
 import { ManageContentPage } from '../lms/pages/ManageContentPage';
 import { CourseDashboardPage } from '../lms/pages/CourseDashboardPage';
 import { CoursePlayerPage } from '../lms/pages/CoursePlayerPage';
 import { AdminApprovalDesk } from '../lms/pages/AdminApproval';
 import { AvailableCourses } from '../lms/pages/AvailableCourses';
 
+import QuizPerformancePage from "../../Progress/Quiz/Quizperformance";
+import CourseCompletion from "../../Progress/Coursecompletion/Completion";
+import TimeSpentAnalytics from "../../Progress/Timespent/Timespent";
+
 const ElearningRoutes = () => {
   return (
     <Routes>
+
+{/* Progress */}
+
+ <Route
+        path="student/quiz"
+        element={<QuizPerformancePage />}
+      />
+ <Route
+        path="student/completion"
+        element={<CourseCompletion />}
+      />
+ <Route
+        path="student/timespent"
+        element={<TimeSpentAnalytics />}
+      />
+
+
+
+
+
+
+
       {/* Student */}
       <Route path="student/dashboard" element={<StudentDashboard />} />
       <Route path="student/courses" element={<CourseDashboardPage />} />
