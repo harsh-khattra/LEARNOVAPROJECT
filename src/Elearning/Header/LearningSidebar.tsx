@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { FiCreditCard } from "react-icons/fi";
 import {
   FiHome,
   FiBookOpen,
@@ -6,6 +7,8 @@ import {
   FiAward,
   FiUser,
   FiMessageCircle,
+  FiUsers,
+  FiShield
 } from "react-icons/fi";
 
 import styles from "./LearningSidebar.module.css";
@@ -18,9 +21,20 @@ const LearningSidebar = () => {
       icon: <FiHome />,
     },
     {
-      name: "My Courses",
-      path: "/learning/student/courses",
+      name: "Upload Courses",
+      path: "student/courses",
+      //  Element:<CourseDashboardPage/> ,
       icon: <FiBookOpen />,
+    },
+     {
+      name: "Courses Available",
+      path: "employee/courses", 
+      icon: <FiUsers />,
+    },
+    {
+      name: "Admin Panel",
+      path: "admin/approval-desk", 
+      icon: <FiShield />,
     },
     {
       name: "Assignments",
@@ -42,22 +56,31 @@ const LearningSidebar = () => {
       path: "/learning/student/profile",
       icon: <FiUser />,
     },
+// <<<<<<< HEAD
     
     {
       name: "Quiz",
       path: "/learning/student/quiz",
-      icon: <FiUser />,
+     icon: <FiClipboard />
     },
     {
       name: "Completion",
       path: "/learning/student/completion",
-      icon: <FiUser />,
+       icon: <FiClipboard />
     },
     {
       name: "Timespent",
       path: "/learning/student/timespent",
-      icon: <FiUser />,
+     icon: <FiUser />,
+    },
+    {
+      name: "Enrolled",
+      path: "/learning/student/enroll",
+     icon: <FiCreditCard />,
     }
+
+   
+// >>>>>>> eb878d71666ccab9d586f1f55866103654d20008
   ];
 
   return (

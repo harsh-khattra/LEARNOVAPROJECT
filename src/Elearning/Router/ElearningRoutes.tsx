@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 
 import StudentDashboard from "../Student/Dashboard";
-import MyCourses from "../Student/MyCourses";
+// import MyCourses from "../Student/MyCourses";
 import Discussion from "../Student/Discussion";
 import Certificates from "../Student/Certificate";
 
@@ -13,6 +13,14 @@ import Analytics from "../Admin/Analytics";
 import QuizPerformancePage from "../../Progress/Quiz/Quizperformance";
 import CourseCompletion from "../../Progress/Coursecompletion/Completion";
 import TimeSpentAnalytics from "../../Progress/Timespent/Timespent";
+import { CourseDashboardPage } from "../lms/pages/CourseDashboardPage";
+import { AvailableCourses } from "../lms/pages/AvailableCourses";
+import { AdminApprovalDesk } from "../lms/pages/AdminApproval";
+import { ManageContentPage } from "../lms/pages/ManageContentPage";
+import { CoursePlayerPage } from "../lms/pages/CoursePlayerPage";
+import Enrollment from "../../Progress/Enrollment/enroll";
+import EnrolledCourses from "../../Progress/Enrolled/Enrolledcourses";
+
 
 const ElearningRoutes = () => {
   return (
@@ -32,13 +40,10 @@ const ElearningRoutes = () => {
         path="student/timespent"
         element={<TimeSpentAnalytics />}
       />
-
-
-
-
-
-
-
+ <Route
+        path="student/enroll"
+        element={<EnrolledCourses />}
+      />
       {/* Student */}
 
       <Route
@@ -48,7 +53,7 @@ const ElearningRoutes = () => {
 
       <Route
         path="student/courses"
-        element={<MyCourses />}
+        element={<CourseDashboardPage />}
       />
 
       <Route
@@ -60,6 +65,15 @@ const ElearningRoutes = () => {
         path="student/certificates"
         element={<Certificates />}
       />
+      
+<Route
+        path="student/courses"
+        element={<Certificates />}
+      />
+        <Route
+        path="employee/courses"
+        element={<AvailableCourses/>}
+      />
 
       {/* Teacher */}
 
@@ -67,23 +81,39 @@ const ElearningRoutes = () => {
         path="teacher/dashboard"
         element={<TeacherDashboard />}
       />
-
-      <Route
+  {/* <Route
         path="teacher/courses"
-        element={<TeacherCourses />}
-      />
+        element={<TeacherCourses/>}
+      /> */}
 
+    
       {/* Admin */}
 
       <Route
-        path="admin/dashboard"
-        element={<AdminDashboard />}
+        path="admin/approval-desk"
+        element={<AdminApprovalDesk />}
       />
 
       <Route
         path="admin/analytics"
         element={<Analytics />}
+
       />
+
+        <Route
+        path="lms/dashboard"
+        element={<CourseDashboardPage/>}
+      />
+        <Route
+        path="lms/managecontent/:id"
+        element={<ManageContentPage/>}
+      />
+  <Route
+        path="learning/course-player/:id"
+        element={<CoursePlayerPage/>}
+      />
+
+
     </Routes>
   );
 };

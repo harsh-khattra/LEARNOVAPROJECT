@@ -48,7 +48,7 @@
   background: var(--bg);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  min-height: 100%;
+  height: 100%;
   width: 100%;
 }
 
@@ -90,14 +90,22 @@
 .accent-green-bg { background: var(--green); }
 
 /* ----------------------------------- Shell --------------------------------- */
+/* CRITICAL: .tsa-shell is now a fixed-height viewport box. Its two children
+   (.tsa-sidebar and .tsa-main) each manage their OWN scrolling independently.
+   This is what makes the sidebar stay static while only the content scrolls. */
 
 .tsa-shell {
   display: grid;
   grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
-  min-height: 100vh;
+  height: 100vh;
+  align-items: stretch;
+  overflow: hidden; /* prevents the whole page from scrolling as one block */
 }
 
 /* ---------------------------------- Sidebar --------------------------------- */
+/* Sidebar manages its own internal scroll (in case nav grows) but never
+   moves with the main content — it's a sibling grid column, not an
+   ancestor wrapper, so main content scrolling can never drag it along. */
 
 .tsa-sidebar {
   display: flex;
@@ -106,6 +114,8 @@
   padding: 24px 18px;
   border-right: 1px solid var(--border);
   background: var(--surface);
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .tsa-sidebar__brand {
@@ -187,6 +197,9 @@
 }
 
 /* ----------------------------------- Main ----------------------------------- */
+/* THIS is the scroll container. height: 100vh + overflow-y: auto turns
+   .tsa-main into its own independent scrolling box, separate from the
+   sidebar. scrollTo() calls in the component target this element directly. */
 
 .tsa-main {
   display: flex;
@@ -194,6 +207,9 @@
   gap: 20px;
   padding: 28px 32px 48px;
   min-width: 0;
+  height: 100vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 .tsa-topbar {
@@ -912,6 +928,7 @@ select:focus-visible {
 @media (max-width: 880px) {
   .tsa-shell {
     grid-template-columns: 1fr;
+    height: 100vh;
   }
 
   .tsa-sidebar {
@@ -921,7 +938,9 @@ select:focus-visible {
     border-bottom: 1px solid var(--border);
     padding: 14px 16px;
     gap: 16px;
+    height: auto;
     overflow-x: auto;
+    overflow-y: visible;
   }
 
   .tsa-sidebar__nav {
@@ -937,5 +956,7 @@ select:focus-visible {
 
   .tsa-main {
     padding: 20px 16px 36px;
+    height: auto;
+    flex: 1;
   }
 }

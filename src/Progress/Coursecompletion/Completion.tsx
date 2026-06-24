@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FiCheckCircle,
   FiClock,
@@ -15,8 +15,8 @@ import {
   CartesianGrid,
   Cell,
 } from "recharts";
-
- import styles from "./CourseCompletion.module.css";
+import { SupabaseClient } from "../../Helper/Supabase";
+import styles from "./CourseCompletion.module.css";
 
 // ── Types ─────────────────────────────────────────────────
 type CourseStatus = "completed" | "inprogress" | "notstarted";
@@ -31,8 +31,12 @@ interface CourseItem {
   id: string;
   title: string;
   category: string;
-  progress: number;
+  description: string;
+  thumbnail_url: string;
   status: CourseStatus;
+  dbStatus: string; // raw status from Supabase e.g. "published"
+  duration: string | null;
+  created_at: string;
 }
 
 interface WeeklyPoint {
@@ -40,7 +44,7 @@ interface WeeklyPoint {
   completed: number;
 }
 
-// ── Mock Data ─────────────────────────────────────────────
+// ── Static Data ───────────────────────────────────────────
 const stats: CourseStat[] = [
   { label: "Courses completed", value: "12", icon: <FiCheckCircle /> },
   { label: "In progress",       value: "4",  icon: <FiClock />       },
@@ -59,45 +63,7 @@ const weeklyData: WeeklyPoint[] = [
   { week: "W8", completed: 2 },
 ];
 
-const courses: CourseItem[] = [
-  {
-    id: "1",
-    title: "UI/UX Design Principles",
-    category: "Design · Completed Jun 14",
-    progress: 100,
-    status: "completed",
-  },
-  {
-    id: "2",
-    title: "Node.js API Design",
-    category: "Backend · Completed Jun 10",
-    progress: 100,
-    status: "completed",
-  },
-  {
-    id: "3",
-    title: "React & TypeScript Mastery",
-    category: "Frontend · In progress",
-    progress: 72,
-    status: "inprogress",
-  },
-  {
-    id: "4",
-    title: "Data Structures in Python",
-    category: "CS Fundamentals · In progress",
-    progress: 45,
-    status: "inprogress",
-  },
-  {
-    id: "5",
-    title: "System Design Fundamentals",
-    category: "Architecture · Not started",
-    progress: 0,
-    status: "notstarted",
-  },
-];
-
-// ── Donut SVG chart ───────────────────────────────────────
+// ── Donut SVG Chart ───────────────────────────────────────
 const DonutChart = ({ percent }: { percent: number }) => {
   const r = 70;
   const cx = 90;
@@ -109,9 +75,7 @@ const DonutChart = ({ percent }: { percent: number }) => {
     <svg width="180" height="180" viewBox="0 0 180 180">
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e8e4d9" strokeWidth="14" />
       <circle
-        cx={cx}
-        cy={cy}
-        r={r}
+        cx={cx} cy={cy} r={r}
         fill="none"
         stroke="#0f9d6e"
         strokeWidth="14"
@@ -154,9 +118,59 @@ const progressLabelClass: Record<CourseStatus, string> = {
   notstarted: styles.labelNeutral,
 };
 
+// ── Helper: map Supabase status string → CourseStatus ────
+const getStatus = (dbStatus: string): CourseStatus => {
+  const s = (dbStatus ?? "").toLowerCase();
+  if (s === "completed")  return "completed";
+  if (s === "published")  return "completed";   // published = done
+  if (s === "inprogress" || s === "in_progress" || s === "draft") return "inprogress";
+  return "notstarted";
+};
+
+// ── Helper: progress % from status ───────────────────────
+const getProgress = (dbStatus: string): number => {
+  const s = (dbStatus ?? "").toLowerCase();
+  if (s === "completed" || s === "published") return 100;
+  if (s === "inprogress" || s === "in_progress" || s === "draft") return 50;
+  return 0;
+};
+
 // ── Component ─────────────────────────────────────────────
 const CourseCompletion = () => {
   const [visibleCount, setVisibleCount] = useState<number>(4);
+
+  // ✅ Single courses state — fetched from Supabase
+  const [courseList, setCourseList] = useState<CourseItem[]>([]);
+  const [loading, setLoading]       = useState<boolean>(true);
+
+  useEffect(() => {
+    getCourses();
+  }, []);
+
+  async function getCourses() {
+    setLoading(true);
+    const { data, error } = await SupabaseClient
+      .from("course")
+      .select("id, title, description, category, thumbnail_url, status, duration, created_at");
+
+    if (error) {
+      console.error("Supabase error:", error);
+    } else {
+      const mapped: CourseItem[] = (data ?? []).map((item: any) => ({
+        id:            String(item.id),
+        title:         item.title ?? "Untitled",
+        description:   item.description ?? "",
+        category:      item.category ?? "Uncategorized",
+        thumbnail_url: item.thumbnail_url ?? "",
+        dbStatus:      item.status ?? "",
+        status:        getStatus(item.status ?? ""),
+        duration:      item.duration ?? null,
+        created_at:    item.created_at ?? "",
+      }));
+      setCourseList(mapped);
+    }
+    setLoading(false);
+  }
 
   return (
     <div className={styles.container}>
@@ -177,7 +191,7 @@ const CourseCompletion = () => {
       {/* Charts row */}
       <div className={styles.chartsRow}>
 
-        {/* Donut chart — pure SVG, no recharts */}
+        {/* Donut chart */}
         <div className={styles.chartCard}>
           <h3 className={styles.chartTitle}>Overall completion</h3>
           <div className={styles.donutWrap}>
@@ -215,10 +229,7 @@ const CourseCompletion = () => {
               />
               <Bar dataKey="completed">
                 {weeklyData.map((entry, i) => (
-                  <Cell
-                    key={i}
-                    fill={entry.completed >= 4 ? "#0f9d6e" : "#b8ddd0"}
-                  />
+                  <Cell key={i} fill={entry.completed >= 4 ? "#0f9d6e" : "#b8ddd0"} />
                 ))}
               </Bar>
             </BarChart>
@@ -227,40 +238,64 @@ const CourseCompletion = () => {
 
       </div>
 
-      {/* Course list */}
+      {/* Course list — dynamic from Supabase */}
       <div className={styles.historySection}>
         <h3 className={styles.historyTitle}>Course history</h3>
-        <div className={styles.historyList}>
-          {courses.slice(0, visibleCount).map((course) => (
-            <div key={course.id} className={styles.courseCard}>
-              <span className={`${styles.statusIcon} ${statusIconClass[course.status]}`}>
-                {statusIcon[course.status]}
-              </span>
-              <div className={styles.courseInfo}>
-                <span className={styles.courseTitle}>{course.title}</span>
-                <span className={styles.courseCategory}>{course.category}</span>
-                <div className={styles.progressBarTrack}>
-                  <div
-                    className={`${styles.progressBarFill} ${progressBarClass[course.status]}`}
-                    style={{ width: `${course.progress}%` }}
-                  />
-                </div>
-              </div>
-              <span className={`${styles.progressLabel} ${progressLabelClass[course.status]}`}>
-                {course.progress}%
-              </span>
-            </div>
-          ))}
-        </div>
 
-        {visibleCount < courses.length && (
-          <button
-            className={styles.loadMoreBtn}
-            onClick={() => setVisibleCount((p) => p + 4)}
-            aria-label="Load more"
-          >
-            <FiChevronDown />
-          </button>
+        {loading ? (
+          <p style={{ color: "#9b958c", fontSize: 14 }}>Loading courses...</p>
+        ) : courseList.length === 0 ? (
+          <p style={{ color: "#9b958c", fontSize: 14 }}>No courses found.</p>
+        ) : (
+          <>
+            <div className={styles.historyList}>
+              {courseList.slice(0, visibleCount).map((course) => (
+                <div key={course.id} className={styles.courseCard}>
+                  {/* Thumbnail or fallback icon */}
+                  {course.thumbnail_url ? (
+                    <img
+                      src={course.thumbnail_url}
+                      alt={course.title}
+                      className={styles.courseThumbnail}
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                  ) : (
+                    <span className={`${styles.statusIcon} ${statusIconClass[course.status]}`}>
+                      {statusIcon[course.status]}
+                    </span>
+                  )}
+
+                  <div className={styles.courseInfo}>
+                    <span className={styles.courseTitle}>{course.title}</span>
+                    <span className={styles.courseCategory}>
+                      {course.category}
+                      {course.duration ? ` · ${course.duration}` : ""}
+                    </span>
+                    <div className={styles.progressBarTrack}>
+                      <div
+                        className={`${styles.progressBarFill} ${progressBarClass[course.status]}`}
+                        style={{ width: `${getProgress(course.dbStatus)}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <span className={`${styles.progressLabel} ${progressLabelClass[course.status]}`}>
+                    {course.dbStatus}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {visibleCount < courseList.length && (
+              <button
+                className={styles.loadMoreBtn}
+                onClick={() => setVisibleCount((p) => p + 4)}
+                aria-label="Load more"
+              >
+                <FiChevronDown />
+              </button>
+            )}
+          </>
         )}
       </div>
 

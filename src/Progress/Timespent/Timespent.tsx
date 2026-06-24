@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
- import "./Timespent.css";
+import React, { useEffect, useMemo, useState, useRef } from "react";
+import "./Timespent.css";
 
 /* =========================================================================
    TIME SPENT ANALYTICS
@@ -317,10 +317,30 @@ const TimeSpentAnalytics: React.FC = () => {
   const [courseFilter, setCourseFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
 
+  // Ref to the scrollable main content area. The sidebar lives OUTSIDE this
+  // element, so scrolling this ref never moves/scrolls the sidebar.
+  const mainRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const t = setTimeout(() => setMounted(true), 80);
     return () => clearTimeout(t);
   }, []);
+
+  // Handles sidebar nav clicks ourselves instead of letting the browser's
+  // native "#id" anchor-jump behaviour run. The native behaviour scrolls the
+  // nearest scrollable ancestor of the target — if that ancestor wraps both
+  // the sidebar and the main content, the sidebar appears to "scroll" too.
+  // By calling preventDefault() and scrolling `.tsa-main` directly, only the
+  // content area moves and the sidebar stays perfectly static.
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const container = mainRef.current;
+    if (!container) return;
+    const target = container.querySelector<HTMLElement>(`#${id}`);
+    if (!target) return;
+    const top = target.offsetTop - container.offsetTop;
+    container.scrollTo({ top, behavior: "smooth" });
+  };
 
   const chartData = useMemo(() => {
     if (period === "day") return { values: dailyHours, labels: WEEK_LABELS, highlight: TODAY_INDEX };
@@ -345,22 +365,35 @@ const TimeSpentAnalytics: React.FC = () => {
   const weeklyActualHours = dailyHours.reduce((a, b) => a + b, 0);
   const goalPct = Math.min(100, Math.round((weeklyActualHours / weeklyGoalHours) * 100));
 
+  const navItems: { id: string; label: string }[] = [
+    { id: "overview", label: "Overview" },
+    { id: "trends", label: "Trends" },
+    { id: "courses", label: "Courses" },
+    { id: "calendar", label: "Calendar" },
+    { id: "sessions", label: "Sessions" },
+    { id: "insights", label: "Insights" },
+  ];
+
   return (
     <div className="tsa-root" data-theme={theme}>
       <div className="tsa-shell">
-        {/* ---------- Sidebar ---------- */}
+        {/* ---------- Sidebar (static — never scrolls) ---------- */}
         <aside className="tsa-sidebar">
           <div className="tsa-sidebar__brand">
             <span className="tsa-sidebar__mark">◐</span>
             <span>LearnTrack</span>
           </div>
           <nav className="tsa-sidebar__nav">
-            <a href="#overview" className="is-active">Overview</a>
-            <a href="#trends">Trends</a>
-            <a href="#courses">Courses</a>
-            <a href="#calendar">Calendar</a>
-            <a href="#sessions">Sessions</a>
-            <a href="#insights">Insights</a>
+            {navItems.map((item, i) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className={i === 0 ? "is-active" : ""}
+                onClick={(e) => handleNavClick(e, item.id)}
+              >
+                {item.label}
+              </a>
+            ))}
           </nav>
           <button
             className="tsa-theme-toggle"
@@ -372,8 +405,8 @@ const TimeSpentAnalytics: React.FC = () => {
           </button>
         </aside>
 
-        {/* ---------- Main ---------- */}
-        <div className="tsa-main">
+        {/* ---------- Main (only this area scrolls) ---------- */}
+        <div className="tsa-main" ref={mainRef}>
           <header className="tsa-topbar" id="overview">
             <div>
               <h1>Time Spent Analytics</h1>
