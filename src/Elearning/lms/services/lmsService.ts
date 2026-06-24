@@ -309,7 +309,7 @@ async updateContent(assetId: string, updates: any) {
     return data;
   },
 
-  // 🗑️ Chapter aur Assets ke Delete functions bhi database connection ke liye add karein
+  // 🗑️Chapter aur Assets ke Delete functions bhi database connection ke liye add karein
   async deleteContentAsset(assetId: string) {
     const { error } = await SupabaseClient
       .from('contents')
@@ -325,6 +325,24 @@ async updateContent(assetId: string, updates: any) {
       .eq('id', chapterId);
     if (error) throw error;
   },
+
+  // src/services/lmsService.ts ke andar baki functions ke sath niche yeh add karein:
+
+async fetchEmployeeEnrollments(employeeId: string): Promise<string[]> {
+  const { data, error } = await SupabaseClient
+    .from('course_enrollment') // Aapki nayi table ka naam
+    .select('course_id')
+    .eq('employee_id', employeeId);
+
+  if (error) {
+    console.error("Enrollment data fetch failed:", error);
+    throw error;
+  }
+
+  // Hum database se aaye data ko ek simple array format string me convert kar rahe hain
+  // e.g., ['course-id-1', 'course-id-2'] taaki component me check karna aasan ho.
+  return data ? data.map((enrollment: any) => enrollment.course_id) : [];
+},
 
   async publishCourseAndSubmitAllVideos(courseId: string): Promise<void> {
     try {
