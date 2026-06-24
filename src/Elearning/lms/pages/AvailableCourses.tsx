@@ -4,9 +4,9 @@ import { lmsService } from '../services/lmsService';
 import type { Course } from '../types/lms';
 import { CourseCard } from '../components/CourseCard';
 
-// import Enrollment from '../../../Progress/Enrollment/Enroll'; // adjust path as per your folder structure
+//  import Enrollment from '../../../Progress/Enrollment/Enroll'; // adjust path as per your folder structure
 
-import './courseDashboard.css';
+import './availableCourses.css';
 
 export const AvailableCourses: React.FC = () => {
   const navigate = useNavigate();
