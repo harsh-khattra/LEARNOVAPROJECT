@@ -81,22 +81,9 @@ const Enrollment: React.FC<EnrollmentProps> = ({ onClose }) => {
       </div>
 
       {/* What You'll Learn */}
-      <div className="learn-section">
-        <h3 className="section-title">What you will learn</h3>
-        <div className="learn-grid">
-          {[
-            "Python basics", "Pandas & NumPy",
-            "Data visualization", "Machine learning",
-            "Model evaluation", "Real datasets",
-          ].map((item) => (
-            <div key={item} className="learn-item">
-              <span className="check">✓</span> {item}
-            </div>
-          ))}
-        </div>
-      </div>
+     
 
-      {/* Students Also Bought */}
+     
      
     </div>
   );

@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { lmsService } from '../services/lmsService';
 import type { Course } from '../types/lms';
 import { CourseCard } from '../components/CourseCard';
-import Enrollment from '../../../Progress/Enrollment/enroll'; // adjust path as per your folder structure
+import Enrollment from '../../../Progress/Enrollment/Enroll'; // adjust path as per your folder structure
+
+
 import './courseDashboard.css';
 
 export const AvailableCourses: React.FC = () => {
