@@ -1,144 +1,97 @@
 import React, { useState } from 'react';
-import type { Course } from '../types/lms';
-import { formatCoursePrice, getStatusBadgeStyles } from '../utils/lmsShared';
+import  type { Course } from '../types/lms';
 
-// Interface ko bilkul aise hi verify kijiye
-export interface CourseCardProps {
+interface CourseCardProps {
   course: Course;
-  isTeacher: boolean; // <-- Make sure this line exists!
+  isTeacher: boolean;
   onManageContent: (id: string) => void;
-  onStartLearning: (id: string) => void;
   onPublish: (id: string) => void;
   onRevertToDraft: (id: string) => void;
   onDelete: (id: string) => void;
+  onStartLearning: (id: string) => void;
 }
 
 export const CourseCard: React.FC<CourseCardProps> = ({
   course,
   isTeacher,
-  onManageContent,
-  onStartLearning,
-  onPublish,
-  onRevertToDraft,
-  onDelete
+  onStartLearning
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const badgeStyle = getStatusBadgeStyles(course.status);
+  // 🔥 Individual state for smooth standalone dropdown
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // Cast course to any safely to access nested chapters if they exist in runtime data
+  const courseData = course as any;
 
   return (
-    <div className="modern-course-card">
-      {/* Thumbnail Cover Layer */}
-      <div className="card-thumbnail-wrapper">
-        {course.thumbnail_url ? (
-          <img src={course.thumbnail_url} alt={course.title} className="card-img" />
-        ) : (
-          <div className="no-image-placeholder">No Image Attached</div>
-        )}
-        
-        <span className="badge-price">
-          {formatCoursePrice(course.category)}
-        </span>
-
-        {/* Fixed Typo here */}
-        {isTeacher && (
-          <span className="badge-status" style={{
-            backgroundColor: badgeStyle.backgroundColor, 
-            color: badgeStyle.color, 
-            border: badgeStyle.border
-          }}>
-            {badgeStyle.text}
-          </span>
-        )}
+    <div className="course-catalog-card student-card-view">
+      
+      {/* Top Lock status tag overlay */}
+      <div className="card-badge-status">
+        <span className="badge-lock">🔒 Preview Lock</span>
       </div>
 
-      {/* Text Description Block */}
-      <div className="card-body-content">
-        <h3 className="card-main-title">{course.title}</h3>
-        <p className="card-desc-summary">
-          {course.description || 'No course curriculum description summary initialized yet.'}
-        </p>
-
-        {/* 📚 STUDENT ACCORDION UI */}
-        {!isTeacher && (
-          <div className="syllabus-accordion-section">
-            <button 
-              type="button" 
-              className={`btn-toggle-syllabus ${isExpanded ? 'active' : ''}`}
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? "🔽 Hide Modules & Syllabus" : "👁️ View Course Modules & Lectures"}
-            </button>
-
-            {isExpanded && (
-              <div className="syllabus-preview-tray">
-                {/* @ts-ignore */}
-                {course.chapters && course.chapters.length > 0 ? (
-                  // @ts-ignore
-                  course.chapters.map((chapter: any, index: number) => (
-                    <div key={chapter.id} className="preview-chapter-group">
-                      <h4 className="preview-chapter-title">
-                         Module {index + 1}: {chapter.title}
-                      </h4>
-
-                      <ul className="preview-lecture-list">
-                        {chapter.contents && chapter.contents.length > 0 ? (
-                          chapter.contents.map((lecture: any) => (
-                            <li key={lecture.id} className="preview-lecture-item">
-                              <div className="lecture-meta-line">
-                                <span className="lecture-icon-title"> {lecture.title}</span>
-                                <span className="lecture-type-badge">{lecture.type || 'Video'}</span>
-                              </div>
-                              {lecture.description && (
-                                <p className="lecture-desc-text" style = {{color: '#666', 
-                                      fontSize: '13px', 
-                                      marginTop: '4px',
-                                     lineHeight: '1.4'}} >{lecture.description}</p>
-                              )}
-                            </li>
-                          ))
-                        ) : (
-                          <li className="no-lectures-notice">No approved lectures inside this module yet.</li>
-                        )}
-                      </ul>
-                    </div>
-                  ))
-                ) : (
-                  <div className="no-modules-notice">No structured modules available for preview.</div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+      <div className="course-card-thumbnail-box">
+        <img src={courseData.thumbnail_url || '/placeholder.jpg'} alt={course.title} />
       </div>
 
-      {/* Actions Footer */}
-      <div className="card-footer-actions">
-        {isTeacher ? (
-          <>
-            <button onClick={() => onManageContent(course.id)} className="btn-manage-syllabus">
-              Manage Content & Syllabus
-            </button>
-            <div className="action-button-row">
-              {course.status === 'draft' ? (
-                <button onClick={() => onPublish(course.id)} className="btn-action-publish">
-                  🚀 Publish Course
-                </button>
-              ) : (
-                <button onClick={() => onRevertToDraft(course.id)} className="btn-action-draft">
-                  ⚡ Set to Draft
-                </button>
-              )}
-              <button onClick={() => onDelete(course.id)} className="btn-action-delete">
-                Delete
-              </button>
-            </div>
-          </>
-        ) : (
-          <button onClick={() => onStartLearning(course.id)} className="btn-student-start">
-            ▶ Start Learning & Watch
+      <div className="course-card-body-details">
+        <span className="course-card-category">{courseData.category || "Academic"}</span>
+        <h3 className="course-card-title">{course.title}</h3>
+        <p className="course-card-desc">{course.description}</p>
+
+        {/* 🚀 ULTRA-SMOOTH PLAYLIST ACCORDION DROPDOWN */}
+        <div className="smooth-accordion-container">
+          <button
+            type="button"
+            className={`syllabus-trigger-btn ${isDropdownOpen ? 'active' : ''}`}
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          >
+            <span>📋 View Playlist ({courseData.chapters?.length || 0} Modules)</span>
+            <span className="arrow-icon">{isDropdownOpen ? '▲' : '▼'}</span>
           </button>
-        )}
+
+          {/* Collapsible Dropdown Wrapper */}
+          <div className={`smooth-dropdown-wrapper ${isDropdownOpen ? 'is-expanded' : ''}`}>
+            <div className="syllabus-content-inner-scroll">
+              {courseData.chapters && courseData.chapters.length > 0 ? (
+                courseData.chapters.map((chapter: any, index: number) => (
+                  <div key={chapter.id || index} className="syllabus-chapter-block">
+                    <h4 className="syllabus-chapter-title">
+                      M{index + 1}: {chapter.title}
+                    </h4>
+                    <ul className="syllabus-lessons-list">
+                      {chapter.contents && chapter.contents.length > 0 ? (
+                        chapter.contents.map((content: any, cIndex: number) => (
+                          <li key={content.id || cIndex} className="syllabus-lesson-item">
+                            <span className="lesson-name">📹 {content.title}</span>
+                            <span className="lesson-lock-tag locked">🔒 Lock</span>
+                          </li>
+                        ))
+                  ) : (
+                        <li className="no-lessons-notice">No content items inside this module.</li>
+                      )}
+                    </ul>
+                  </div>
+                ))
+              ) : (
+                <p className="no-chapters-notice">No curriculum modules uploaded yet.</p>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Main Bottom CTA Action Button */}
+      <div className="course-card-footer-actions">
+        <button
+          type="button"
+          className="btn-action-enroll"
+          onClick={() => onStartLearning(course.id)}
+        >
+          Enroll & Unlock Course 🔒
+        </button>
+      </div>
+
     </div>
   );
 };

@@ -1,25 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { data, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { lmsService } from '../services/lmsService';
 import type { Course } from '../types/lms';
 import { CourseCard } from '../components/CourseCard';
+import Enrollment from '../../../Progress/Enrollment/Enroll'; // adjust path as per your folder structure
 
-//  import Enrollment from '../../../Progress/Enrollment/Enroll'; // adjust path as per your folder structure
 
-import './availableCourses.css';
+import './courseDashboard.css';
 
 export const AvailableCourses: React.FC = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showEnrollModal, setShowEnrollModal] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadStudentCatalog = async () => {
       try {
         setLoading(true);
         const data = await lmsService.fetchCourses('all');
-       console.log(" REAL DATABASE RESPONSE:", data);
+        console.log(" REAL DATABASE RESPONSE:", data);
         const approvedCourses = data.filter((course) => course.status === 'published');
         setCourses(approvedCourses);
       } catch (err) {
@@ -36,6 +38,16 @@ export const AvailableCourses: React.FC = () => {
     course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     course.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleStartLearning = (id: string) => {
+    setSelectedCourseId(id);
+    setShowEnrollModal(true);
+  };
+
+  const closeEnrollModal = () => {
+    setShowEnrollModal(false);
+    setSelectedCourseId(null);
+  };
 
   if (loading) return <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>Opening Student Study Terminal...</div>;
 
@@ -74,17 +86,25 @@ export const AvailableCourses: React.FC = () => {
                 key={course.id}
                 course={course}
                 isTeacher={false} 
-                // Typing parameters explicitly as string to kill the "implicitly has any type" error!
                 onManageContent={(id: string) => {}} 
                 onPublish={(id: string) => {}}
                 onRevertToDraft={(id: string) => {}}
                 onDelete={(id: string) => {}}
-                onStartLearning={(id: string) => navigate(`/learning/course-player/:id/${id}`)}
+                onStartLearning={handleStartLearning}
               />
             ))
           )}
         </div>
       </main>
+
+      {/* Enrollment Modal */}
+      {showEnrollModal && (
+        <div className="modal-overlay" onClick={closeEnrollModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <Enrollment onClose={closeEnrollModal} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

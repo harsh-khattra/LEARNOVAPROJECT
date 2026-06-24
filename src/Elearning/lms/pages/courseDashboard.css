@@ -890,3 +890,228 @@
   font-weight: 600;
   font-size: 14px;
 }
+/* ==========================================================================
+   🧩 COURSE CARD GRID SHIFT PREVENTION FIX
+   ========================================================================== */
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  
+  /* 🔥 CRITICAL FIX: Stops neighboring cards from moving or stretching when one expands */
+  align-items: start; 
+}
+
+
+/* ==========================================================================
+   🚀 SMOOTH PLAYLIST ACCORDION & LOCK OVERLAYS
+   ========================================================================== */
+
+.course-catalog-card.student-card-view {
+  position: relative;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.course-catalog-card.student-card-view:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge Layout */
+.card-badge-status {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+}
+
+.badge-lock {
+  background-color: #0f172a;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 11px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+.course-card-thumbnail-box {
+  width: 100%;
+  height: 160px;
+  background-color: #cbd5e1;
+}
+
+.course-card-thumbnail-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.course-card-body-details {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.course-card-category {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2563eb;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.course-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 8px 0;
+}
+
+.course-card-desc {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.4;
+  margin: 0 0 12px 0;
+}
+
+/* --- Accordion Frame Mechanics --- */
+.smooth-accordion-container {
+  margin-top: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.syllabus-trigger-btn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 13px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  background-color: #f1f5f9;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.syllabus-trigger-btn:hover {
+  background-color: #e2e8f0;
+}
+
+/* Zero padding collapse trigger layout */
+.smooth-dropdown-wrapper {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.smooth-dropdown-wrapper.is-expanded {
+  max-height: 200px;
+  overflow-y: auto;
+  border-top: 1px solid #e2e8f0;
+}
+
+.syllabus-content-inner-scroll {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.syllabus-chapter-block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.syllabus-chapter-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  background: #f8fafc;
+  padding: 4px 6px;
+  border-left: 3px solid #475569;
+}
+
+.syllabus-lessons-list {
+  list-style: none;
+  padding: 0 0 0 6px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.syllabus-lesson-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #475569;
+  padding: 3px 0;
+  border-bottom: 1px dashed #f1f5f9;
+}
+
+.syllabus-lesson-item .lesson-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 75%;
+}
+
+/* Individual list item indicators */
+.lesson-lock-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.lesson-lock-tag.locked {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+/* Footer Control Elements */
+.course-card-footer-actions {
+  padding: 0 20px 20px 20px;
+}
+
+.btn-action-enroll {
+  width: 100%;
+  padding: 11px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  background-color: #475569;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-action-enroll:hover {
+  background-color: #334155;
+}
+
+.no-lessons-notice, .no-chapters-notice {
+  font-size: 11px;
+  color: #94a3b8;
+  font-style: italic;
+  list-style: none;
+}
