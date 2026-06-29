@@ -4,6 +4,9 @@ import { lmsService } from '../services/lmsService';
 import './ManageContent.css';
 import { useAssetDetails, uploadFileToSupabase } from '../utils/lmsShared';
 
+
+const SUPABASE_BUCKET_NAME = 'course-content'; 
+
 export const ManageContentPage: React.FC = () => {
   const { id: courseId } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -77,11 +80,9 @@ export const ManageContentPage: React.FC = () => {
 
     try {
       if (editingChapterId) {
-        // Update Existing Chapter
         await lmsService.updateChapter(editingChapterId, { title: chapterTitle });
         setEditingChapterId(null);
       } else {
-        // Create New Chapter
         const nextOrder = syllabus.length + 1;
         await lmsService.addChapter(courseId, chapterTitle, nextOrder);
       }
@@ -129,16 +130,16 @@ export const ManageContentPage: React.FC = () => {
     try {
       setSavingAsset(true);
       let finalPayload = assetUrl;
-   console.log("Form submit",assetStatus);
+      console.log("Form submit with storage bucket sync:", SUPABASE_BUCKET_NAME);
+      
       // Local File upload handling
       if (assetType !== 'youtube' && assetFile) {
-        const bucketName = 'course-content';
         const folderName = assetType === 'pdf' ? 'pdfs' : 'videos';
-        finalPayload = await uploadFileToSupabase(bucketName, folderName, assetFile);
+        // Using our unified bucket name token
+        finalPayload = await uploadFileToSupabase(SUPABASE_BUCKET_NAME, folderName, assetFile);
       }
 
       if (editingAssetId) {
-        // Update asset
         await lmsService.updateContentAsset(editingAssetId, {
           title: assetTitle,
           type: assetType,
@@ -147,13 +148,12 @@ export const ManageContentPage: React.FC = () => {
         });
         setEditingAssetId(null);
       } else {
-        // Fresh asset creation
         await lmsService.addContentAsset({
           chapterId: activeChapterId,
           title: assetTitle,
           type: assetType,
           payload: finalPayload,
-          status: assetStatus, // 'pending' ya 'draft' database me jayega
+          status: assetStatus, 
         });
       }
 
@@ -161,34 +161,26 @@ export const ManageContentPage: React.FC = () => {
       setAssetTitle('');
       setAssetUrl('');
       setAssetFile(null);
-      setAssetStatus('draft'); // Reset to default draft state
+      setAssetStatus('draft'); 
       setActiveChapterId(null);
-      loadSyllabus();
-      
-      // Refresh list
       loadSyllabus();
       alert('Asset processed successfully!');
     } catch (err) {
       console.error(err);
-      alert('Error saving or uploading content asset.');
+      alert('Error saving or uploading content asset. Ensure Supabase bucket exists and is Public.');
     } finally {
       setSavingAsset(false);
     }
   };
 
   const startEditAsset = (chapterId: string, content: any, e: React.MouseEvent) => {
-    e.stopPropagation(); // Preview modal ko trigger hone se rokne ke liye
+    e.stopPropagation(); 
     setActiveChapterId(chapterId);
     setEditingAssetId(content.id);
     setAssetTitle(content.title);
     setAssetType(content.type);
     setAssetStatus(content.status === 'draft' ? 'draft' : 'published');
-    
-    if (content.type === 'youtube') {
-      setAssetUrl(content.content_url || content.url || '');
-    } else {
-      setAssetUrl(content.content_url || content.url || '');
-    }
+    setAssetUrl(content.content_url || content.url || '');
   };
 
   const handleDeleteAsset = async (assetId: string, e: React.MouseEvent) => {
@@ -261,22 +253,18 @@ export const ManageContentPage: React.FC = () => {
                 <div className="chapter-content">
                   {chapter.contents?.length > 0 ? (
                     chapter.contents.map((content: any) => {
-                      // Safe Fallback Checker: Agar status khali ya undefined hai toh direct 'published' maano
-                      const currentStatus = content.status === 'draft' ? 'draft' : 'published';
-
                       return (
                         <div key={content.id} className="asset-row" onClick={() => setPreviewAsset(content)}>
                           <div className="asset-info">
-                            <span>▶️</span>
+                            <span>{content.type === 'pdf' ? '📄' : '▶️'}</span>
                             <span className="asset-title">{content.title}</span>
                             <span className="asset-badge">{content.type}</span>
                             
-                            {/* Dynamic Badges with explicit classes */}
                             <span className={`status-badge-indicator ${content.status || 'draft'}`}>
-  {content.status === 'published' && '🟢 Published'}
-  {content.status === 'pending' && '⏳ Pending Admin Approval'}
-  {(content.status === 'draft' || !content.status) && '🔘 Draft'}
-</span>
+                              {content.status === 'published' && '🟢 Published'}
+                              {content.status === 'pending' && '⏳ Pending Admin Approval'}
+                              {(content.status === 'draft' || !content.status) && '🔘 Draft'}
+                            </span>
                           </div>
 
                           <div className="asset-row-actions">
@@ -301,7 +289,6 @@ export const ManageContentPage: React.FC = () => {
 
         {/* RIGHT PANEL: ACTIONS FORM */}
         <div className="right-panel">
-          {/* CREATE / EDIT CHAPTER */}
           <div className="card">
             <h4 className="card-title">
               {editingChapterId ? '⚠️ Update Chapter Title' : 'Create New Chapter'}
@@ -337,7 +324,6 @@ export const ManageContentPage: React.FC = () => {
             </form>
           </div>
 
-          {/* ADD / EDIT ASSET FORM */}
           {activeChapterId && (
             <div className="asset-form-card">
               <div className="asset-form-header">
@@ -381,25 +367,20 @@ export const ManageContentPage: React.FC = () => {
                   </select>
                 </div>
 
-               <div>
-  <label className="form-label">Publishing Action</label>
-  <select
-    value={assetStatus}
-    onChange={(e: any) => {
-      console.log("Dropdown ki value change hui:", e.target.value);
-      setAssetStatus(e.target.value as any);
-    }}
-    className="form-input"
-  >
-    <option value="draft">🔘 Save as Draft (Internal Structure)</option>
-    <option value="pending">🚀 Send to Admin for Live Approval</option>
-    
-    {/* Agar admin ne pehle se approve kar diya hai, toh hi published state input me lock dikhegi */}
-    {assetStatus === 'published' && (
-      <option value="published" disabled>🟢 Approved & Live (By Admin)</option>
-    )}
-  </select>
-</div>
+                <div>
+                  <label className="form-label">Publishing Action</label>
+                  <select
+                    value={assetStatus}
+                    onChange={(e: any) => setAssetStatus(e.target.value as any)}
+                    className="form-input"
+                  >
+                    <option value="draft">🔘 Save as Draft (Internal Structure)</option>
+                    <option value="pending">🚀 Send to Admin for Live Approval</option>
+                    {assetStatus === 'published' && (
+                      <option value="published" disabled>🟢 Approved & Live (By Admin)</option>
+                    )}
+                  </select>
+                </div>
 
                 {assetType === 'youtube' ? (
                   <div>
@@ -463,7 +444,7 @@ export const ManageContentPage: React.FC = () => {
 
             <div className="modal-body">
               <div className="video-section">
-                <div className="video-frame">
+                <div className="video-frame" style={{ minHeight: '400px', background: '#000', borderRadius: '8px', overflow: 'hidden' }}>
                   {playlistLoading ? (
                     <div className="loading-video">Loading Playlist...</div>
                   ) : playlistVideos.length > 0 && selectedVideo ? (
@@ -473,6 +454,7 @@ export const ManageContentPage: React.FC = () => {
                       src={`https://www.youtube.com/embed/${selectedVideo.videoId}?autoplay=1`}
                       title={selectedVideo.title}
                       allowFullScreen
+                      style={{ border: 'none', width: '100%', height: '400px' }}
                     />
                   ) : previewAsset.type === 'youtube' ? (
                     <iframe
@@ -481,11 +463,24 @@ export const ManageContentPage: React.FC = () => {
                       src={getSafeEmbedUrl(previewAsset.content_url || previewAsset.url)}
                       title={previewAsset.title}
                       allowFullScreen
+                      style={{ border: 'none', width: '100%', height: '400px' }}
                     />
                   ) : previewAsset.type === 'video' ? (
-                    <video src={previewAsset.content_url || previewAsset.url} controls autoPlay className="video-player" />
+                    <video 
+                      src={previewAsset.content_url || previewAsset.url} 
+                      controls 
+                      autoPlay 
+                      className="video-player" 
+                      style={{ width: '100%', height: '400px', objectFit: 'contain' }}
+                    />
                   ) : (
-                    <iframe src={previewAsset.content_url || previewAsset.url} title={previewAsset.title} className="pdf-frame" />
+                    /* 📄 FIXED PDF PREVIEW: Explicit inline dimension parameters added to stop layout collapsing */
+                    <iframe 
+                      src={`${previewAsset.content_url || previewAsset.url}#toolbar=0`} 
+                      title={previewAsset.title} 
+                      className="pdf-frame" 
+                      style={{ width: '100%', height: '550px', border: 'none', background: '#ffffff' }}
+                    />
                   )}
                 </div>
 

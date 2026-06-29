@@ -336,6 +336,7 @@ async updateContent(assetId: string, updates: any) {
       .eq('id', chapterId);
     if (error) throw error;
   },
+  
 
   async publishCourseAndSubmitAllVideos(courseId: string): Promise<void> {
     try {

@@ -123,9 +123,7 @@ export const getYouTubeEmbedUrl = (url: string | undefined): string => {
 
     
 
-};/* =========================================================
-   🔥 REUSABLE CUSTOM HOOK FOR YOUTUBE DATA FETCHING
-   ========================================================= */
+};
 
 const YOUTUBE_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY || '';
 

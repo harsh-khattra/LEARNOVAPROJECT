@@ -1,77 +1,127 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { lmsService } from '../services/lmsService';
-// import './coursePlayer.css'; 
-
+import './CoursePlayer.css'
 export const CoursePlayerPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // URL se Course ID nikali
+  const { id } = useParams<{ id: string }>(); 
   const navigate = useNavigate();
   
   const [course, setCourse] = useState<any>(null);
-  const [activeVideo, setActiveVideo] = useState<any>(null);
+  const [activeVideo, setActiveVideo] = useState<any>(null); // Acts as active content (Video or PDF)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchFullCourseContent = async () => {
-      if (!id) return;
-      try {
-        setLoading(true);
-        // Poora nested data course + chapters + contents call kiya
-        const data = await lmsService.fetchCourses('all');
-        const currentCourse = data.find((c: any) => c.id === id);
+useEffect(() => {
+  const fetchFullCourseContent = async () => {
+    if (!id) return;
+    try {
+      setLoading(true);
+      console.log("🚀 Player Mount Hua! Fetching for Course ID:", id);
+      
+      const data = await lmsService.fetchCourses('all');
+      console.log("📦 Supabase se saara data aaya:", data);
 
-        if (!currentCourse) {
-          setError("Requested academic course could not be found.");
-          return;
-        }
+      const currentCourse = data.find((c: any) => c.id === id);
+      console.log("🎯 Match Hone Wala Course:", currentCourse);
 
-        setCourse(currentCourse);
-
-        // 🎥 First available video ko auto-select karein playback ke liye
-        if (currentCourse.chapters && currentCourse.chapters.length > 0) {
-          const firstChapter = currentCourse.chapters[0];
-          if (firstChapter.contents && firstChapter.contents.length > 0) {
-            setActiveVideo(firstChapter.contents[0]);
-          }
-        }
-      } catch (err) {
-        console.error("Player data optimization crash:", err);
-        setError("Failed to stream playlist metadata.");
-      } finally {
-        setLoading(false);
+      if (!currentCourse) {
+        console.warn("❌ Yeh ID data mein nahi mili!");
+        setError("Requested academic course could not be found.");
+        return;
       }
-    };
 
-    fetchFullCourseContent();
-  }, [id]);
+      setCourse(currentCourse);
 
-  if (loading) return <div className="player-loading">Syncing Video Playback Streams...</div>;
+      if (currentCourse.chapters && currentCourse.chapters.length > 0) {
+        const firstChapter = currentCourse.chapters[0];
+        if (firstChapter.contents && firstChapter.contents.length > 0) {
+          setActiveVideo(firstChapter.contents[0]);
+        }
+      }
+    } catch (err) {
+      console.error("💥 Player crash error:", err);
+      setError("Failed to stream playlist metadata.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchFullCourseContent();
+}, [id]);
+
+  // Helper to detect and format YouTube URLs
+  const getYouTubeEmbedUrl = (url: string) => {
+    if (!url) return null;
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
+    }
+    return null;
+  };
+
+  if (loading) return <div className="player-loading">Syncing Academic Content Streams...</div>;
   if (error || !course) return <div className="player-error">⚠️ {error || "Course offline"}</div>;
+
+  // Smart URL and Type Detection
+  const currentUrl = activeVideo?.content_url || activeVideo?.url || '';
+  const youtubeEmbedUrl = getYouTubeEmbedUrl(currentUrl);
+  
+  // Detect if the content is a PDF (by content type or file extension)
+  const isPdf = activeVideo?.type?.toLowerCase() === 'pdf' || 
+                currentUrl.toLowerCase().includes('.pdf') || 
+                activeVideo?.lecture_row_type?.toLowerCase() === 'pdf';
 
   return (
     <div className="course-player-workspace">
       
-      {/*  LEFT SIDE: Big Screen Video Player Viewport */}
+      {/* LEFT SIDE: Dynamic Viewport (Player or Document Viewer) */}
       <div className="video-viewport-area">
         <div className="video-wrapper">
-          {activeVideo && (activeVideo.content_url || activeVideo.url) ? (
-            <video 
-              key={activeVideo.id} // Prevents element caching on toggle 
-              src={activeVideo.content_url || activeVideo.url} 
-              controls 
-              autoPlay
-              controlsList="nodownload" // Basic privacy security
-              className="main-html5-player"
-            />
+          {activeVideo && currentUrl ? (
+            
+            /* 1️⃣ IF CONTENT IS A PDF */
+            isPdf ? (
+              <iframe
+                key={activeVideo.id}
+                src={`${currentUrl}#toolbar=0`} // #toolbar=0 disables downloading/printing if supported
+                title={activeVideo.title || "PDF Document"}
+                className="main-html5-player"
+                style={{ border: 'none', width: '100%', height: '100%', background: '#fff' }}
+              />
+            ) : 
+            
+            /* 2️⃣ IF CONTENT IS A YOUTUBE VIDEO */
+            youtubeEmbedUrl ? (
+              <iframe
+                key={activeVideo.id}
+                src={youtubeEmbedUrl}
+                title={activeVideo.title || "YouTube Video Player"}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="main-html5-player"
+                style={{ border: 'none', width: '100%', height: '100%' }}
+              />
+            ) : (
+              
+              /* 3️⃣ IF CONTENT IS A SUPABASE STORAGE VIDEO (.mp4) */
+              <video 
+                key={activeVideo.id}
+                src={currentUrl} 
+                controls 
+                autoPlay
+                controlsList="nodownload"
+                className="main-html5-player"
+              />
+            )
           ) : (
             <div className="video-placeholder-box">
-              🎬 No active secure streaming video link attached to this topic yet.
+              🎬 No active secure streaming link attached to this topic yet.
             </div>
           )}
         </div>
         
-        {/* Active Playing Video Info */}
+        {/* Content Metadata */}
         <div className="video-metadata-card">
           <span className="badge-category">{course.category}</span>
           <h1 className="playing-lecture-title">
@@ -81,7 +131,7 @@ export const CoursePlayerPage: React.FC = () => {
         </div>
       </div>
 
-      {/* RIGHT SIDE: Course Playlist Sidebar Accordion */}
+      {/* RIGHT SIDE: Playlist Sidebar */}
       <div className="playlist-sidebar-tray">
         <div className="playlist-header">
           <h3>Course Content Syllabus</h3>
@@ -105,7 +155,7 @@ export const CoursePlayerPage: React.FC = () => {
                       onClick={() => setActiveVideo(lecture)}
                     >
                       <span className="play-status-icon">
-                        {activeVideo?.id === lecture.id ? "🔊" : "▶"}
+                        {activeVideo?.id === lecture.id ? "🔊" : (lecture.type?.toLowerCase() === 'pdf' ? "📄" : "▶")}
                       </span>
                       <div className="lecture-row-details">
                         <p className="lecture-row-title">{lecture.title}</p>
@@ -114,7 +164,7 @@ export const CoursePlayerPage: React.FC = () => {
                     </button>
                   ))
                 ) : (
-                  <p className="empty-lecture-notice">No videos inside this module.</p>
+                  <p className="empty-lecture-notice">No content inside this module.</p>
                 )}
               </div>
             </div>

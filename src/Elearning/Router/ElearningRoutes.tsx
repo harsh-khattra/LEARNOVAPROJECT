@@ -65,7 +65,7 @@ const ElearningRoutes = () => {
       <Route path="lms/managecontent/:id" element={<ManageContentPage />} />
       
        
-       <Route path="/learning/course-player/:id" element={<CoursePlayerPage />} />
+       <Route path="/course-player/:id" element={<CoursePlayerPage />} />
     </Routes>
   );
 };
