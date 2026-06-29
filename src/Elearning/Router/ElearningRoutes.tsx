@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 
 import StudentDashboard from "../Student/Dashboard";
 import MyCourses from "../Student/MyCourses";
-import Discussion from "../Student/Discussion";
+import Discussion from "../Discussion/DiscussionModule";
 import Certificates from "../Student/Certificate";
 
 import TeacherDashboard from "../Teacher/Dashboard";

@@ -1,0 +1,19 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.status {
+  font-size: 0.9rem;
+  color: #6b6b70;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.statusError {
+  font-size: 0.9rem;
+  color: #b3261e;
+  text-align: center;
+  padding: 2rem 0;
+}
