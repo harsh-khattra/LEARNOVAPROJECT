@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { lmsService } from '../services/lmsService';
+import { SupabaseClient } from '../../../Helper/Supabase';
 import type { Course } from '../types/lms';
 import { CourseCard } from '../components/CourseCard';
-import Enrollment from '../../../Progress/Enrollment/Enroll'; // adjust path as per your folder structure
-
+import Enrollment from '../../../Progress/Enrollment/Enroll';
 
 import './courseDashboard.css';
 
@@ -14,16 +14,26 @@ export const AvailableCourses: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showEnrollModal, setShowEnrollModal] = useState(false);
-  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [enrolledCourseIds, setEnrolledCourseIds] = useState<string[]>([]);
 
   useEffect(() => {
     const loadStudentCatalog = async () => {
       try {
         setLoading(true);
         const data = await lmsService.fetchCourses('all');
-        console.log(" REAL DATABASE RESPONSE:", data);
         const approvedCourses = data.filter((course) => course.status === 'published');
         setCourses(approvedCourses);
+
+        // Logged-in user ke existing enrollments fetch karo
+        const {
+          data: { user },
+        } = await SupabaseClient.auth.getUser();
+
+        if (user) {
+          const enrolledIds = await lmsService.fetchEmployeeEnrollments(user.id);
+          setEnrolledCourseIds(enrolledIds);
+        }
       } catch (err) {
         console.error("Error loading student course catalog:", err);
       } finally {
@@ -40,13 +50,20 @@ export const AvailableCourses: React.FC = () => {
   );
 
   const handleStartLearning = (id: string) => {
-    setSelectedCourseId(id);
+    const course = courses.find((c) => c.id === id) || null;
+    setSelectedCourse(course);
     setShowEnrollModal(true);
   };
 
   const closeEnrollModal = () => {
     setShowEnrollModal(false);
-    setSelectedCourseId(null);
+    setSelectedCourse(null);
+  };
+
+  const handleEnrolledSuccess = (courseId: string) => {
+    setEnrolledCourseIds((prev) =>
+      prev.includes(courseId) ? prev : [...prev, courseId]
+    );
   };
 
   if (loading) return <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>Opening Student Study Terminal...</div>;
@@ -86,6 +103,7 @@ export const AvailableCourses: React.FC = () => {
                 key={course.id}
                 course={course}
                 isTeacher={false} 
+                isEnrolled={enrolledCourseIds.includes(course.id)}
                 onManageContent={(id: string) => {}} 
                 onPublish={(id: string) => {}}
                 onRevertToDraft={(id: string) => {}}
@@ -98,10 +116,14 @@ export const AvailableCourses: React.FC = () => {
       </main>
 
       {/* Enrollment Modal */}
-      {showEnrollModal && (
+      {showEnrollModal && selectedCourse && (
         <div className="modal-overlay" onClick={closeEnrollModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <Enrollment onClose={closeEnrollModal} />
+            <Enrollment
+              course={selectedCourse}
+              onClose={closeEnrollModal}
+              onEnrolled={handleEnrolledSuccess}
+            />
           </div>
         </div>
       )}

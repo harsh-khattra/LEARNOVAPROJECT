@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import "./EnrolledCourses.css";
+import "./Certificate.css";
 
 /* =========================================================================
    STATIC CERTIFICATES PAGE
@@ -126,7 +126,7 @@ function filterCourses(courses: Course[], tab: TabKey): Course[] {
   }
 }
 
-export default function EnrolledCourses() {
+export default function Certificate() {
   const [activeTab, setActiveTab] = useState<TabKey>("enrolled");
   const courses = STATIC_COURSES;
 

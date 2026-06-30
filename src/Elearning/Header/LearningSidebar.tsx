@@ -56,7 +56,7 @@ const LearningSidebar = () => {
       path: "/learning/student/profile",
       icon: <FiUser />,
     },
-// <<<<<<< HEAD
+
     
     {
       name: "Quiz",
@@ -77,10 +77,25 @@ const LearningSidebar = () => {
       name: "Enrolled",
       path: "/learning/student/enroll",
      icon: <FiCreditCard />,
-    }
+    },
 
-   
-// >>>>>>> eb878d71666ccab9d586f1f55866103654d20008
+  
+    
+    // {
+    //   name: "Quiz",
+    //   path: "/learning/student/quiz",
+    //   icon: <FiUser />,
+    // },
+    // {
+    //   name: "Completion",
+    //   path: "/learning/student/completion",
+    //   icon: <FiUser />,
+    // },
+    // {
+    //   name: "Timespent",
+    //   path: "/learning/student/timespent",
+    //   icon: <FiUser />,
+    // }
   ];
 
   return (

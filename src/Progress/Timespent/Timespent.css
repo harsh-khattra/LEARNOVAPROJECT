@@ -960,3 +960,29 @@ select:focus-visible {
     flex: 1;
   }
 }
+
+
+/* ── Loading states (add to your existing Timespent.css) ── */
+
+@keyframes tsa-spin {
+  to { transform: rotate(360deg); }
+}
+
+.tsa-spinner {
+  width: 28px;
+  height: 28px;
+  animation: tsa-spin 0.9s linear infinite;
+  color: var(--blue);
+}
+
+.tsa-chart-loading {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tsa-loading-text {
+  color: var(--text-tertiary);
+  opacity: 0.5;
+}

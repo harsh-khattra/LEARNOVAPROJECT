@@ -1,69 +1,85 @@
 import React, { useState } from "react";
+import { SupabaseClient } from "../../Helper/Supabase";
+import { lmsService } from "../../Elearning/lms/services/lmsService";
 import "./Enroll.css";
 
-interface EnrollmentProps {
-  onClose: () => void;
+interface CourseInfo {
+  id: string;
+  title: string;
+  description?: string;
+  category?: string;
 }
 
-const Enrollment: React.FC<EnrollmentProps> = ({ onClose }) => {
-  const [coupon, setCoupon] = useState("");
+interface EnrollmentProps {
+  course: CourseInfo;
+  onClose: () => void;
+  onEnrolled: (courseId: string) => void;
+}
 
-  const relatedCourses = [
-    { title: "Complete React & TypeScript Bootcamp", rating: 4.8, badge: "Certificate" },
-    { title: "Node.js & Express Backend Mastery", rating: 4.7, badge: "Certificate" },
-    { title: "MongoDB & SQL Complete Course", rating: 4.8, badge: "Certificate" },
-  ];
+const Enrollment: React.FC<EnrollmentProps> = ({ course, onClose, onEnrolled }) => {
+  const [isEnrolling, setIsEnrolling] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const handleEnrollClick = async () => {
+    setErrorMsg(null);
+    setIsEnrolling(true);
+
+    try {
+      const {
+        data: { user },
+        error: authError,
+      } = await SupabaseClient.auth.getUser();
+
+      if (authError || !user) {
+        setErrorMsg("Please log in to enroll in this course.");
+        setIsEnrolling(false);
+        return;
+      }
+
+      await lmsService.enrollEmployeeInCourse(user.id, course.id);
+
+      onEnrolled(course.id);
+      onClose();
+    } catch (err) {
+      console.error("Enrollment failed:", err);
+      setErrorMsg("Something went wrong. Please try again.");
+    } finally {
+      setIsEnrolling(false);
+    }
+  };
 
   return (
     <div className="card-wrapper">
-      {/* Close button */}
       <button className="modal-close-btn" onClick={onClose} aria-label="Close">
         ✕
       </button>
 
-      {/* Header */}
       <div className="card-header">
         <div className="card-icon">⚡</div>
         <div className="card-header-text">
-          <h2 className="card-title">Python for Data Science & ML</h2>
-          <p className="card-subtitle">Master Python, Pandas, NumPy and scikit-learn</p>
+          <h2 className="card-title">{course.title}</h2>
+          <p className="card-subtitle">{course.description}</p>
           <div className="card-meta">
-            <span className="rating">⭐ 4.9</span>
-            <span className="dot">•</span>
-            <span>👥 51,000 students</span>
-            <span className="dot">•</span>
-            <span>⏱ 36h</span>
-            <span className="dot">•</span>
             <span className="cert-badge">🎓 Certificate</span>
           </div>
         </div>
       </div>
 
-      {/* Price */}
-      <div className="price-section">
-        <span className="price-current">₹599</span>
-        <span className="price-original">₹3,499</span>
-        <span className="price-discount">83% off</span>
-      </div>
-      <p className="price-urgency">⏰ 2 days left at this price!</p>
+      <button
+        className="btn-enroll"
+        onClick={handleEnrollClick}
+        disabled={isEnrolling}
+      >
+        {isEnrolling ? "Enrolling…" : "Enroll now"}
+      </button>
+      <button className="btn-wishlist" disabled={isEnrolling}>
+        ♡ Add to wishlist
+      </button>
 
-      {/* Coupon */}
-      <div className="coupon-row">
-        <input
-          className="coupon-input"
-          type="text"
-          placeholder="Have a coupon?"
-          value={coupon}
-          onChange={(e) => setCoupon(e.target.value)}
-        />
-        <button className="coupon-btn">Apply</button>
-      </div>
+      {errorMsg && (
+        <p style={{ color: "red", marginTop: "8px" }}>{errorMsg}</p>
+      )}
 
-      {/* CTA Buttons */}
-      <button className="btn-enroll">Enroll now</button>
-      <button className="btn-wishlist">♡ Add to wishlist</button>
-
-      {/* Features */}
       <ul className="features-list">
         <li>🖥️ On-demand video lectures</li>
         <li>📥 Downloadable resources</li>
@@ -72,19 +88,12 @@ const Enrollment: React.FC<EnrollmentProps> = ({ onClose }) => {
       </ul>
       <p className="money-back">♡ 30-day money-back guarantee</p>
 
-      {/* Share */}
       <div className="share-row">
         <span className="share-label">Share:</span>
         <button className="share-btn linkedin">LinkedIn</button>
         <button className="share-btn twitter">Twitter</button>
         <button className="share-btn copy">Copy link</button>
       </div>
-
-      {/* What You'll Learn */}
-     
-
-     
-     
     </div>
   );
 };

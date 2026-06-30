@@ -3,23 +3,25 @@ import { Routes, Route } from "react-router-dom";
 import StudentDashboard from "../Student/Dashboard";
 // import MyCourses from "../Student/MyCourses";
 import Discussion from "../Student/Discussion";
-import Certificates from "../Student/Certificate";
+import Certificates from "../../Progress/Certificate/Certificate";
 
 import TeacherDashboard from "../Teacher/Dashboard";
-import TeacherCourses from "../Teacher/Courses";
+// import TeacherCourses from "../Teacher/Courses";
 
-import AdminDashboard from "../Admin/Dashboard";
+// import AdminDashboard from "../Admin/Dashboard";
 import Analytics from "../Admin/Analytics";
+
 import QuizPerformancePage from "../../Progress/Quiz/Quizperformance";
-import CourseCompletion from "../../Progress/Coursecompletion/Completion";
+import CourseCompletion from "../../Progress/Coursecompletion/CourseCompletion";
 import TimeSpentAnalytics from "../../Progress/Timespent/Timespent";
 import { CourseDashboardPage } from "../lms/pages/CourseDashboardPage";
 import { AvailableCourses } from "../lms/pages/AvailableCourses";
 import { AdminApprovalDesk } from "../lms/pages/AdminApproval";
 import { ManageContentPage } from "../lms/pages/ManageContentPage";
 import { CoursePlayerPage } from "../lms/pages/CoursePlayerPage";
-import Enrollment from "../../Progress/Enrollment/enroll";
+// import Enrollment from "../../Progress/Enrollment/enroll";
 import EnrolledCourses from "../../Progress/Enrolled/Enrolledcourses";
+
 
 
 const ElearningRoutes = () => {
@@ -40,10 +42,20 @@ const ElearningRoutes = () => {
         path="student/timespent"
         element={<TimeSpentAnalytics />}
       />
+
  <Route
         path="student/enroll"
         element={<EnrolledCourses />}
       />
+
+
+
+
+
+
+
+
+
       {/* Student */}
 
       <Route

@@ -293,7 +293,38 @@ async fetchCourses(filter?: string) {
 
     return data;
   },
-  
+  async fetchEmployeeEnrollments(employeeId: string): Promise<string[]> {
+  const { data, error } = await SupabaseClient
+    .from('course_enrollment')
+    .select('course_id')
+    .eq('employee_id', employeeId);
+
+  if (error) {
+    console.error("Enrollment data fetch failed:", error);
+    throw error;
+  }
+  return data ? data.map((enrollment: any) => enrollment.course_id) : [];
+},
+
+async enrollEmployeeInCourse(employeeId: string, courseId: string) {
+  const { data, error } = await SupabaseClient
+    .from('course_enrollment')
+    .insert([
+      {
+        employee_id: employeeId,
+        course_id: courseId,
+        progress_percentage: 0,
+      },
+    ])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Enrollment insert failed:", error);
+    throw error;
+  }
+  return data;
+},
 async updateContent(assetId: string, updates: any) {
     const { data, error } = await SupabaseClient
       .from('contents')

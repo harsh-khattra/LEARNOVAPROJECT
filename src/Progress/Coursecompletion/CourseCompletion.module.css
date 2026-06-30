@@ -159,6 +159,18 @@
   background: var(--bg);
 }
 
+/* Thumbnail image shown instead of the status icon when a course has
+   thumbnail_url set. Sized to match .statusIcon (34px) so the row layout
+   stays identical whether a thumbnail or a fallback icon is rendered. */
+.courseThumbnail {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--neutral-bg);
+}
+
 .statusIcon {
   display: flex;
   align-items: center;

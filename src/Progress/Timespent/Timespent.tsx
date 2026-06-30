@@ -1,14 +1,11 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import "./Timespent.css";
+import { SupabaseClient as supabase } from "../../Helper/Supabase";
 
 /* =========================================================================
-   TIME SPENT ANALYTICS
-   A self-contained, dependency-free dashboard component for an e-learning
-   product. Drop the .tsx and .css file into your project — no chart
-   library or icon package required.
+   TIME SPENT ANALYTICS — Fully Dynamic Version
+   All data fetched from watch_sessions table in Supabase.
    ========================================================================= */
-
-/* ---------------------------------- Types -------------------------------- */
 
 type Period = "day" | "week" | "month";
 type AccentColor = "blue" | "green";
@@ -16,7 +13,7 @@ type AccentColor = "blue" | "green";
 interface CourseTime {
   id: string;
   name: string;
-  hours: number;
+  minutes: number;
   color: AccentColor;
 }
 
@@ -25,21 +22,22 @@ interface StudySession {
   course: string;
   date: Date;
   minutes: number;
-  type: "Video Lecture" | "Reading" | "Quiz" | "Coding Exercise" | "Practice";
 }
 
-/* ----------------------------- Helper functions --------------------------- */
-
-const daysAgo = (n: number): Date => {
-  const d = new Date();
-  d.setHours(9 + (n % 5), 15, 0, 0);
-  d.setDate(d.getDate() - n);
-  return d;
-};
+interface WatchSessionRow {
+  id: number;
+  student_id: string;
+  course_id: string;
+  lesson_id: string | null;
+  seconds_watched: number;
+  watched_at: string;
+  courses?: { title: string } | null;
+}
 
 const formatHM = (totalMinutes: number): string => {
   const h = Math.floor(totalMinutes / 60);
   const m = Math.round(totalMinutes % 60);
+  if (h <= 0 && m === 0) return "0m";
   if (h <= 0) return `${m}m`;
   if (m === 0) return `${h}h`;
   return `${h}h ${m}m`;
@@ -48,69 +46,27 @@ const formatHM = (totalMinutes: number): string => {
 const formatDate = (d: Date): string =>
   d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
-/* --------------------------------- Mock data ------------------------------ */
+const startOfDay = (date: Date): Date => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+const getMonday = (date: Date): Date => {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+const startOfMonth = (date: Date): Date => {
+  return new Date(date.getFullYear(), date.getMonth(), 1, 0, 0, 0, 0);
+};
 
 const WEEK_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-// Hours logged Mon → Sun. Today is Thursday; Fri–Sun haven't happened yet.
-const dailyHours = [1.25, 0.75, 2.25, 1.75, 0, 0, 0];
-const TODAY_INDEX = 3;
-
-// Last 8 weeks of total hours, the final entry is the current (in-progress) week.
-const weeklyHours = [7.5, 8.25, 6.75, 9.0, 7.25, 8.5, 9.75, 6.0];
-const WEEK_TAB_LABELS = ["W-7", "W-6", "W-5", "W-4", "W-3", "W-2", "W-1", "This wk"];
-
-// Last 6 months of total hours, the final entry is the current (in-progress) month.
-const monthlyHours = [29.5, 33.25, 31.0, 35.5, 30.75, 32.5];
-const MONTH_TAB_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-
-const courses: CourseTime[] = [
-  { id: "react-ts", name: "React & TypeScript Mastery", hours: 11.17, color: "blue" },
-  { id: "ui-ux", name: "UI/UX Design Principles", hours: 8.75, color: "green" },
-  { id: "dsa-py", name: "Data Structures in Python", hours: 7.33, color: "blue" },
-  { id: "node-api", name: "Node.js API Design", hours: 5.25, color: "green" },
-];
-
-const sessions: StudySession[] = [
-  { id: "s1", course: "React & TypeScript Mastery", date: daysAgo(0), minutes: 105, type: "Coding Exercise" },
-  { id: "s2", course: "Data Structures in Python", date: daysAgo(0), minutes: 40, type: "Quiz" },
-  { id: "s3", course: "UI/UX Design Principles", date: daysAgo(1), minutes: 135, type: "Video Lecture" },
-  { id: "s4", course: "React & TypeScript Mastery", date: daysAgo(1), minutes: 50, type: "Reading" },
-  { id: "s5", course: "Node.js API Design", date: daysAgo(2), minutes: 80, type: "Coding Exercise" },
-  { id: "s6", course: "UI/UX Design Principles", date: daysAgo(3), minutes: 30, type: "Practice" },
-  { id: "s7", course: "Data Structures in Python", date: daysAgo(4), minutes: 95, type: "Video Lecture" },
-  { id: "s8", course: "React & TypeScript Mastery", date: daysAgo(6), minutes: 60, type: "Quiz" },
-  { id: "s9", course: "Node.js API Design", date: daysAgo(8), minutes: 45, type: "Reading" },
-  { id: "s10", course: "UI/UX Design Principles", date: daysAgo(11), minutes: 70, type: "Practice" },
-];
-
-// 12 weeks × 7 days calendar heatmap, intensity 0–4. Built deterministically
-// (no Math.random) so the page renders identically every time.
-const buildHeatmap = (): number[] => {
-  const cells: number[] = [];
-  for (let w = 0; w < 12; w++) {
-    for (let d = 0; d < 7; d++) {
-      const weekendDip = d >= 5 ? 0.45 : 1;
-      const trend = 0.55 + (w / 11) * 0.6;
-      const wave = Math.sin((w * 7 + d) / 4.5) * 0.5 + 0.5;
-      const level = Math.min(4, Math.round(trend * weekendDip * wave * 4));
-      cells.push(level);
-    }
-  }
-  return cells;
-};
-const heatmapCells = buildHeatmap();
-
-// 24-hour focus ring — relative study intensity by hour of day.
-const hourlyFocus = [
-  2, 1, 0, 0, 0, 0, 1, 3, 5, 6, 7, 6, 5, 6, 7, 6, 7, 8, 10, 10, 9, 6, 3, 2,
-];
-
-const streakDays = [true, true, true, true, true, false, false]; // Mon–Sun, this week so far
-const CURRENT_STREAK = 9;
-const LONGEST_STREAK = 14;
-
-/* ---------------------------------- Icons --------------------------------- */
+const ACCENT_COLORS: AccentColor[] = ["blue", "green"];
 
 const Icon = {
   Flame: () => (
@@ -147,11 +103,6 @@ const Icon = {
       <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.7 8.7 0 1 0 20 14.5Z" />
     </svg>
   ),
-  Plus: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M12 5v14M5 12h14" strokeLinecap="round" />
-    </svg>
-  ),
   Bulb: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M9 18h6M10 21h4M7 9a5 5 0 1 1 8.6 3.5c-.8.8-1.6 1.5-1.6 3.5h-6c0-2-.8-2.7-1.6-3.5A5 5 0 0 1 7 9Z" strokeLinejoin="round" />
@@ -163,9 +114,13 @@ const Icon = {
       <path d="M20 5.5A2 2 0 0 0 18 4h-6v16h6a2 2 0 0 0 2-2Z" strokeLinejoin="round" />
     </svg>
   ),
+  Spinner: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="tsa-spinner">
+      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+      <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
+    </svg>
+  ),
 };
-
-/* -------------------------------- Subcomponents ---------------------------- */
 
 const StatCard: React.FC<{
   label: string;
@@ -174,7 +129,8 @@ const StatCard: React.FC<{
   icon?: React.ReactNode;
   accent?: AccentColor;
   delay?: number;
-}> = ({ label, value, sub, icon, accent, delay = 0 }) => (
+  loading?: boolean;
+}> = ({ label, value, sub, icon, accent, delay = 0, loading }) => (
   <div className="card stat-card" style={{ animationDelay: `${delay}ms` }}>
     <div className="stat-card__top">
       <span className="stat-card__label">{label}</span>
@@ -182,8 +138,12 @@ const StatCard: React.FC<{
         <span className={`stat-card__icon ${accent ? `accent-${accent}` : ""}`}>{icon}</span>
       )}
     </div>
-    <div className="stat-card__value">{value}</div>
-    {sub && <div className="stat-card__sub">{sub}</div>}
+    {loading ? (
+      <div className="stat-card__value tsa-loading-text">—</div>
+    ) : (
+      <div className="stat-card__value">{value}</div>
+    )}
+    {sub && <div className="stat-card__sub">{loading ? "Loading..." : sub}</div>}
   </div>
 );
 
@@ -202,7 +162,7 @@ const BarChart: React.FC<{
             <div
               className={`barchart__bar ${i === highlightIndex ? "is-today" : ""}`}
               style={{ height: mounted ? `${(v / max) * 100}%` : "0%" }}
-              title={`${labels[i]}: ${formatHM(v * 60)}`}
+              title={`${labels[i]}: ${formatHM(v)}`}
             />
           </div>
           <span className="barchart__label">{labels[i]}</span>
@@ -214,20 +174,20 @@ const BarChart: React.FC<{
 
 const CourseRow: React.FC<{
   course: CourseTime;
-  maxHours: number;
+  maxMinutes: number;
   mounted: boolean;
   dimmed: boolean;
   delay: number;
-}> = ({ course, maxHours, mounted, dimmed, delay }) => (
+}> = ({ course, maxMinutes, mounted, dimmed, delay }) => (
   <div className={`course-row ${dimmed ? "is-dimmed" : ""}`} style={{ animationDelay: `${delay}ms` }}>
     <span className="course-row__name">{course.name}</span>
     <div className="course-row__track">
       <div
         className={`course-row__fill accent-${course.color}-bg`}
-        style={{ width: mounted ? `${(course.hours / maxHours) * 100}%` : "0%" }}
+        style={{ width: mounted ? `${(course.minutes / maxMinutes) * 100}%` : "0%" }}
       />
     </div>
-    <span className="course-row__value">{formatHM(course.hours * 60)}</span>
+    <span className="course-row__value">{formatHM(course.minutes)}</span>
   </div>
 );
 
@@ -270,6 +230,12 @@ const FocusRing: React.FC<{ values: number[] }> = ({ values }) => {
   const innerR = 46;
   const outerR = 100;
 
+  const peakHour = values.indexOf(Math.max(...values));
+  const peakLabel =
+    peakHour < 12
+      ? `${peakHour === 0 ? 12 : peakHour} AM`
+      : `${peakHour === 12 ? 12 : peakHour - 12} PM`;
+
   const segments = values.map((v, i) => {
     const a0 = (i / 24) * Math.PI * 2 - Math.PI / 2;
     const a1 = ((i + 1) / 24) * Math.PI * 2 - Math.PI / 2;
@@ -297,10 +263,10 @@ const FocusRing: React.FC<{ values: number[] }> = ({ values }) => {
       {segments}
       <circle cx={center} cy={center} r={innerR - 2} className="focus-ring__hub" />
       <text x={center} y={center - 4} textAnchor="middle" className="focus-ring__big">
-        7–9
+        {peakLabel}
       </text>
       <text x={center} y={center + 16} textAnchor="middle" className="focus-ring__small">
-        PM peak
+        peak
       </text>
     </svg>
   );
@@ -312,13 +278,35 @@ const TimeSpentAnalytics: React.FC = () => {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [period, setPeriod] = useState<Period>("day");
   const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [dateRange, setDateRange] = useState("7d");
   const [courseFilter, setCourseFilter] = useState("all");
-  const [categoryFilter, setCategoryFilter] = useState("all");
 
-  // Ref to the scrollable main content area. The sidebar lives OUTSIDE this
-  // element, so scrolling this ref never moves/scrolls the sidebar.
+  const [todayMinutes, setTodayMinutes] = useState(0);
+  const [weekMinutes, setWeekMinutes] = useState(0);
+  const [monthMinutes, setMonthMinutes] = useState(0);
+  const [monthActiveCourses, setMonthActiveCourses] = useState(0);
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [longestStreak, setLongestStreak] = useState(0);
+  const [streakDays, setStreakDays] = useState<boolean[]>([false, false, false, false, false, false, false]);
+
+  const [dailyMinutesArr, setDailyMinutesArr] = useState<number[]>(Array(7).fill(0));
+  const [weeklyMinutesArr, setWeeklyMinutesArr] = useState<number[]>(Array(8).fill(0));
+  const [monthlyMinutesArr, setMonthlyMinutesArr] = useState<number[]>(Array(6).fill(0));
+  const [monthTabLabels, setMonthTabLabels] = useState<string[]>(["", "", "", "", "", ""]);
+
+  const [courseList, setCourseList] = useState<CourseTime[]>([]);
+  const [heatmapCells, setHeatmapCells] = useState<number[]>(Array(84).fill(0));
+  const [hourlyFocus, setHourlyFocus] = useState<number[]>(Array(24).fill(0));
+
+  const [avgSessionMin, setAvgSessionMin] = useState(0);
+  const [longestSessionMin, setLongestSessionMin] = useState(0);
+  const [dailyAvgMin, setDailyAvgMin] = useState(0);
+
+  const [recentSessions, setRecentSessions] = useState<StudySession[]>([]);
+  const [allCourseNames, setAllCourseNames] = useState<string[]>([]);
+
   const mainRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -326,46 +314,271 @@ const TimeSpentAnalytics: React.FC = () => {
     return () => clearTimeout(t);
   }, []);
 
-  // Handles sidebar nav clicks ourselves instead of letting the browser's
-  // native "#id" anchor-jump behaviour run. The native behaviour scrolls the
-  // nearest scrollable ancestor of the target — if that ancestor wraps both
-  // the sidebar and the main content, the sidebar appears to "scroll" too.
-  // By calling preventDefault() and scrolling `.tsa-main` directly, only the
-  // content area moves and the sidebar stays perfectly static.
+  /* ── MAIN DATA FETCH ── */
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setLoading(false); return; }
+
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+      // ── Fetch watch_sessions using correct column names ──
+      const { data: rows, error } = await supabase
+        .from("watch_sessions")
+        .select("id, student_id, course_id, lesson_id, seconds_watched, watched_at")
+        .eq("student_id", user.id)
+        .gte("watched_at", sixMonthsAgo.toISOString())
+        .order("watched_at", { ascending: false });
+
+      if (error) {
+        console.error("watch_sessions fetch error:", error);
+        setLoading(false);
+        return;
+      }
+
+      if (!rows || rows.length === 0) {
+        setLoading(false);
+        return;
+      }
+
+      // ── Fetch course titles ──
+      const uniqueCourseIds = [...new Set((rows as any[]).map((r: any) => r.course_id))];
+      const { data: coursesData } = await supabase
+        .from("courses")
+        .select("id, title")
+        .in("id", uniqueCourseIds);
+
+      const courseNameMap: Record<string, string> = {};
+      (coursesData ?? []).forEach((c: any) => {
+        courseNameMap[c.id] = c.title;
+      });
+
+      const typedRows: WatchSessionRow[] = (rows as any[]).map((r: any) => ({
+        ...r,
+        courses: { title: courseNameMap[r.course_id] ?? "Unknown Course" },
+      }));
+
+      const now = new Date();
+
+      // ── TODAY ──
+      const todayStart = startOfDay(now);
+      const todayRows = typedRows.filter(r => new Date(r.watched_at) >= todayStart);
+      setTodayMinutes(todayRows.reduce((s, r) => s + r.seconds_watched, 0) / 60);
+
+      // ── THIS WEEK ──
+      const weekStart = getMonday(now);
+      const weekRows = typedRows.filter(r => new Date(r.watched_at) >= weekStart);
+      setWeekMinutes(weekRows.reduce((s, r) => s + r.seconds_watched, 0) / 60);
+
+      // ── THIS MONTH ──
+      const monthStart = startOfMonth(now);
+      const monthRows = typedRows.filter(r => new Date(r.watched_at) >= monthStart);
+      setMonthMinutes(monthRows.reduce((s, r) => s + r.seconds_watched, 0) / 60);
+      setMonthActiveCourses(new Set(monthRows.map(r => r.course_id)).size);
+
+      // ── STREAK ──
+      const studyDaySet = new Set(
+        typedRows.map(r => {
+          const d = new Date(r.watched_at);
+          return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        })
+      );
+
+      let streak = 0;
+      const check = new Date(now);
+      while (true) {
+        const key = `${check.getFullYear()}-${check.getMonth()}-${check.getDate()}`;
+        if (studyDaySet.has(key)) {
+          streak++;
+          check.setDate(check.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+      setCurrentStreak(streak);
+
+      const sortedDays = Array.from(studyDaySet)
+        .map(k => {
+          const [y, mo, d] = k.split("-").map(Number);
+          return new Date(y, mo, d).getTime();
+        })
+        .sort((a, b) => a - b);
+
+      let maxStreak = 0, curRun = 0;
+      let prevTs: number | null = null;
+      for (const ts of sortedDays) {
+        curRun = (prevTs !== null && ts - prevTs === 86400000) ? curRun + 1 : 1;
+        if (curRun > maxStreak) maxStreak = curRun;
+        prevTs = ts;
+      }
+      setLongestStreak(Math.max(maxStreak, streak));
+
+      const thisMonday = weekStart.getTime();
+      setStreakDays(
+        WEEK_LABELS.map((_, i) => {
+          const day = new Date(thisMonday + i * 86400000);
+          return studyDaySet.has(`${day.getFullYear()}-${day.getMonth()}-${day.getDate()}`);
+        })
+      );
+
+      // ── DAILY CHART ──
+      setDailyMinutesArr(
+        WEEK_LABELS.map((_, i) => {
+          const dayStart = new Date(thisMonday + i * 86400000);
+          const dayEnd = new Date(dayStart.getTime() + 86400000);
+          return typedRows
+            .filter(r => { const t = new Date(r.watched_at).getTime(); return t >= dayStart.getTime() && t < dayEnd.getTime(); })
+            .reduce((s, r) => s + r.seconds_watched, 0) / 60;
+        })
+      );
+
+      // ── WEEKLY CHART ──
+      const weeklyArr: number[] = [];
+      for (let w = 7; w >= 0; w--) {
+        const wStart = new Date(weekStart.getTime() - w * 7 * 86400000);
+        const wEnd = new Date(wStart.getTime() + 7 * 86400000);
+        weeklyArr.push(
+          typedRows
+            .filter(r => { const t = new Date(r.watched_at).getTime(); return t >= wStart.getTime() && t < wEnd.getTime(); })
+            .reduce((s, r) => s + r.seconds_watched, 0) / 60
+        );
+      }
+      setWeeklyMinutesArr(weeklyArr);
+
+      // ── MONTHLY CHART ──
+      const monthlyArr: number[] = [];
+      const monthLabels: string[] = [];
+      for (let m = 5; m >= 0; m--) {
+        const mDate = new Date(now.getFullYear(), now.getMonth() - m, 1);
+        const mStart = new Date(mDate.getFullYear(), mDate.getMonth(), 1);
+        const mEnd = new Date(mDate.getFullYear(), mDate.getMonth() + 1, 1);
+        monthLabels.push(mDate.toLocaleDateString("en-US", { month: "short" }));
+        monthlyArr.push(
+          typedRows
+            .filter(r => { const t = new Date(r.watched_at).getTime(); return t >= mStart.getTime() && t < mEnd.getTime(); })
+            .reduce((s, r) => s + r.seconds_watched, 0) / 60
+        );
+      }
+      setMonthlyMinutesArr(monthlyArr);
+      setMonthTabLabels(monthLabels);
+
+      // ── TIME BY COURSE ──
+      const courseMap: Record<string, { name: string; minutes: number }> = {};
+      for (const r of typedRows) {
+        const name = (r.courses as any)?.title ?? "Unknown Course";
+        if (!courseMap[r.course_id]) courseMap[r.course_id] = { name, minutes: 0 };
+        courseMap[r.course_id].minutes += r.seconds_watched / 60;
+      }
+      const sortedCourses: CourseTime[] = Object.entries(courseMap)
+        .sort((a, b) => b[1].minutes - a[1].minutes)
+        .map(([id, v], i) => ({ id, name: v.name, minutes: v.minutes, color: ACCENT_COLORS[i % 2] }));
+      setCourseList(sortedCourses);
+      setAllCourseNames(sortedCourses.map(c => c.name));
+
+      // ── HEATMAP ──
+      const heatStart = new Date(now.getTime() - 84 * 86400000);
+      const dayMinMap: Record<string, number> = {};
+      for (const r of typedRows) {
+        const d = new Date(r.watched_at);
+        if (d < heatStart) continue;
+        const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        dayMinMap[key] = (dayMinMap[key] ?? 0) + r.seconds_watched / 60;
+      }
+      const maxDayMin = Math.max(...Object.values(dayMinMap), 1);
+      const cells: number[] = [];
+      for (let i = 83; i >= 0; i--) {
+        const d = new Date(now.getTime() - i * 86400000);
+        const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        const mins = dayMinMap[key] ?? 0;
+        cells.push(Math.min(4, Math.ceil((mins / maxDayMin) * 4)));
+      }
+      const startDow = new Date(now.getTime() - 83 * 86400000).getDay();
+      const mondayOffset = startDow === 0 ? 6 : startDow - 1;
+      setHeatmapCells([...Array(mondayOffset).fill(0), ...cells.reverse()].slice(0, 84));
+
+      // ── HOURLY FOCUS ──
+      const hourArr = Array(24).fill(0);
+      for (const r of typedRows) hourArr[new Date(r.watched_at).getHours()] += r.seconds_watched / 60;
+      setHourlyFocus(hourArr);
+
+      // ── SESSION METRICS ──
+      const sessionMap: Record<string, number> = {};
+      for (const r of typedRows) {
+        const d = new Date(r.watched_at);
+        const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}-${r.course_id}`;
+        sessionMap[key] = (sessionMap[key] ?? 0) + r.seconds_watched / 60;
+      }
+      const sessionMins = Object.values(sessionMap);
+      if (sessionMins.length > 0) {
+        setAvgSessionMin(sessionMins.reduce((a, b) => a + b, 0) / sessionMins.length);
+        setLongestSessionMin(Math.max(...sessionMins));
+      }
+      const totalAllMin = typedRows.reduce((s, r) => s + r.seconds_watched, 0) / 60;
+      setDailyAvgMin(studyDaySet.size > 0 ? totalAllMin / studyDaySet.size : 0);
+
+      // ── RECENT SESSIONS ──
+      setRecentSessions(
+        typedRows.slice(0, 50).map(r => ({
+          id: String(r.id),
+          course: (r.courses as any)?.title ?? "Unknown Course",
+          date: new Date(r.watched_at),
+          minutes: r.seconds_watched / 60,
+        }))
+      );
+
+    } catch (err) {
+      console.error("TimeSpent fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  /* ── DERIVED ── */
+  const todayDayIndex = useMemo(() => {
+    const day = new Date().getDay();
+    return day === 0 ? 6 : day - 1;
+  }, []);
+
+  const WEEK_TAB_LABELS = ["W-7", "W-6", "W-5", "W-4", "W-3", "W-2", "W-1", "This wk"];
+
+  const chartData = useMemo(() => {
+    if (period === "day") return { values: dailyMinutesArr, labels: WEEK_LABELS, highlight: todayDayIndex };
+    if (period === "week") return { values: weeklyMinutesArr, labels: WEEK_TAB_LABELS, highlight: weeklyMinutesArr.length - 1 };
+    return { values: monthlyMinutesArr, labels: monthTabLabels, highlight: monthlyMinutesArr.length - 1 };
+  }, [period, dailyMinutesArr, weeklyMinutesArr, monthlyMinutesArr, monthTabLabels, todayDayIndex]);
+
+  const maxCourseMinutes = Math.max(...courseList.map(c => c.minutes), 1);
+  const monthTotal = courseList.reduce((s, c) => s + c.minutes, 0);
+  const weeklyGoalMinutes = 20 * 60;
+  const goalPct = Math.min(100, Math.round((weekMinutes / weeklyGoalMinutes) * 100));
+
+  const rangeDays = dateRange === "7d" ? 7 : dateRange === "30d" ? 30 : dateRange === "month" ? 31 : 9999;
+  const filteredSessions = recentSessions
+    .filter(s => courseFilter === "all" || s.course === courseFilter)
+    .filter(s => (Date.now() - s.date.getTime()) / (1000 * 60 * 60 * 24) <= rangeDays)
+    .slice(0, 20);
+
+  const peakHour = hourlyFocus.indexOf(Math.max(...hourlyFocus, 1));
+  const peakHourLabel =
+    peakHour < 12
+      ? `${peakHour === 0 ? 12 : peakHour} AM`
+      : `${peakHour === 12 ? 12 : peakHour - 12} PM`;
+
+  /* ── SIDEBAR NAV ── */
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     const container = mainRef.current;
     if (!container) return;
     const target = container.querySelector<HTMLElement>(`#${id}`);
     if (!target) return;
-    const top = target.offsetTop - container.offsetTop;
-    container.scrollTo({ top, behavior: "smooth" });
+    container.scrollTo({ top: target.offsetTop - container.offsetTop, behavior: "smooth" });
   };
 
-  const chartData = useMemo(() => {
-    if (period === "day") return { values: dailyHours, labels: WEEK_LABELS, highlight: TODAY_INDEX };
-    if (period === "week") return { values: weeklyHours, labels: WEEK_TAB_LABELS, highlight: weeklyHours.length - 1 };
-    return { values: monthlyHours, labels: MONTH_TAB_LABELS, highlight: monthlyHours.length - 1 };
-  }, [period]);
-
-  const maxCourseHours = Math.max(...courses.map((c) => c.hours));
-  const monthTotal = courses.reduce((s, c) => s + c.hours, 0);
-
-  const rangeDays = dateRange === "7d" ? 7 : dateRange === "30d" ? 30 : dateRange === "month" ? 31 : 9999;
-
-  const filteredSessions = sessions
-    .filter((s) => (courseFilter === "all" ? true : s.course === courseFilter))
-    .filter((s) => (categoryFilter === "all" ? true : s.type === categoryFilter))
-    .filter((s) => {
-      const diff = (Date.now() - s.date.getTime()) / (1000 * 60 * 60 * 24);
-      return diff <= rangeDays;
-    });
-
-  const weeklyGoalHours = 20;
-  const weeklyActualHours = dailyHours.reduce((a, b) => a + b, 0);
-  const goalPct = Math.min(100, Math.round((weeklyActualHours / weeklyGoalHours) * 100));
-
-  const navItems: { id: string; label: string }[] = [
+  const navItems = [
     { id: "overview", label: "Overview" },
     { id: "trends", label: "Trends" },
     { id: "courses", label: "Courses" },
@@ -374,10 +587,10 @@ const TimeSpentAnalytics: React.FC = () => {
     { id: "insights", label: "Insights" },
   ];
 
+  /* ── RENDER ── */
   return (
     <div className="tsa-root" data-theme={theme}>
       <div className="tsa-shell">
-        {/* ---------- Sidebar (static — never scrolls) ---------- */}
         <aside className="tsa-sidebar">
           <div className="tsa-sidebar__brand">
             <span className="tsa-sidebar__mark">◐</span>
@@ -397,7 +610,7 @@ const TimeSpentAnalytics: React.FC = () => {
           </nav>
           <button
             className="tsa-theme-toggle"
-            onClick={() => setTheme((t) => (t === "light" ? "dark" : "light"))}
+            onClick={() => setTheme(t => t === "light" ? "dark" : "light")}
             aria-label="Toggle dark mode"
           >
             {theme === "light" ? <Icon.Moon /> : <Icon.Sun />}
@@ -405,79 +618,67 @@ const TimeSpentAnalytics: React.FC = () => {
           </button>
         </aside>
 
-        {/* ---------- Main (only this area scrolls) ---------- */}
         <div className="tsa-main" ref={mainRef}>
           <header className="tsa-topbar" id="overview">
             <div>
               <h1>Time Spent Analytics</h1>
               <p>Track your study habits and stay on pace with your goals.</p>
             </div>
-
             <div className="tsa-filters">
-              <select value={dateRange} onChange={(e) => setDateRange(e.target.value)} aria-label="Date range">
+              <select value={dateRange} onChange={e => setDateRange(e.target.value)}>
                 <option value="7d">Last 7 days</option>
                 <option value="30d">Last 30 days</option>
                 <option value="month">This month</option>
                 <option value="all">All time</option>
               </select>
-              <select value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} aria-label="Course filter">
+              <select value={courseFilter} onChange={e => setCourseFilter(e.target.value)}>
                 <option value="all">All courses</option>
-                {courses.map((c) => (
-                  <option key={c.id} value={c.name}>{c.name}</option>
+                {allCourseNames.map(name => (
+                  <option key={name} value={name}>{name}</option>
                 ))}
-              </select>
-              <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} aria-label="Category filter">
-                <option value="all">All activity types</option>
-                <option value="Video Lecture">Video Lecture</option>
-                <option value="Reading">Reading</option>
-                <option value="Quiz">Quiz</option>
-                <option value="Coding Exercise">Coding Exercise</option>
-                <option value="Practice">Practice</option>
               </select>
             </div>
           </header>
 
-          {/* ---------- Hero stats ---------- */}
           <section className="tsa-grid stats-grid">
-            <StatCard label="Today" value={formatHM(dailyHours[TODAY_INDEX] * 60)} sub="1 session logged" icon={<Icon.Clock />} accent="blue" delay={0} />
-            <StatCard label="This week" value={formatHM(weeklyActualHours * 60)} sub={`Goal: ${weeklyGoalHours}h`} icon={<Icon.Trend />} accent="green" delay={40} />
-            <StatCard label="This month" value={formatHM(monthTotal * 60)} sub={`${courses.length} active courses`} icon={<Icon.Book />} accent="blue" delay={80} />
-            <StatCard label="Current streak" value={`${CURRENT_STREAK} days`} sub="Study today to keep it going" icon={<Icon.Flame />} accent="green" delay={120} />
+            <StatCard label="Today" value={formatHM(todayMinutes)} sub={todayMinutes > 0 ? "Active today" : "No sessions yet"} icon={<Icon.Clock />} accent="blue" delay={0} loading={loading} />
+            <StatCard label="This week" value={formatHM(weekMinutes)} sub="Goal: 20h" icon={<Icon.Trend />} accent="green" delay={40} loading={loading} />
+            <StatCard label="This month" value={formatHM(monthMinutes)} sub={`${monthActiveCourses} active course${monthActiveCourses !== 1 ? "s" : ""}`} icon={<Icon.Book />} accent="blue" delay={80} loading={loading} />
+            <StatCard label="Current streak" value={`${currentStreak} day${currentStreak !== 1 ? "s" : ""}`} sub={currentStreak > 0 ? "Study today to keep it going" : "Start your streak today!"} icon={<Icon.Flame />} accent="green" delay={120} loading={loading} />
           </section>
 
-          {/* ---------- Charts + course distribution ---------- */}
           <section className="tsa-grid two-col" id="trends">
             <div className="card chart-card">
               <div className="card__head">
                 <h2>Study hours</h2>
                 <div className="tab-switch">
-                  {(["day", "week", "month"] as Period[]).map((p) => (
-                    <button
-                      key={p}
-                      className={period === p ? "is-active" : ""}
-                      onClick={() => setPeriod(p)}
-                    >
+                  {(["day", "week", "month"] as Period[]).map(p => (
+                    <button key={p} className={period === p ? "is-active" : ""} onClick={() => setPeriod(p)}>
                       {p === "day" ? "Day" : p === "week" ? "Week" : "Month"}
                     </button>
                   ))}
                 </div>
               </div>
-              <BarChart values={chartData.values} labels={chartData.labels} mounted={mounted} highlightIndex={chartData.highlight} />
+              {loading ? <div className="tsa-chart-loading"><Icon.Spinner /></div> : (
+                <BarChart values={chartData.values} labels={chartData.labels} mounted={mounted} highlightIndex={chartData.highlight} />
+              )}
             </div>
 
             <div className="card streak-card">
               <div className="card__head">
                 <h2>Streak</h2>
-                <span className="pill accent-green">{LONGEST_STREAK}d best</span>
+                {longestStreak > 0 && <span className="pill accent-green">{longestStreak}d best</span>}
               </div>
               <div className="streak-card__big">
                 <Icon.Flame />
-                <span>{CURRENT_STREAK} days</span>
+                <span>{loading ? "—" : `${currentStreak} day${currentStreak !== 1 ? "s" : ""}`}</span>
               </div>
-              <p className="streak-card__copy">Study today to keep it going.</p>
+              <p className="streak-card__copy">
+                {currentStreak > 0 ? "Study today to keep it going." : "Start learning to build your streak!"}
+              </p>
               <div className="streak-card__days">
                 {WEEK_LABELS.map((label, i) => (
-                  <div key={label} className={`streak-dot ${streakDays[i] ? "is-filled" : ""} ${i === TODAY_INDEX ? "is-today" : ""}`}>
+                  <div key={label} className={`streak-dot ${streakDays[i] ? "is-filled" : ""} ${i === todayDayIndex ? "is-today" : ""}`}>
                     {label[0]}
                   </div>
                 ))}
@@ -485,27 +686,22 @@ const TimeSpentAnalytics: React.FC = () => {
             </div>
           </section>
 
-          {/* ---------- Course distribution ---------- */}
           <section className="card" id="courses">
             <div className="card__head">
               <h2>Time by course</h2>
-              <span className="card__head-meta">{formatHM(monthTotal * 60)} total this month</span>
+              <span className="card__head-meta">{loading ? "Loading..." : `${formatHM(monthTotal)} total this month`}</span>
             </div>
-            <div className="course-list">
-              {courses.map((c, i) => (
-                <CourseRow
-                  key={c.id}
-                  course={c}
-                  maxHours={maxCourseHours}
-                  mounted={mounted}
-                  dimmed={courseFilter !== "all" && courseFilter !== c.name}
-                  delay={i * 60}
-                />
-              ))}
-            </div>
+            {loading ? <div className="tsa-chart-loading"><Icon.Spinner /></div> : courseList.length === 0 ? (
+              <p className="empty-row">No watch data yet. Start a course to see time breakdown!</p>
+            ) : (
+              <div className="course-list">
+                {courseList.map((c, i) => (
+                  <CourseRow key={c.id} course={c} maxMinutes={maxCourseMinutes} mounted={mounted} dimmed={courseFilter !== "all" && courseFilter !== c.name} delay={i * 60} />
+                ))}
+              </div>
+            )}
           </section>
 
-          {/* ---------- Calendar heatmap ---------- */}
           <section className="card" id="calendar">
             <div className="card__head">
               <h2>Activity calendar</h2>
@@ -514,96 +710,101 @@ const TimeSpentAnalytics: React.FC = () => {
             <Heatmap cells={heatmapCells} />
           </section>
 
-          {/* ---------- Session metrics + focus ring + goal ---------- */}
           <section className="tsa-grid three-col">
             <div className="card">
               <div className="card__head"><h2>Session metrics</h2></div>
-              <div className="metric-row">
-                <span>Average session</span>
-                <strong>52m</strong>
-              </div>
-              <div className="metric-row">
-                <span>Longest session</span>
-                <strong>2h 15m</strong>
-              </div>
-              <div className="metric-row">
-                <span>Daily average</span>
-                <strong>1h 25m</strong>
-              </div>
-              <div className="metric-row">
-                <span>Longest streak</span>
-                <strong>{LONGEST_STREAK} days</strong>
-              </div>
+              <div className="metric-row"><span>Average session</span><strong>{loading ? "—" : formatHM(avgSessionMin)}</strong></div>
+              <div className="metric-row"><span>Longest session</span><strong>{loading ? "—" : formatHM(longestSessionMin)}</strong></div>
+              <div className="metric-row"><span>Daily average</span><strong>{loading ? "—" : formatHM(dailyAvgMin)}</strong></div>
+              <div className="metric-row"><span>Longest streak</span><strong>{loading ? "—" : `${longestStreak} day${longestStreak !== 1 ? "s" : ""}`}</strong></div>
             </div>
 
             <div className="card focus-card" id="insights">
               <div className="card__head"><h2>Peak focus hours</h2></div>
-              <FocusRing values={hourlyFocus} />
-              <p className="focus-card__copy">You study most effectively between <strong>7–9 PM</strong>.</p>
+              {loading ? <div className="tsa-chart-loading"><Icon.Spinner /></div> : <FocusRing values={hourlyFocus} />}
+              <p className="focus-card__copy">
+                {hourlyFocus.some(v => v > 0)
+                  ? <><strong>{peakHourLabel}</strong> is your peak focus time.</>
+                  : "Start studying to discover your peak focus time."}
+              </p>
             </div>
 
             <div className="card goal-card">
               <div className="card__head"><h2>Weekly goal</h2></div>
-              <div className="goal-card__ring" style={{ "--pct": `${goalPct}%` } as React.CSSProperties}>
+              <div className="goal-card__ring" style={{ "--pct": `${mounted ? goalPct : 0}%` } as React.CSSProperties}>
                 <div className="goal-card__ring-inner">
-                  <strong>{goalPct}%</strong>
-                  <span>of {weeklyGoalHours}h</span>
+                  <strong>{loading ? "—" : `${goalPct}%`}</strong>
+                  <span>of 20h</span>
                 </div>
               </div>
               <p className="goal-card__copy">
-                {formatHM(weeklyActualHours * 60)} logged · {formatHM((weeklyGoalHours - weeklyActualHours) * 60)} to go
+                {loading ? "Loading..." : `${formatHM(weekMinutes)} logged · ${formatHM(Math.max(0, weeklyGoalMinutes - weekMinutes))} to go`}
               </p>
             </div>
           </section>
 
-          {/* ---------- Recent sessions ---------- */}
           <section className="card" id="sessions">
-            <div className="card__head">
-              <h2>Recent sessions</h2>
-              <button className="btn-outline"><Icon.Plus /> Add entry</button>
-            </div>
+            <div className="card__head"><h2>Recent sessions</h2></div>
             <div className="table-wrap">
               <table>
                 <thead>
                   <tr>
                     <th>Course</th>
                     <th>Date</th>
-                    <th>Activity</th>
                     <th className="align-right">Duration</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredSessions.length === 0 && (
-                    <tr><td colSpan={4} className="empty-row">No sessions match these filters yet.</td></tr>
+                  {loading ? (
+                    <tr><td colSpan={3} className="empty-row">Loading sessions...</td></tr>
+                  ) : filteredSessions.length === 0 ? (
+                    <tr><td colSpan={3} className="empty-row">No sessions found for these filters.</td></tr>
+                  ) : (
+                    filteredSessions.map(s => (
+                      <tr key={s.id}>
+                        <td>{s.course}</td>
+                        <td className="mono">{formatDate(s.date)}</td>
+                        <td className="align-right mono">{formatHM(s.minutes)}</td>
+                      </tr>
+                    ))
                   )}
-                  {filteredSessions.map((s) => (
-                    <tr key={s.id}>
-                      <td>{s.course}</td>
-                      <td className="mono">{formatDate(s.date)}</td>
-                      <td><span className="tag">{s.type}</span></td>
-                      <td className="align-right mono">{formatHM(s.minutes)}</td>
-                    </tr>
-                  ))}
                 </tbody>
               </table>
             </div>
           </section>
 
-          {/* ---------- Insights ---------- */}
           <section className="tsa-grid three-col">
             <div className="card insight-card">
               <span className="insight-card__icon accent-green"><Icon.Bulb /></span>
-              <p>You study most effectively between <strong>7–9 PM</strong> — consider scheduling harder topics then.</p>
+              <p>
+                {hourlyFocus.some(v => v > 0)
+                  ? <>You study most at <strong>{peakHourLabel}</strong> — schedule harder topics then.</>
+                  : <>Start watching videos to discover your <strong>peak focus time</strong>.</>}
+              </p>
             </div>
             <div className="card insight-card">
               <span className="insight-card__icon accent-blue"><Icon.Target /></span>
-              <p>You're <strong>{goalPct}%</strong> toward your weekly goal with time left to close the gap.</p>
+              <p>
+                You're <strong>{goalPct}%</strong> toward your weekly goal
+                {goalPct < 100
+                  ? <> with <strong>{formatHM(Math.max(0, weeklyGoalMinutes - weekMinutes))}</strong> to go.</>
+                  : <> — you've hit your goal this week! 🎉</>}
+              </p>
             </div>
             <div className="card insight-card">
               <span className="insight-card__icon accent-green"><Icon.Flame /></span>
-              <p>You're on a <strong>{CURRENT_STREAK}-day streak</strong> — {LONGEST_STREAK - CURRENT_STREAK} more days ties your best.</p>
+              <p>
+                {currentStreak > 0
+                  ? <>You're on a <strong>{currentStreak}-day streak</strong>
+                    {longestStreak > currentStreak
+                      ? <> — {longestStreak - currentStreak} more day{longestStreak - currentStreak !== 1 ? "s" : ""} ties your best!</>
+                      : <> — that's your best streak yet!</>}
+                  </>
+                  : <>Start a session today to <strong>begin your streak</strong>!</>}
+              </p>
             </div>
           </section>
+
         </div>
       </div>
     </div>
