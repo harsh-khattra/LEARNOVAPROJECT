@@ -4,7 +4,11 @@ import { lmsService } from '../services/lmsService';
 import { SupabaseClient } from '../../../Helper/Supabase';
 import type { Course } from '../types/lms';
 import { CourseCard } from '../components/CourseCard';
-import Enrollment from '../../../Progress/Enrollment/Enroll';
+
+
+import Enrollment from '../../../Progress/Enrollment/Enroll'; 
+
+
 
 import './courseDashboard.css';
 

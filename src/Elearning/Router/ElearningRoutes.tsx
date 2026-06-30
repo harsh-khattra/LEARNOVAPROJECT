@@ -78,10 +78,7 @@ const ElearningRoutes = () => {
         element={<Certificates />}
       />
       
-<Route
-        path="student/courses"
-        element={<Certificates />}
-      />
+
         <Route
         path="employee/courses"
         element={<AvailableCourses/>}
@@ -98,7 +95,7 @@ const ElearningRoutes = () => {
         element={<TeacherCourses/>}
       /> */}
 
-    
+
       {/* Admin */}
 
       <Route
@@ -125,6 +122,14 @@ const ElearningRoutes = () => {
         element={<CoursePlayerPage/>}
       />
 
+
+
+      {/* LMS Core - FIXED: Added /:id parameter */}
+      <Route path="/lms/dashboard" element={<CourseDashboardPage />} />
+      <Route path="lms/managecontent/:id" element={<ManageContentPage />} />
+      
+       
+       <Route path="/course-player/:id" element={<CoursePlayerPage />} />
 
     </Routes>
   );

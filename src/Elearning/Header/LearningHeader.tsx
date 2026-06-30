@@ -1,8 +1,9 @@
+import React from "react";
 import { FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import styles from "./LearningHeader.module.css";
 
-const LearningHeader = () => {
+const LearningHeader: React.FC = () => {
   const navigate = useNavigate();
 
   return (

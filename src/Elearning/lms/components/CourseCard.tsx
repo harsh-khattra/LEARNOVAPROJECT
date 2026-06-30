@@ -17,7 +17,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
   isEnrolled = false,
   onStartLearning
 }) => {
-  // 🔥 Individual state for smooth standalone dropdown
+  // Individual state for smooth standalone dropdown
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Cast course to any safely to access nested chapters if they exist in runtime data
