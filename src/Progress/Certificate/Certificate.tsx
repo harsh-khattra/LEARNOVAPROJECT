@@ -1,13 +1,7 @@
 import React, { useMemo, useState } from "react";
 import "./Certificate.css";
+import { useNavigate } from 'react-router-dom';
 
-/* =========================================================================
-   STATIC CERTIFICATES PAGE
-   - Dummy data only, no Supabase calls yet.
-   - Tabs: Enrolled / Active / Completed / Certificates
-   - Certificates tab shows only 100%-complete courses with a
-     category-colored left strip and a "View certificate" button.
-   ========================================================================= */
 
 type CourseCategory =
   | "Software engineering"
@@ -127,8 +121,18 @@ function filterCourses(courses: Course[], tab: TabKey): Course[] {
 }
 
 export default function Certificate() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>("enrolled");
   const courses = STATIC_COURSES;
+
+  const handleNavigateToDownloadcertificate = (course: Course) => {
+    if (course.progress === 100 && course.certificateId) {
+      navigate(`/learning/student/downloadcertificate/${course.certificateId}`);
+    } else {
+      // Not yet completed — send them to continue learning instead.
+      navigate(`/learning/student/course/${course.id}`);
+    }
+  };
 
   const certificateCount = useMemo(
     () => courses.filter((c) => c.progress === 100).length,
@@ -141,15 +145,6 @@ export default function Certificate() {
   );
 
   const isCertificatesTab = activeTab === "certificates";
-
-  function handlePrimaryAction(course: Course) {
-    if (course.progress === 100) {
-      // Placeholder — wire up to the real Certificate page route later.
-      console.log("Open certificate for", course.certificateId);
-    } else {
-      console.log("Continue learning", course.id);
-    }
-  }
 
   return (
     <div className="cert-page">
@@ -235,7 +230,7 @@ export default function Certificate() {
                     )}
                     <button
                       className={`cert-action-btn ${isDone ? "is-done" : ""}`}
-                      onClick={() => handlePrimaryAction(course)}
+                      onClick={() => handleNavigateToDownloadcertificate(course)}
                     >
                       {isDone ? <AwardIcon /> : <PlayIcon />}
                       {isDone ? "View certificate" : "Continue learning"}

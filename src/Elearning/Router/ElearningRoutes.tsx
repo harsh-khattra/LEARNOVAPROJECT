@@ -1,13 +1,12 @@
 import { Routes, Route } from "react-router-dom";
 
 import StudentDashboard from "../Student/Dashboard";
-// import MyCourses from "../Student/MyCourses";
 import Discussion from "../Student/Discussion";
 import Certificates from "../../Progress/Certificate/Certificate";
 
 import TeacherDashboard from "../Teacher/Dashboard";
-// import TeacherCourses from "../Teacher/Courses";
 
+//  REMOVED: import  ← this was causing the parse error
 // import AdminDashboard from "../Admin/Dashboard";
 import Analytics from "../Admin/Analytics";
 
@@ -19,117 +18,51 @@ import { AvailableCourses } from "../lms/pages/AvailableCourses";
 import { AdminApprovalDesk } from "../lms/pages/AdminApproval";
 import { ManageContentPage } from "../lms/pages/ManageContentPage";
 import { CoursePlayerPage } from "../lms/pages/CoursePlayerPage";
-// import Enrollment from "../../Progress/Enrollment/enroll";
 import EnrolledCourses from "../../Progress/Enrolled/Enrolledcourses";
-
-
+import { LandingPage } from "../lms/pages/LandingPage";
+import { AssignmentDashboard } from "../lms/pages/AssignmentDashboard";
+import Downloadcert from "../../Progress/Certificate/Downloadcert";
 
 const ElearningRoutes = () => {
   return (
     <Routes>
 
-{/* Progress */}
+      {/* ── Progress ── */}
+      <Route path="student/quiz"        element={<QuizPerformancePage />} />
+      <Route path="student/completion"  element={<CourseCompletion />} />
+      <Route path="student/timespent"   element={<TimeSpentAnalytics />} />
+      <Route path="student/enroll"      element={<EnrolledCourses />} />
 
- <Route
-        path="student/quiz"
-        element={<QuizPerformancePage />}
-      />
- <Route
-        path="student/completion"
-        element={<CourseCompletion />}
-      />
- <Route
-        path="student/timespent"
-        element={<TimeSpentAnalytics />}
-      />
+      {/* ── Student ── */}
+      <Route path="student/landingPage"   element={<LandingPage />} />
+      <Route path="student/assignments"   element={<AssignmentDashboard />} />
+      <Route path="student/courses"       element={<CourseDashboardPage />} />
+      <Route path="student/discussion"    element={<Discussion />} />
 
- <Route
-        path="student/enroll"
-        element={<EnrolledCourses />}
-      />
+      {/* Certificate list page (tabs: Enrolled / Active / Completed / Certificates) */}
+      <Route path="student/certificates"  element={<Certificates />} />
 
-
-
-
-
-
-
-
-
-      {/* Student */}
-
+      {/* Certificate detail/download page — opened when "View certificate" is clicked */}
       <Route
-        path="student/dashboard"
-        element={<StudentDashboard />}
+        path="student/downloadcertificate/:certId"
+        element={<Downloadcert />}
       />
 
-      <Route
-        path="student/courses"
-        element={<CourseDashboardPage />}
-      />
+      <Route path="employee/courses"      element={<AvailableCourses />} />
 
-      <Route
-        path="student/discussion"
-        element={<Discussion />}
-      />
+      {/* ── Teacher ── */}
+      <Route path="teacher/dashboard"     element={<TeacherDashboard />} />
 
-      <Route
-        path="student/certificates"
-        element={<Certificates />}
-      />
-      
+      {/* ── Admin ── */}
+      <Route path="admin/approval-desk"   element={<AdminApprovalDesk />} />
+      <Route path="admin/analytics"       element={<Analytics />} />
 
-        <Route
-        path="employee/courses"
-        element={<AvailableCourses/>}
-      />
-
-      {/* Teacher */}
-
-      <Route
-        path="teacher/dashboard"
-        element={<TeacherDashboard />}
-      />
-  {/* <Route
-        path="teacher/courses"
-        element={<TeacherCourses/>}
-      /> */}
-
-
-      {/* Admin */}
-
-      <Route
-        path="admin/approval-desk"
-        element={<AdminApprovalDesk />}
-      />
-
-      <Route
-        path="admin/analytics"
-        element={<Analytics />}
-
-      />
-
-        <Route
-        path="lms/dashboard"
-        element={<CourseDashboardPage/>}
-      />
-        <Route
-        path="lms/managecontent/:id"
-        element={<ManageContentPage/>}
-      />
-  <Route
-        path="learning/course-player/:id"
-        element={<CoursePlayerPage/>}
-      />
-
-
-
-      {/* LMS Core - FIXED: Added /:id parameter */}
-      <Route path="/lms/dashboard" element={<CourseDashboardPage />} />
+      {/* ── LMS ── */}
+      <Route path="lms/dashboard"         element={<CourseDashboardPage />} />
       <Route path="lms/managecontent/:id" element={<ManageContentPage />} />
-      
-       
-       <Route path="/course-player/:id" element={<CoursePlayerPage />} />
+      <Route path="learning/course-player/:id" element={<CoursePlayerPage />} />
+      <Route path="/lms/dashboard"        element={<CourseDashboardPage />} />
+      <Route path="/course-player/:id"    element={<CoursePlayerPage />} />
 
     </Routes>
   );
