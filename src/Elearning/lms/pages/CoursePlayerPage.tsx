@@ -80,7 +80,7 @@ useEffect(() => {
         <div className="video-wrapper">
           {activeVideo && currentUrl ? (
             
-            /* 1️⃣ IF CONTENT IS A PDF */
+            /* 1️ IF CONTENT IS A PDF */
             isPdf ? (
               <iframe
                 key={activeVideo.id}
@@ -91,7 +91,7 @@ useEffect(() => {
               />
             ) : 
             
-            /* 2️⃣ IF CONTENT IS A YOUTUBE VIDEO */
+            /* 2️ IF CONTENT IS A YOUTUBE VIDEO */
             youtubeEmbedUrl ? (
               <iframe
                 key={activeVideo.id}
@@ -104,7 +104,7 @@ useEffect(() => {
               />
             ) : (
               
-              /* 3️⃣ IF CONTENT IS A SUPABASE STORAGE VIDEO (.mp4) */
+              /* 3️ IF CONTENT IS A SUPABASE STORAGE VIDEO (.mp4) */
               <video 
                 key={activeVideo.id}
                 src={currentUrl} 

@@ -127,21 +127,30 @@ export const AssignmentDashboard: React.FC = () => {
                 <p>Task Parameter: Contains {asm.total_questions} Objective Assertions</p>
               </div>
               
-              <div className="asm-action-zone">
-                {asm.status === 'Pending' ? (
-                  // Redirects user cleanly to the dynamic quiz view page path
-                  <button 
-                    className="asm-action-btn start" 
-                    onClick={() => navigate(`/learning/student/assignments/${asm.content_id}`)}
-                  >
-                    Start Test 📝
-                  </button>
-                ) : (
-                  <div className="asm-score-display">
-                    Score: <strong>{asm.score_secured}/{asm.total_questions}</strong> Verified
-                  </div>
-                )}
-              </div>
+            <div className="asm-action-zone">
+  {asm.status === 'Pending' ? (
+    <button 
+      className="asm-action-btn start" 
+      onClick={() => navigate(`/learning/student/assignments/${asm.content_id}`)}
+    >
+      Start Test 📝
+    </button>
+  ) : (
+    //  Completed hone par score bhi dikhega aur Review ka button bhi milega
+    <div className="asm-completed-actions" style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
+      <div className="asm-score-display">
+        Score: <strong>{asm.score_secured}/{asm.total_questions}</strong> Verified
+      </div>
+      <button 
+        className="asm-action-btn start review-btn" 
+        style={{ backgroundColor: '#4F46E5' }} /* Purple or custom color for review */
+        onClick={() => navigate(`/learning/student/assignments/${asm.content_id}`)}
+      >
+        Review Test 👁️
+      </button>
+    </div>
+  )}
+</div>
             </div>
           ))
         )}

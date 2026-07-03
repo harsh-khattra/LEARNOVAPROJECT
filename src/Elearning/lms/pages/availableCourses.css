@@ -395,11 +395,11 @@
   gap: 25px;
   padding: 5px 0;
   
-  /* 🔥 THE GRID MOVEMENT FIX: Keeps other cards static during collapse/expand */
+  /*  THE GRID MOVEMENT FIX: Keeps other cards static during collapse/expand */
   align-items: start; 
 }
 
-/* 🎴 CARD ARCHITECTURE */
+/*  CARD ARCHITECTURE */
 .course-catalog-card {
   position: relative;
   background: #ffffff;
@@ -625,4 +625,190 @@
 @media (max-width: 768px) {
   .catalog-control-panel { flex-direction: column; align-items: flex-start; }
   .search-box-wrapper { width: 100%; }
+}
+
+
+.youtube-supplemental-section {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Base Card Setup matching your existing database layout */
+.course-card-mock {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Ensures all rows are equal height */
+}
+
+/* Hover Effect: Card jumps up slightly */
+.course-card-mock:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Thumbnail wrapper image styling */
+.course-card-mock img {
+  border-bottom: 2px solid #f1f5f9;
+  transition: filter 0.2s ease;
+}
+
+.course-card-mock:hover img {
+  filter: brightness(0.95); /* Subtle dim on hover */
+}
+
+/* Watch Button Accent adjustments */
+.course-card-mock button {
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.course-card-mock button:hover {
+  background-color: #dc2626 !important; /* Darker YouTube Red on Hover */
+}
+
+.course-card-mock button:active {
+  transform: scale(0.98); /* Squish animation on click */
+}
+
+/* Smooth enter animation for content streams */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.youtube-supplemental-section {
+    margin-top: 50px;
+}
+
+.youtube-divider {
+    border: 0;
+    height: 1px;
+    background: #e2e8f0;
+    margin-bottom: 30px;
+}
+
+/* ===========================
+   Header
+=========================== */
+
+.youtube-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* White text with Blue Gradient Background */
+
+.youtube-title-text {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8, #0f172a);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
+}
+
+.youtube-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-top: 10px;
+}
+
+/* ===========================
+   States
+=========================== */
+
+.youtube-loading,
+.youtube-empty {
+    padding: 20px;
+    color: #888;
+}
+
+.youtube-empty {
+    color: #999;
+}
+
+/* ===========================
+   Grid
+=========================== */
+
+.youtube-grid {
+    margin-top: 20px;
+}
+
+.youtube-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    transition: 0.3s ease;
+}
+
+.youtube-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 35px rgba(0,0,0,.12);
+}
+
+.youtube-thumbnail {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.youtube-card-content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+.youtube-video-title {
+    margin: 0 0 8px;
+    font-size: 15px;
+    color: #1e293b;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.youtube-channel {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 12px;
+}
+
+
+
+.youtube-watch-btn {
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+
+    background: linear-gradient(135deg, #22c55e, #16a34a, #15803d);
+
+    transition: all .3s ease;
+}
+
+.youtube-watch-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(34, 197, 94, .35);
+}
+
+.youtube-watch-btn:active {
+    transform: scale(0.97);
 }

@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { SupabaseClient} from '../../../Helper/Supabase'; 
+import { SupabaseClient } from '../../../Helper/Supabase'; 
 import './QuizView.css';
 
 interface Option {
   id: string;
+  question_id: string;
   option_text: string;
   is_correct: boolean;
 }
 
 interface Question {
   id: string;
+  content_id: string;
   question_text: string;
   quiz_options: Option[];
 }
 
 export const QuizComponent: React.FC = () => {
-  const { contentId } = useParams<{ contentId: string }>(); // URL se dynamic content_id pakadne ke liye
+  const { contentId } = useParams<{ contentId: string }>(); 
   const navigate = useNavigate();
   
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -24,51 +26,66 @@ export const QuizComponent: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
-   const loadQuizQuestions = async () => {
+
+  useEffect(() => {
+    if (contentId) {
+      loadQuizQuestionsAndHistory();
+    } else {
+      setLoading(false); 
+    }
+  }, [contentId]);
+
+  const loadQuizQuestionsAndHistory = async () => {
     try {
       setLoading(true);
-      
-useEffect(() => {
-  if (contentId) {
-    loadQuizQuestions();
-  } else {
-    // Agar URL mein ID nahi hai, toh loading band karo aur fasa mat rehne do
-    setLoading(false); 
-  }
-}, [contentId]);
 
+      // 1. Fetch current user session
+      const { data: { user } } = await SupabaseClient.auth.getUser();
 
-      //  Fetching questions based on your custom content_id
-      const { data, error } = await SupabaseClient
+      // 2. Fetch Questions & Options
+      const { data: qData, error: qError } = await SupabaseClient
         .from('quiz_questions')
-        .select(`
-          id,
-          question_text,
-          quiz_options (
-            id,
-            option_text,
-            is_correct
-          )
-        `)
+        .select('*, quiz_options(*)')
         .eq('content_id', contentId);
 
-      if (error) throw error;
-      setQuestions(data as unknown as Question[]);
+      if (qError) throw qError;
+      const loadedQuestions = qData as unknown as Question[];
+      setQuestions(loadedQuestions);
+
+      
+      if (user) {
+        const { data: sData, error: sError } = await SupabaseClient
+          .from('quiz_submissions')
+          .select('*')
+          .eq('content_id', contentId)
+          .eq('user_id', user.id)
+          .maybeSingle(); // Ek hi row return karega agar hogi toh
+
+        if (sData) {
+          // Agar submission mil gaya, toh quiz state direct completed set karo
+          setQuizSubmitted(true);
+          setFinalScore(sData.score);
+          if (sData.answers) {
+            setSelectedAnswers(sData.answers as Record<string, Option>);
+          }
+        }
+      }
+
     } catch (err) {
-      console.error("Error fetching quiz content:", err);
+      console.error("Error loading quiz dashboard pipeline:", err);
     } finally {
       setLoading(false);
     }
   };
 
   const handleSelectOption = (questionId: string, option: Option) => {
-    if (quizSubmitted) return;
+    if (quizSubmitted) return; // Locked if already submitted/review mode
     setSelectedAnswers(prev => ({ ...prev, [questionId]: option }));
   };
 
   const handleSubmitQuiz = async () => {
     if (Object.keys(selectedAnswers).length < questions.length) {
-      alert("⚠️ Plz answer all questions before submitting!");
+      alert("Please answer all questions before submitting!");
       return;
     }
 
@@ -79,15 +96,16 @@ useEffect(() => {
 
     try {
       const { data: { user } } = await SupabaseClient.auth.getUser();
-
-      // 🟢 Inserting entry to match your quiz_submissions structure exactly
+      
+      //  SAVING WITH ANSWERS
       const { error } = await SupabaseClient
         .from('quiz_submissions')
         .insert({
           user_id: user?.id || null, 
-          content_id: contentId, // Maps to your specific content row
+          content_id: contentId, 
           score: calculatedScore,
-          total_questions: questions.length
+          total_questions: questions.length,
+          answers: selectedAnswers 
         });
 
       if (error) throw error;
@@ -103,28 +121,30 @@ useEffect(() => {
   };
 
   if (loading) return <div className="quiz-loader">Fetching assessment data... ⚡</div>;
+
   if (!contentId) {
-  return (
-    <div className="quiz-page-container" style={{ textAlign: 'center', padding: '40px' }}>
-      <div className="quiz-header-card">
-        <h2>⚠️ Assignment ID Missing</h2>
-        <p>Please select a specific course content or topic from the layout to view its respective quiz.</p>
+    return (
+      <div className="quiz-page-container" style={{ textAlign: 'center', padding: '40px' }}>
+        <div className="quiz-header-card">
+          <h2>⚠️ Assignment ID Missing</h2>
+          <p>Please select a specific course content or topic from the layout to view its respective quiz.</p>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
+
   if (questions.length === 0) return <div className="quiz-loader">No questions mapped to this content yet.</div>;
 
   return (
     <div className="quiz-page-container">
       <div className="quiz-header-card">
-        <h2>Content Evaluation Tracker</h2>
-        <p>Complete this quick evaluation check to unlock your completion metric badge for this topic.</p>
+        <h2>{quizSubmitted ? "✨ Performance Evaluation Review" : "Content Evaluation Tracker"}</h2>
+        <p>{quizSubmitted ? "Review your selected choices against verified answer keys below." : "Complete this quick evaluation check to unlock your completion metric badge for this topic."}</p>
         
         {quizSubmitted && (
           <div className="quiz-score-banner">
-            <h3>🎯 Results Calculated!</h3>
-            <p>Score Secured: <strong>{finalScore} / {questions.length}</strong> ({Math.round((finalScore / questions.length) * 100)}%)</p>
+            <h3>🎯 Results Secured!</h3>
+            <p>Score: <strong>{finalScore} / {questions.length}</strong> ({Math.round((finalScore / questions.length) * 100)}%)</p>
           </div>
         )}
       </div>
@@ -139,9 +159,12 @@ useEffect(() => {
               {q.quiz_options?.map((opt) => {
                 const isSelected = selectedAnswers[q.id]?.id === opt.id;
                 let optionClass = "option-item";
+                
                 if (isSelected) optionClass += " selected";
-                if (quizSubmitted && opt.is_correct) optionClass += " correct-answer";
-                if (quizSubmitted && isSelected && !opt.is_correct) optionClass += " wrong-answer";
+                
+                // Aapka condition logic bilkul sahi kaam karega ab:
+                if (quizSubmitted && opt.is_correct) optionClass += " correct-answer"; // Green
+                if (quizSubmitted && isSelected && !opt.is_correct) optionClass += " wrong-answer"; // Red
 
                 return (
                   <button
@@ -149,7 +172,7 @@ useEffect(() => {
                     type="button"
                     className={optionClass}
                     onClick={() => handleSelectOption(q.id, opt)}
-                    disabled={quizSubmitted}
+                    disabled={quizSubmitted} // Review mode mein options un-clickable honge
                   >
                     <span className="option-indicator"></span>
                     <span className="option-text-label">{opt.option_text}</span>
@@ -168,7 +191,7 @@ useEffect(() => {
           </button>
         ) : (
           <button type="button" className="quiz-back-trigger" onClick={() => navigate(-1)}>
-            Back to Course Content
+            Back to Assignment & Quiz 📊
           </button>
         )}
       </div>

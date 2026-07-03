@@ -73,7 +73,7 @@ export const CourseDashboardPage: React.FC = () => {
     }
   };
 
-  // 🚀 BULK PUBLISH: Jab course ko publish karenge toh internal videos automatic sync hongi
+  //  BULK PUBLISH: Jab course ko publish karenge toh internal videos automatic sync hongi
   const handlePublishCourseClick = async (courseId: string) => {
     const confirmPublish = window.confirm(
       "all modules will go for approval to admin."
@@ -91,7 +91,7 @@ export const CourseDashboardPage: React.FC = () => {
     }
   };
 
-  // ⚡ DRAFT TOGGLE: Agar published se wapas draft par lekar jaana ho
+  //  DRAFT TOGGLE: Agar published se wapas draft par lekar jaana ho
   const handleRevertToDraft = async (id: string) => {
     try {
       await lmsService.updateCourseStatus(id, 'draft');
@@ -159,7 +159,7 @@ export const CourseDashboardPage: React.FC = () => {
           )}
         </div>
 
-        {/* 📦 CLEAN UNIFORM GRID */}
+        {/* CLEAN UNIFORM GRID */}
         <div className="course-grid">
           {filteredCourses.length === 0 ? (
             <div className="empty-state">No courses found matching your criteria.</div>
