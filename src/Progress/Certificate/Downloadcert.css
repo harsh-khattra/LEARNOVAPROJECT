@@ -1,0 +1,738 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Petit+Formal+Script&display=swap");
+
+/* =========================================================================
+   DOWNLOAD CERTIFICATE — styles
+   Tokens are matched 1:1 to Timespent.css (.tsa-root) so this page reads as
+   part of the same design system. Sizing follows the same "own content
+   fills the space the parent grid/flex hands it" model as .tsa-main —
+   .dc-page never claims its own 100vh, which is what was pushing it below
+   the sidebar instead of sitting beside it.
+   ========================================================================= */
+
+.dc-page {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+
+  /* light palette — identical values to .tsa-root so both pages match */
+  --dc-bg: #F6F5F1;
+  --dc-surface: #FFFFFF;
+  --dc-surface-muted: #F1EFE9;
+  --dc-border: #E7E4DC;
+  --dc-border-soft: #EFEDE6;
+
+  --dc-text-primary: #1E1D1B;
+  --dc-text-secondary: #6B6862;
+  --dc-text-tertiary: #9A968C;
+
+  --dc-blue: #4A7DFF;
+  --dc-blue-soft: #E4ECFF;
+  --dc-blue-strong: #2F5FE0;
+
+  --dc-green: #3CB179;
+  --dc-green-soft: #E1F4EA;
+  --dc-green-strong: #279A63;
+
+  --dc-amber: #E0A638;
+
+  /* legacy aliases used throughout this file — kept so class rules below
+     don't need to be rewritten one by one */
+  --dc-ink: var(--dc-text-primary);
+  --dc-paper: var(--dc-bg);
+  --dc-card: var(--dc-surface);
+  --dc-muted: var(--dc-text-secondary);
+  --dc-accent: #caa53a; /* gold classic, default certificate accent */
+  --dc-accent-soft: #f3e6c2;
+
+  --dc-radius-sm: 8px;
+  --dc-radius-md: 12px;
+  --dc-radius-lg: 16px;
+
+  --shadow-card: 0 1px 2px rgba(30, 29, 27, 0.04), 0 6px 20px rgba(30, 29, 27, 0.04);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Shell-safe sizing ──
+     No min-height: 100vh here. This page is rendered as the "main" slot
+     inside a parent shell that already owns the viewport height and the
+     sidebar column — this element just fills whatever space it's given
+     and scrolls internally, exactly like .tsa-main does. */
+  height: 100%;
+  width: 100%;
+  min-width: 0; /* lets it shrink inside a flex/grid row instead of
+                    overflowing past the sidebar */
+  overflow-y: auto;
+  box-sizing: border-box;
+
+  background: var(--dc-bg);
+  color: var(--dc-text-primary);
+  font-family: var(--font-sans);
+  padding: 28px 32px 48px;
+}
+
+.dc-page[data-theme="dark"] {
+  --dc-bg: #15151A;
+  --dc-surface: #1C1C22;
+  --dc-surface-muted: #22222A;
+  --dc-border: #30303A;
+  --dc-border-soft: #2A2A33;
+
+  --dc-text-primary: #F1F0EE;
+  --dc-text-secondary: #A7A5AE;
+  --dc-text-tertiary: #777581;
+
+  --dc-blue: #6E93FF;
+  --dc-blue-soft: #232C49;
+  --dc-blue-strong: #8AA6FF;
+
+  --dc-green: #4FD699;
+  --dc-green-soft: #1E3329;
+  --dc-green-strong: #6FE3AC;
+
+  --dc-amber: #E8B85B;
+}
+
+/* Certificate theme swatches (gold / emerald / sapphire) are a separate,
+   independent accent from the app's light/dark palette above — they only
+   affect the certificate card itself, never the page chrome. */
+.dc-page[data-theme="emerald"] {
+  --dc-accent: #1f9d6b;
+  --dc-accent-soft: #d3f1e3;
+}
+
+.dc-page[data-theme="sapphire"] {
+  --dc-accent: #2f6fed;
+  --dc-accent-soft: #dbe7fd;
+}
+
+.dc-page * {
+  box-sizing: border-box;
+}
+
+/* ---------------- Header ---------------- */
+
+.dc-header {
+ 
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  background: linear-gradient(135deg, #0c1210 0%, #101d17 48%, #0a1310 100%);
+  border-radius: var(--dc-radius-lg);
+  padding: 30px 34px;
+  color: #f4f6f5;
+}
+
+.dc-header-glow {
+ position: center;
+  inset: -40% 40% auto -10%;
+  height: 60px;
+  background: radial-gradient(circle, rgba(31, 157, 107, 0.35), transparent 65%);
+  pointer-events: none;
+  
+}
+
+.dc-header-main {
+  position: relative;
+  max-width: 500px;
+
+}
+
+.dc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #7fe3b4;
+  background: rgba(127, 227, 180, 0.12);
+  border: 1px solid rgba(127, 227, 180, 0.35);
+  padding: 6px 12px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+
+.dc-heading {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 30px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  letter-spacing: -0.01em;
+}
+
+.dc-subheading {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(244, 246, 245, 0.68);
+  max-width: 520px;
+}
+
+.dc-header-select {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.dc-header-select label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(244, 246, 245, 0.55);
+}
+
+.dc-select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dc-select-wrap select {
+  appearance: none;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #f4f6f5;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px 36px 11px 14px;
+  border-radius: var(--dc-radius-sm);
+  cursor: pointer;
+}
+
+.dc-select-wrap select:focus-visible {
+  outline: 2px solid var(--dc-accent);
+  outline-offset: 2px;
+}
+
+.dc-select-wrap svg {
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+  color: rgba(244, 246, 245, 0.6);
+}
+
+/* ---------------- Toolbar ---------------- */
+
+.dc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 6px;
+  font-size: 13.5px;
+  color: var(--dc-muted);
+}
+
+.dc-toolbar-status {
+  display: flex;
+  gap: 8px;
+  padding-left: 300px;
+}
+
+.dc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dc-green);
+  box-shadow: 0 0 0 4px var(--dc-green-soft);
+}
+
+.dc-zoom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: var(--dc-ink);
+}
+
+.dc-zoom button {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--dc-border);
+  background: var(--dc-card);
+  color: var(--dc-accent);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.dc-zoom button:hover:not(:disabled) {
+  background: var(--dc-surface-muted);
+  border-color: var(--dc-text-tertiary);
+}
+
+.dc-zoom button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.dc-zoom span {
+  min-width: 40px;
+  text-align: center;
+}
+
+/* ---------------- Body layout ---------------- */
+
+.dc-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 22px;
+  align-items: start;
+  margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+  .dc-body {
+    grid-template-columns: 1fr;
+  }
+  .dc-header {
+    flex-direction: column;
+  }
+  .dc-header-select {
+    width: 100%;
+  }
+}
+
+.dc-viewer {
+  background: var(--dc-card);
+  border: 1px solid var(--dc-border);
+  border-radius: var(--dc-radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  min-height: 520px;
+}
+
+.dc-viewer-scale {
+  transform-origin: center;
+  transition: transform 0.15s var(--ease);
+}
+
+/* ---------------- Certificate card ---------------- */
+
+.dc-cert {
+  position: relative;
+  width: 640px;
+  max-width: 84vw;
+  padding: 14px;
+  border-radius: var(--dc-radius-md);
+  background: linear-gradient(180deg, var(--dc-accent-soft), #fff 40%);
+  border: 1px solid var(--dc-accent);
+}
+
+.dc-cert-inner {
+  border: 1.5px solid var(--dc-accent);
+  border-radius: 10px;
+  background: #fffdf8;
+  padding: 40px 46px 32px;
+  text-align: center;
+}
+
+.dc-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--dc-accent);
+  opacity: 0.75;
+}
+
+.dc-corner-tl {
+  top: 6px;
+  left: 6px;
+  border-right: none;
+  border-bottom: none;
+}
+.dc-corner-tr {
+  top: 6px;
+  right: 6px;
+  border-left: none;
+  border-bottom: none;
+}
+.dc-corner-bl {
+  bottom: 6px;
+  left: 6px;
+  border-right: none;
+  border-top: none;
+}
+.dc-corner-br {
+  bottom: 6px;
+  right: 6px;
+  border-left: none;
+  border-top: none;
+}
+
+.dc-cert-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.dc-brand-mark {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--dc-ink);
+  color: #fff;
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dc-brand-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.dc-cert-eyebrow {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dc-muted);
+}
+
+.dc-cert-lede {
+  margin: 0 0 4px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dc-muted);
+}
+
+.dc-cert-name {
+  font-family: "Petit Formal Script", "Fraunces", cursive;
+  font-size: 48px;
+  font-weight: 400;
+  margin: 6px 0 14px;
+  color: var(--dc-ink);
+  border-bottom: 1.5px solid var(--dc-accent);
+  display: inline-block;
+  padding-bottom: 10px;
+}
+
+.dc-cert-desc {
+  max-width: 420px;
+  margin: 0 auto 20px;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--dc-muted);
+}
+
+.dc-cert-course {
+  margin: 0 0 4px;
+  font-family: "Fraunces", serif;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.dc-cert-grade {
+  margin: 0 0 26px;
+  font-size: 12px;
+  color: var(--dc-muted);
+}
+
+.dc-cert-signrow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 20px;
+  padding: 0 10px 22px;
+  border-bottom: 1px dashed var(--dc-border);
+  margin-bottom: 18px;
+}
+
+.dc-signature {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dc-signature-name {
+  font-family: "Fraunces", serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--dc-accent);
+  border-bottom: 1px solid var(--dc-border);
+  padding-bottom: 6px;
+}
+
+.dc-signature-label {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dc-muted);
+}
+
+.dc-seal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--dc-accent);
+}
+
+.dc-cert-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 11px;
+  color: var(--dc-muted);
+  flex-wrap: wrap;
+}
+
+.dc-footer-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.dc-footer-label {
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dc-footer-chip {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 11.5px;
+  color: var(--dc-ink);
+  background: var(--dc-accent-soft);
+  border-radius: 6px;
+  padding: 3px 8px;
+  display: inline-block;
+}
+
+.dc-footer-value {
+  font-weight: 600;
+  color: var(--dc-ink);
+}
+
+.dc-footer-link {
+  text-align: right;
+  margin-left: auto;
+  color: var(--dc-accent);
+}
+
+/* ---------------- Side panel ---------------- */
+
+.dc-panel {
+  background: var(--dc-card);
+  border: 1px solid var(--dc-border);
+  border-radius: var(--dc-radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dc-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.dc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dc-field label,
+.dc-field-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--dc-ink);
+}
+
+.dc-field input {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: var(--dc-radius-sm);
+  border: 1px solid var(--dc-border);
+  background: var(--dc-surface-muted);
+  color: var(--dc-text-primary);
+}
+
+.dc-field input:focus-visible {
+  outline: 2px solid var(--dc-accent);
+  outline-offset: 1px;
+}
+
+.dc-field-hint {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--dc-muted);
+}
+
+.dc-theme-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.dc-theme-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 6px;
+  border-radius: var(--dc-radius-sm);
+  border: 1.5px solid var(--dc-border);
+  background: var(--dc-surface);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--dc-muted);
+  cursor: pointer;
+  transition: background 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.dc-theme-swatch.is-selected {
+  border-color: var(--dc-accent);
+  color: var(--dc-ink);
+  background: var(--dc-accent-soft);
+}
+
+.dc-swatch-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.dc-theme-swatch[data-swatch="gold"] .dc-swatch-dot {
+  background: #caa53a;
+}
+.dc-theme-swatch[data-swatch="emerald"] .dc-swatch-dot {
+  background: #1f9d6b;
+}
+.dc-theme-swatch[data-swatch="sapphire"] .dc-swatch-dot {
+  background: #2f6fed;
+}
+
+.dc-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dc-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 12px 14px;
+  border-radius: var(--dc-radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: filter 0.15s var(--ease), background 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.dc-btn-primary {
+  background: var(--dc-green);
+  color: #fff;
+}
+
+.dc-btn-primary:hover {
+  filter: brightness(0.95);
+}
+
+.dc-btn-secondary {
+  background: var(--dc-surface);
+  border-color: var(--dc-border);
+  color: var(--dc-ink);
+}
+
+.dc-btn-secondary:hover {
+  background: var(--dc-surface-muted);
+}
+
+.dc-btn-dark {
+  background: var(--dc-ink);
+  color: var(--dc-surface);
+}
+
+.dc-btn-dark:hover {
+  filter: brightness(1.15);
+}
+
+.dc-auth-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid var(--dc-border);
+}
+
+.dc-auth-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--dc-blue-strong);
+}
+
+.dc-auth-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dc-green-strong);
+  background: var(--dc-green-soft);
+  padding: 4px 9px;
+  border-radius: 999px;
+}
+
+.dc-empty {
+  padding: 60px;
+  text-align: center;
+  color: var(--dc-muted);
+}
+
+/* ---------------- Motion & accessibility ---------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .dc-viewer-scale,
+  .dc-zoom button,
+  .dc-btn,
+  .dc-theme-swatch {
+    transition: none;
+  }
+}
+
+.dc-page a:focus-visible,
+.dc-page button:focus-visible,
+.dc-page select:focus-visible,
+.dc-page input:focus-visible {
+  outline: 2px solid var(--dc-blue);
+  outline-offset: 2px;
+  border-radius: var(--dc-radius-sm);
+}

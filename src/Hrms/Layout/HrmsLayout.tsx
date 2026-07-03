@@ -20,7 +20,9 @@ const HrmsLayout = ({ locale, setLocale }: HrmsLayoutProps) => {
       <div className="appLayout">
         <Header locale={locale} setLocale={setLocale} />
         <div className="zone-switcher">
+
           <button onClick={() => navigate("learning/student/LandingPage")}>
+
             🎓 Switch to eLearning
           </button>
         </div>

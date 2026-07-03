@@ -52,6 +52,7 @@ const LandingPage = () => {
         </div>
 
         <div className="lp-card" onClick={() => goTo("learning/student/landingPage")}>
+
           <div className="lp-card-icon icon-teal">🎓</div>
           <h2>eLearning</h2>
           <p>Access courses, track your progress, join discussions, and earn certificates.</p>

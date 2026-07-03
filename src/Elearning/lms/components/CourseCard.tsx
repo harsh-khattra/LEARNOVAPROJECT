@@ -4,16 +4,17 @@ import  type { Course } from '../types/lms';
 interface CourseCardProps {
   course: Course;
   isTeacher: boolean;
+  isEnrolled?: boolean;
   onManageContent: (id: string) => void;
   onPublish: (id: string) => void;
   onRevertToDraft: (id: string) => void;
   onDelete: (id: string) => void;
   onStartLearning: (id: string) => void;
 }
-
 export const CourseCard: React.FC<CourseCardProps> = ({
   course,
   isTeacher,
+  isEnrolled = false,
   onStartLearning
 }) => {
   // Individual state for smooth standalone dropdown
@@ -83,14 +84,15 @@ export const CourseCard: React.FC<CourseCardProps> = ({
 
       {/* Main Bottom CTA Action Button */}
       <div className="course-card-footer-actions">
-        <button
-          type="button"
-          className="btn-action-enroll"
-          onClick={() => onStartLearning(course.id)}
-        >
-          Enroll & Unlock Course 🔒
-        </button>
-      </div>
+  <button
+    type="button"
+    className={isEnrolled ? "btn-action-enrolled" : "btn-action-enroll"}
+    onClick={() => !isEnrolled && onStartLearning(course.id)}
+    disabled={isEnrolled}
+  >
+    {isEnrolled ? "Enrolled ✓" : "Enroll & Unlock Course 🔒"}
+  </button>
+</div>
 
     </div>
   );

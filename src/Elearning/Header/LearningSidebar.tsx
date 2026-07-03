@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { FiCreditCard } from "react-icons/fi";
 import {
   FiHome,
   FiBookOpen,
@@ -16,7 +17,9 @@ const LearningSidebar = () => {
   const menuItems = [
     {
       name: "Dashboard",
+
       path: "/learning/student/landingPage",
+
       icon: <FiHome />,
     },
     {
@@ -56,25 +59,45 @@ const LearningSidebar = () => {
       icon: <FiUser />,
     },
 
-   
-
     
     {
       name: "Quiz",
       path: "/learning/student/quiz",
-      icon: <FiUser />,
+     icon: <FiClipboard />
     },
     {
       name: "Completion",
       path: "/learning/student/completion",
-      icon: <FiUser />,
+       icon: <FiClipboard />
     },
     {
       name: "Timespent",
       path: "/learning/student/timespent",
-      icon: <FiUser />,
-    }
-// >>>>>>> f6ef510 (coursecompletion)
+     icon: <FiUser />,
+    },
+    {
+      name: "Enrolled",
+      path: "/learning/student/enroll",
+     icon: <FiCreditCard />,
+    },
+
+  
+    
+    // {
+    //   name: "Quiz",
+    //   path: "/learning/student/quiz",
+    //   icon: <FiUser />,
+    // },
+    // {
+    //   name: "Completion",
+    //   path: "/learning/student/completion",
+    //   icon: <FiUser />,
+    // },
+    // {
+    //   name: "Timespent",
+    //   path: "/learning/student/timespent",
+    //   icon: <FiUser />,
+    // }
   ];
 
   return (

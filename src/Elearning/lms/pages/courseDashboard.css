@@ -20,6 +20,7 @@
   color: #ffffff;
   padding-bottom: 20px;
   width: 100%;
+  
 }
 
 .hero-header {
@@ -1124,4 +1125,12 @@
   color: #94a3b8;
   font-style: italic;
   list-style: none;
+}
+
+.btn-action-enrolled {
+  background-color: #109842;
+  color: white;
+  cursor: default;
+  border-radius: 7px;
+  /* opacity:1 ; */
 }
