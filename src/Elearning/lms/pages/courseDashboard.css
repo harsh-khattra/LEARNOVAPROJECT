@@ -905,9 +905,7 @@
   font-weight: 600;
   font-size: 14px;
 }
-/* ==========================================================================
-   🧩 COURSE CARD GRID SHIFT PREVENTION FIX
-   ========================================================================== */
+
 
 .course-grid {
   display: grid;
@@ -919,10 +917,6 @@
 }
 
 
-/* ==========================================================================
-   🚀 SMOOTH PLAYLIST ACCORDION & LOCK OVERLAYS
-   ========================================================================== */
-
 .course-catalog-card.student-card-view {
   position: relative;
   background: #ffffff;
@@ -933,6 +927,8 @@
   overflow: hidden;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height:440px;
+  overflow-y: scroll;
 }
 
 .course-catalog-card.student-card-view:hover {

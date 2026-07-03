@@ -1,10 +1,7 @@
-// src/modules/lms/components/AllCoursesGrid.tsx
 import React, { useEffect, useState } from 'react';
-import { SupabaseClient } from '../../../Helper/Supabase'; // Adjust path if needed
-
-
-const YOUTUBE_API_KEY = 'AIzaSyDCjS8TxBh4Ddu0KOtdY2yKeHBx83bIcfI';
-const PLAYLIST_ID = 'PL9i39jUQljInNAIHUnnZhKrYhLbFt5I_6&index=2';
+import { SupabaseClient } from '../../../Helper/Supabase'; 
+const YOUTUBE_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
+const PLAYLIST_ID = import.meta.env.VITE_PLAYLIST_ID
 
 interface AssetCard {
   id: string;
@@ -26,8 +23,6 @@ export const AllCoursesGrid: React.FC = () => {
       let youtubeVideos: AssetCard[] = [];
       let supabaseAssets: AssetCard[] = [];
 
-      // Stream 1: Fetch Live YouTube Videos
-      // CHANGED: Just check if the key exists instead of comparing literal strings
       if (YOUTUBE_API_KEY) {
         try {
           const ytRes = await fetch(

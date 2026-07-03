@@ -51,7 +51,9 @@ const LandingPage = () => {
           <button className="card-cta cta-blue">Open HRMS →</button>
         </div>
 
-        <div className="lp-card" onClick={() => goTo("/learning/student/landingpage")}>
+
+        <div className="lp-card" onClick={() => goTo("learning/student/landingPage")}>
+
           <div className="lp-card-icon icon-teal">🎓</div>
           <h2>eLearning</h2>
           <p>Access courses, track your progress, join discussions, and earn certificates.</p>

@@ -207,3 +207,9 @@
   margin-top: 30px;
   padding-bottom: 50px;
 }
+.correct-answer{
+  background-color: #10b981;
+}
+.wrong-answer{
+  background-color: #ef4444;
+}

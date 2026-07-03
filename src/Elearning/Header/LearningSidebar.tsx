@@ -17,7 +17,7 @@ const LearningSidebar = () => {
   const menuItems = [
     {
       name: "Dashboard",
-      path: "/learning/student/landingpage",
+     path: "/learning/student/landingPage",
       icon: <FiHome />,
     },
     {
