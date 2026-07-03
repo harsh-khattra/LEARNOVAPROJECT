@@ -1,29 +1,20 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import "./Certificate.css";
-import { useNavigate } from 'react-router-dom';
+import { lmsService } from "../../Elearning/lms/services/lmsService";
+import type { Course as LmsCourse } from "../../Elearning/lms/types/lms";
+import { SupabaseClient } from "../../Helper/Supabase";
 
+type TabKey = "enrolled" | "active" | "completed" | "certificates";
 
-type CourseCategory =
-  | "Software engineering"
-  | "Cyber security"
-  | "Product management"
-  | "Data science"
-  | "Design";
-
-type Course = {
-  id: string;
-  title: string;
-  instructor: string;
-  category: CourseCategory;
-  thumbnail: string;
+type EnrolledCourse = LmsCourse & {
   progress: number; // 0 - 100
   certificateId: string | null;
   completedOn: string | null;
 };
 
-type TabKey = "enrolled" | "active" | "completed" | "certificates";
-
-const CATEGORY_COLOR: Record<CourseCategory, string> = {
+const CATEGORY_COLOR: Record<string, string> = {
   "Software engineering": "amber",
   "Cyber security": "blue",
   "Product management": "purple",
@@ -31,75 +22,16 @@ const CATEGORY_COLOR: Record<CourseCategory, string> = {
   Design: "coral",
 };
 
-/* ---- Static dummy data — replace with Supabase fetch later ---- */
-const STATIC_COURSES: Course[] = [
-  {
-    id: "c1",
-    title: "Advanced full-stack engineering and AI systems",
-    instructor: "Dr. Samantha Sterling",
-    category: "Software engineering",
-    thumbnail:
-      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=300&fit=crop",
-    progress: 100,
-    certificateId: "CERT-2026-X9Y2",
-    completedOn: "2026-06-26",
-  },
-  {
-    id: "c2",
-    title: "Ethical hacking and network defenses",
-    instructor: "Prof. Donald Vance",
-    category: "Cyber security",
-    thumbnail:
-      "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=600&h=300&fit=crop",
-    progress: 100,
-    certificateId: "CERT-2026-H8K1",
-    completedOn: "2026-04-12",
-  },
-  {
-    id: "c3",
-    title: "Agile methodologies and product delivery",
-    instructor: "Kelly Woods",
-    category: "Product management",
-    thumbnail:
-      "https://images.unsplash.com/photo-1551434678-e076c223a692?w=600&h=300&fit=crop",
-    progress: 100,
-    certificateId: "CERT-2025-P4A1",
-    completedOn: "2025-11-05",
-  },
-  {
-    id: "c4",
-    title: "Applied machine learning foundations",
-    instructor: "Dr. Wei Chen",
-    category: "Data science",
-    thumbnail:
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=300&fit=crop",
-    progress: 62,
-    certificateId: null,
-    completedOn: null,
-  },
-  {
-    id: "c5",
-    title: "Full stack web development bootcamp",
-    instructor: "Marcus Lee",
-    category: "Software engineering",
-    thumbnail:
-      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=300&fit=crop",
-    progress: 0,
-    certificateId: null,
-    completedOn: null,
-  },
-  {
-    id: "c6",
-    title: "Enterprise UI/UX design masterclass",
-    instructor: "Priya Nair",
-    category: "Design",
-    thumbnail:
-      "https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600&h=300&fit=crop",
-    progress: 18,
-    certificateId: null,
-    completedOn: null,
-  },
-];
+function getCategoryColor(category?: string | null): string {
+  return CATEGORY_COLOR[category ?? ""] ?? "amber";
+}
+
+function getField<T = string>(course: any, ...keys: string[]): T | undefined {
+  for (const key of keys) {
+    if (course?.[key] !== undefined && course?.[key] !== null) return course[key];
+  }
+  return undefined;
+}
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: "enrolled", label: "Enrolled" },
@@ -108,7 +40,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "certificates", label: "Certificates" },
 ];
 
-function filterCourses(courses: Course[], tab: TabKey): Course[] {
+function filterCourses(courses: EnrolledCourse[], tab: TabKey): EnrolledCourse[] {
   switch (tab) {
     case "active":
       return courses.filter((c) => c.progress > 0 && c.progress < 100);
@@ -123,14 +55,101 @@ function filterCourses(courses: Course[], tab: TabKey): Course[] {
 export default function Certificate() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>("enrolled");
-  const courses = STATIC_COURSES;
+  const [courses, setCourses] = useState<EnrolledCourse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleNavigateToDownloadcertificate = (course: Course) => {
-    if (course.progress === 100 && course.certificateId) {
+  /* ── Fetch real enrolled courses + progress from Supabase ──
+     Same approach as EnrolledCourses.tsx: pull the course catalog + this
+     employee's enrollments, then read progress_percentage / completed_at
+     directly from public.course_enrollment so it always matches what the
+     player writes back while watching a course. */
+  useEffect(() => {
+    const loadEnrolledCourses = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const {
+          data: { user },
+        } = await SupabaseClient.auth.getUser();
+
+        if (!user) {
+          setCourses([]);
+          return;
+        }
+
+        const allCourses = await lmsService.fetchCourses("all");
+
+        const enrollments: any[] = await lmsService.fetchEmployeeEnrollments(user.id);
+
+        const directProgress = new Map<string, { progress: number; completedOn: string | null }>();
+        const { data: enrollmentRows, error: enrollFetchError } = await SupabaseClient
+          .from("course_enrollment")
+          .select("course_id, progress_percentage, completed_at")
+          .eq("employee_id", user.id);
+
+        if (enrollFetchError) {
+          console.error("[course_enrollment] fetch on load FAILED:", enrollFetchError);
+        } else {
+          for (const row of enrollmentRows ?? []) {
+            directProgress.set(row.course_id, {
+              progress: Number(row.progress_percentage ?? 0),
+              completedOn: row.completed_at ?? null,
+            });
+          }
+        }
+
+        const hydrated: EnrolledCourse[] = enrollments
+          .map((enr) => {
+            const courseId =
+              typeof enr === "string" ? enr : enr.course_id ?? enr.courseId ?? enr.id;
+            const course = allCourses.find((c: any) => c.id === courseId);
+            if (!course) return null;
+
+            const direct = directProgress.get(courseId);
+            const progress =
+              direct?.progress ??
+              (typeof enr === "object"
+                ? Number(enr.progress ?? enr.progress_percent ?? enr.progress_percentage ?? 0)
+                : 0);
+            const certificateId =
+              typeof enr === "object"
+                ? enr.certificate_id ?? enr.certificateId ?? null
+                : null;
+            const completedOn =
+              direct?.completedOn ??
+              (typeof enr === "object"
+                ? enr.completed_on ?? enr.completedOn ?? null
+                : null);
+
+            return {
+              ...course,
+              progress,
+              certificateId,
+              completedOn,
+            } as EnrolledCourse;
+          })
+          .filter((c): c is EnrolledCourse => c !== null);
+
+        setCourses(hydrated);
+      } catch (err) {
+        console.error("Error loading enrolled courses:", err);
+        setError("Could not load your enrolled courses. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEnrolledCourses();
+  }, []);
+
+  const handleNavigateToDownloadcertificate = (course: EnrolledCourse) => {
+    if (course.progress >= 100 ) {
       navigate(`/learning/student/downloadcertificate/${course.certificateId}`);
     } else {
       // Not yet completed — send them to continue learning instead.
-      navigate(`/learning/student/course/${course.id}`);
+      navigate(`/learning/student/enroll/${course.id}`);
     }
   };
 
@@ -146,17 +165,27 @@ export default function Certificate() {
 
   const isCertificatesTab = activeTab === "certificates";
 
+  if (loading) {
+    return (
+      <div style={{ padding: "40px", textAlign: "center", color: "#666" }}>
+        Loading your certificates...
+      </div>
+    );
+  }
+
   return (
     <div className="cert-page">
       <div className="cert-banner">
         <div className="cert-banner-text">
-          <h1>Enrolled courses</h1>
+          <h1>Certificate</h1>
           <p>Continue learning from where you left off, track your progress across every course.</p>
         </div>
-        <button className="cert-banner-menu" aria-label="More options">
-          <DotsIcon />
-        </button>
+        {/* <button className="cert-banner-menu" aria-label="More options"> */}
+          {/* <DotsIcon /> */}
+        {/* </button> */}
       </div>
+
+      {error && <div className="cert-empty" style={{ marginBottom: 16 }}>{error}</div>}
 
       <nav className="cert-tabs" role="tablist" aria-label="Course filters">
         {TABS.map((tab) => (
@@ -188,7 +217,13 @@ export default function Certificate() {
         <div className="cert-grid">
           {visibleCourses.map((course) => {
             const isDone = course.progress === 100;
-            const colorKey = CATEGORY_COLOR[course.category];
+            const category = getField<string>(course, "category");
+            const instructor = getField<string>(course, "instructor", "instructor_name") ?? "Instructor";
+            const thumbnail =
+              getField<string>(course, "thumbnail", "thumbnail_url") ??
+              "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=300&fit=crop";
+            const colorKey = getCategoryColor(category);
+
             return (
               <article
                 key={course.id}
@@ -201,15 +236,15 @@ export default function Certificate() {
               >
                 <div
                   className="cert-card-thumb"
-                  style={{ backgroundImage: `url(${course.thumbnail})` }}
+                  style={{ backgroundImage: `url(${thumbnail})` }}
                   role="img"
                   aria-label={course.title}
                 />
 
                 <div className="cert-card-body">
-                  <p className="cert-card-category">{course.category}</p>
+                  {category && <p className="cert-card-category">{category}</p>}
                   <h3 className="cert-card-title">{course.title}</h3>
-                  <p className="cert-card-instructor">{course.instructor}</p>
+                  <p className="cert-card-instructor">{instructor}</p>
 
                   <div className="cert-progress-track">
                     <div
@@ -229,11 +264,14 @@ export default function Certificate() {
                       <span />
                     )}
                     <button
-                      className={`cert-action-btn ${isDone ? "is-done" : ""}`}
-                      onClick={() => handleNavigateToDownloadcertificate(course)}
+                      className={`cert-action-btn ${isDone ? "is-done" : "is-locked"}`}
+                      disabled={!isDone}
+                      onClick={() => {
+                        if (isDone) handleNavigateToDownloadcertificate(course);
+                      }}
                     >
-                      {isDone ? <AwardIcon /> : <PlayIcon />}
-                      {isDone ? "View certificate" : "Continue learning"}
+                      <AwardIcon />
+                      View certificate
                     </button>
                   </div>
                 </div>

@@ -518,15 +518,29 @@ const TimeSpentAnalytics: React.FC = () => {
       const totalAllMin = typedRows.reduce((s, r) => s + r.seconds_watched, 0) / 60;
       setDailyAvgMin(studyDaySet.size > 0 ? totalAllMin / studyDaySet.size : 0);
 
-      // ── RECENT SESSIONS ──
-      setRecentSessions(
-        typedRows.slice(0, 50).map(r => ({
-          id: String(r.id),
-          course: (r.courses as any)?.title ?? "Unknown Course",
-          date: new Date(r.watched_at),
-          minutes: r.seconds_watched / 60,
+      // ── RECENT SESSIONS (grouped by course: total time summed, sorted by most recent activity) ──
+      const sessionAgg: Record<string, { course: string; totalMinutes: number; lastDate: Date }> = {};
+      for (const r of typedRows) {
+        const courseName = (r.courses as any)?.title ?? "Unknown Course";
+        const watchedDate = new Date(r.watched_at);
+        if (!sessionAgg[r.course_id]) {
+          sessionAgg[r.course_id] = { course: courseName, totalMinutes: 0, lastDate: watchedDate };
+        }
+        sessionAgg[r.course_id].totalMinutes += r.seconds_watched / 60;
+        if (watchedDate > sessionAgg[r.course_id].lastDate) {
+          sessionAgg[r.course_id].lastDate = watchedDate;
+        }
+      }
+      const aggregatedSessions: StudySession[] = Object.entries(sessionAgg)
+        .map(([courseId, v]) => ({
+          id: courseId,
+          course: v.course,
+          date: v.lastDate,
+          minutes: v.totalMinutes,
         }))
-      );
+        .sort((a, b) => b.date.getTime() - a.date.getTime());
+
+      setRecentSessions(aggregatedSessions);
 
     } catch (err) {
       console.error("TimeSpent fetch error:", err);

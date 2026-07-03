@@ -22,6 +22,14 @@
   display: flex;
   flex-direction: column;
   gap: 28px;
+
+  margin-left: 260px;   /* ← add this, matched to actual sidebar width */
+}
+
+@media (max-width: 860px) {
+  .container {
+    margin-left: 0;      /* ← undo the offset on smaller screens where sidebar likely collapses/hides */
+  }
 }
 
 /* ── Stat cards ────────────────────────────────────────── */
@@ -272,10 +280,10 @@
   margin-top: 16px;
   padding: 10px;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 100px;
   background: var(--bg);
   color: var(--ink-soft);
-  cursor: pointer;
+  cursor:pointer;
   transition: background 0.2s ease, color 0.2s ease;
 }
 

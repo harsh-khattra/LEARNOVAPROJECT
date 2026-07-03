@@ -1,602 +1,295 @@
-.enrolled-courses {
-  --eg-blue-dark: #0a2c5c;
-  --eg-blue: #1f4f9e;
-  --eg-blue-light: #2f6fcf;
-  --eg-blue-cta: #1f4f9e;
-  --eg-blue-cta-hover: #163d80;
-  --eg-text-primary: #1a1d29;
-  --eg-text-secondary: #5b6472;
-  --eg-border: #e6e8eb;
-  --eg-card-thumb-bg: #f1f0eb;
-  --eg-track-bg: #e6e8eb;
-  --eg-danger: #c0392b;
-  --eg-radius-lg: 14px;
-  --eg-radius-md: 10px;
-  --eg-radius-sm: 8px;
-  --eg-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
-    Arial, sans-serif;
+/* =========================================================================
+   CERTIFICATES / ENROLLED PAGE — STATIC STYLES
+   (Re-themed to match CourseDashboard.css design system)
+   ========================================================================= */
 
-  font-family: var(--eg-font);
-  width: 100%;
-  margin: 0;
-  background: transparent;
-  position: relative;
+.cert-page {
+  --c-amber: #b8860b;
+  --c-blue: #2b96d6;      /* aligned with CourseDashboard action blue */
+  --c-purple: #7c3aed;
+  --c-teal: #0f766e;
+  --c-coral: #e2542d;
+
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #1a1a1a;
+
+  /* ✅ FIX: sidebar + navbar overlap ko avoid karne ke liye offset */
+  margin-left: 260px;   /* sidebar ki actual width se replace karo */
+  padding-top: 24px;    /* navbar ki actual height se replace karo */
+  box-sizing: border-box;
+  min-height: 100vh;
+  background-color: #f8fafc; /* matches CourseDashboard's workspace bg */
 }
 
-/* ---------- Hero ---------- */
-
-.enrolled-courses__hero {
-  position: relative;
-  padding: 40px 40px 36px;
-  text-align: center;
-  background: linear-gradient(
-    135deg,
-    var(--eg-blue-light) 0%,
-    var(--eg-blue) 45%,
-    var(--eg-blue-dark) 100%
-  );
+/* ---- Banner ---- */
+.cert-banner {
+   background: linear-gradient(135deg, #008cf6 0%, #0263df 52%, #0048cb 100%);
   color: #ffffff;
-  border-radius: var(--eg-radius-lg);
-  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 8px 24px rgba(16, 24, 40, 0.08);
+  padding-bottom: 60px;
+  padding-top: 60px;
+  width: 100%;
+
 }
 
-.enrolled-courses__more {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 32px;
-  height: 32px;
-  display: inline-flex;
+
+
+.cert-banner-text h1 {
+  color: #ffffff;
+  font-size: 0px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  letter-spacing: -0.3px;
+  text-align: center;
+}
+
+.cert-banner-text p {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 15.5px;
+  line-height: 1.6;
+  margin: 0;
+  text-align: center;
+}
+
+.cert-banner-menu {
+  width: 35px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
-  color: var(--eg-text-primary);
-  border: none;
-  border-radius: 50%;
+  color: #ffffff;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.12);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
 }
 
-.enrolled-courses__more:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 6px rgba(16, 24, 40, 0.18);
+.cert-banner-menu:hover {
+  background: rgba(255, 255, 255, 0.28);
 }
 
-.enrolled-courses__more:focus-visible {
-  outline: 2px solid #ffffff;
-  outline-offset: 2px;
-}
-
-.enrolled-courses__heading {
-  margin: 0 0 10px;
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.enrolled-courses__subheading {
-  margin: 0 auto;
-  max-width: 560px;
-  font-size: 14.5px;
-  line-height: 1.55;
-  color: rgba(255, 255, 255, 0.88);
-}
-
-/* ---------- Tabs ---------- */
-
-.enrolled-courses__tabs {
+/* ---- Tabs ---- */
+.cert-tabs {
   display: flex;
-  gap: 32px;
-  padding: 4px 24px 0;
-  margin-top: 24px;
-  border-bottom: 1px solid var(--eg-border);
-  background: transparent;
+  gap: 24px;
+  border-bottom: 1px solid #edf2f7;
+  margin-bottom: 24px;
 }
 
-.enrolled-courses__tab {
-  appearance: none;
-  background: none;
+.cert-tab {
   border: none;
+  background: none;
+  padding: 10px 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #606266;
   border-bottom: 2px solid transparent;
   cursor: pointer;
-  padding: 18px 2px 14px;
-  font-size: 14.5px;
-  font-weight: 600;
-  color: var(--eg-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
   transition: color 0.15s ease, border-color 0.15s ease;
 }
 
-.enrolled-courses__tab:hover {
-  color: var(--eg-text-primary);
+.cert-tab:hover {
+  color: #1a1a1a;
 }
 
-.enrolled-courses__tab:focus-visible {
-  outline: 2px solid var(--eg-blue-light);
-  outline-offset: 2px;
-  border-radius: 4px;
+.cert-tab.is-active {
+  color: #1a1a1a;
+  border-bottom-color: #2b96d6; /* CourseDashboard action blue */
 }
 
-.enrolled-courses__tab--active {
-  color: var(--eg-blue);
-  border-bottom-color: var(--eg-blue);
+.cert-tab-badge {
+  background: rgba(43, 150, 214, 0.12);
+  color: #2b96d6;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 10px;
+  line-height: 1.5;
 }
 
-/* ---------- State messages (loading / error / empty) ---------- */
-
-.enrolled-courses__state {
-  margin: 24px 0 0;
-  padding: 48px 24px;
-  text-align: center;
-  font-size: 14px;
-  color: var(--eg-text-secondary);
-  background: #ffffff;
-  border: 1px solid var(--eg-border);
-  border-radius: var(--eg-radius-lg);
-}
-
-.enrolled-courses__state--error {
-  color: var(--eg-danger);
-}
-
-/* ---------- Grid & Cards ---------- */
-
-.enrolled-courses__grid {
+/* ---- Grid ---- */
+.cert-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  padding: 24px 0 0;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px; /* matches CourseDashboard's .course-grid gap */
 }
 
-.course-card {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--eg-border);
-  border-radius: var(--eg-radius-md);
-  overflow: hidden;
+/* ---- Card ---- */
+.cert-card {
   background: #ffffff;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 12px rgba(16, 24, 40, 0.04);
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
-}
-
-.course-card:hover {
-  box-shadow: 0 4px 14px rgba(16, 24, 40, 0.1);
-  transform: translateY(-1px);
-}
-
-.course-card__thumb {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 180px;
-  background: var(--eg-card-thumb-bg);
-  color: var(--eg-text-primary);
-  overflow: hidden;
-}
-
-.course-card__thumb-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.course-card__thumb-fallback {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--eg-text-secondary);
-}
-
-.course-card__body {
-  padding: 20px 22px 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.course-card__title {
-  margin: 0;
-  font-size: 16.5px;
-  font-weight: 700;
-  line-height: 1.35;
-  color: var(--eg-text-primary);
-  min-height: 44px;
-}
-
-.course-card__meta {
-  margin: 0;
-  font-size: 13px;
-  color: var(--eg-text-secondary);
-}
-
-.course-card__progress-track {
-  width: 100%;
-  height: 7px;
-  border-radius: 999px;
-  background: var(--eg-track-bg);
-  overflow: hidden;
-}
-
-.course-card__progress-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: var(--eg-blue);
-  transition: width 0.3s ease;
-}
-
-.course-card__percent {
-  margin: 0;
-  font-size: 13.5px;
-  color: var(--eg-text-secondary);
-}
-
-.course-card__cta {
-  margin-top: 6px;
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 14.5px;
-  font-weight: 600;
-  color: #ffffff;
-  background: var(--eg-blue-cta);
-  border: none;
-  border-radius: var(--eg-radius-sm);
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.course-card__cta:hover {
-  background: var(--eg-blue-cta-hover);
-}
-
-.course-card__cta:focus-visible {
-  outline: 2px solid var(--eg-blue-dark);
-  outline-offset: 2px;
-}
-
-/* ---------- Responsive ---------- */
-
-@media (min-width: 1400px) {
-  .enrolled-courses__grid {
-    gap: 28px;
-  }
-
-  .course-card__thumb {
-    height: 200px;
-  }
-}
-
-@media (max-width: 860px) {
-  .enrolled-courses__grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  .enrolled-courses__hero {
-    padding: 32px 24px 28px;
-  }
-
-  .enrolled-courses__heading {
-    font-size: 22px;
-  }
-
-  .enrolled-courses__tabs {
-    gap: 18px;
-    padding: 4px 4px 0;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
-
-  .enrolled-courses__grid {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-
-  .course-card__thumb {
-    height: 160px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .course-card,
-  .course-card__progress-fill,
-  .enrolled-courses__more,
-  .course-card__cta {
-    transition: none;
-  }
-}
-
-/* =========================================================================
-   COURSE PLAYER MODAL
-   Inline overlay shown when "Continue learning" is clicked. Reuses the same
-   layout/logic as CoursePlayerPage (video viewport + playlist sidebar) but
-   rendered as a centered modal on top of EnrolledCourses, instead of
-   navigating to a separate route.
-   ========================================================================= */
-
-.course-player-modal__backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 14, 26, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  z-index: 1000;
-  animation: cpm-fade-in 0.18s ease;
-}
-
-@keyframes cpm-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.course-player-modal {
-  background: #ffffff;
-  border-radius: var(--eg-radius-lg, 14px);
-  width: 100%;
-  max-width: 1100px;
-  max-height: 90vh;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-  animation: cpm-rise 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-@keyframes cpm-rise {
-  from { opacity: 0; transform: translateY(12px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+.cert-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-.course-player-modal__header {
+.cert-card.has-strip {
+  border-left: 4px solid var(--strip-color, #2b96d6);
+  border-radius: 0 12px 12px 0;
+}
+
+.cert-card-thumb {
+  width: 100%;
+  height: 140px;
+  background-color: #f3f4f6; /* matches CourseDashboard thumbnail wrapper bg */
+  background-size: cover;
+  background-position: center;
+}
+
+.cert-card-body {
+  padding: 10px; /* aligned with CourseDashboard's card-body-content padding */
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--eg-border, #e6e8eb);
-  flex-shrink: 0;
-}
-
-.course-player-modal__title {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--eg-text-primary, #1a1d29);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.course-player-modal__close {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
-  background: var(--eg-card-thumb-bg, #f1f0eb);
-  color: var(--eg-text-primary, #1a1d29);
-  font-size: 15px;
-  line-height: 1;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.course-player-modal__close:hover {
-  background: var(--eg-track-bg, #e6e8eb);
-}
-
-.course-player-modal__state {
-  padding: 60px 24px;
-  text-align: center;
-  font-size: 14px;
-  color: var(--eg-text-secondary, #5b6472);
-}
-
-.course-player-modal__state--error {
-  color: var(--eg-danger, #c0392b);
-}
-
-/* ---------- Player workspace (video + playlist) ---------- */
-
-.course-player-workspace {
-  display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(260px, 1fr);
-  gap: 0;
-  overflow-y: auto;
+  flex-direction: column;
   flex: 1;
 }
 
-.video-viewport-area {
-  padding: 20px;
-  border-right: 1px solid var(--eg-border, #e6e8eb);
+.cert-card-category {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #2b96d6;
+  margin: 0 0 8px;
 }
 
-.video-wrapper {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  background: #0c0f16;
+.cert-card-title {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 8px;
+  color: #1a1a1a;
+}
+
+.cert-card-instructor {
+  font-size: 13px;
+  color: #666666;
+  margin: 0 0 14px;
+}
+
+.cert-progress-track {
+  height: 5px; /* matches CourseDashboard progress-track height */
+  background: #e2e8f0;
   border-radius: 10px;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.main-html5-player {
-  width: 100%;
-  height: 100%;
-  display: block;
-  background: #000;
-  border: none;
-}
-
-.video-placeholder-box {
-  color: #c7cbd4;
-  font-size: 14px;
-  padding: 24px;
-  text-align: center;
-}
-
-.video-metadata-card {
-  margin-top: 16px;
-}
-
-.badge-category {
-  display: inline-block;
-  font-size: 11.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--eg-blue, #1f4f9e);
-  background: var(--eg-card-thumb-bg, #f1f0eb);
-  padding: 3px 9px;
-  border-radius: 999px;
   margin-bottom: 8px;
 }
 
-.playing-lecture-title {
-  margin: 0 0 6px;
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--eg-text-primary, #1a1d29);
+.cert-progress-fill {
+  height: 100%;
+  background-color: #2b96d6;
+  border-radius: 10px;
+  transition: width 0.3s ease;
 }
 
-.playing-course-context {
-  margin: 0;
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: var(--eg-text-secondary, #5b6472);
-}
-
-/* ---------- Playlist sidebar ---------- */
-
-.playlist-sidebar-tray {
-  padding: 20px;
-  background: #fafafa;
-  overflow-y: auto;
-}
-
-.playlist-header {
-  margin-bottom: 14px;
-}
-
-.playlist-header h3 {
-  margin: 0 0 2px;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--eg-text-primary, #1a1d29);
-}
-
-.playlist-header p {
-  margin: 0;
+.cert-progress-label {
   font-size: 12px;
-  color: var(--eg-text-secondary, #5b6472);
+  color: #9ca3af;
+  margin: 0 0 16px;
 }
 
-.playlist-chapter-block {
-  margin-bottom: 16px;
-}
-
-.chapter-block-title {
-  margin: 0 0 8px;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--eg-text-secondary, #5b6472);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.chapter-lectures-sublist {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.playlist-lecture-row {
+.cert-card-footer {
+  margin-top: auto;
   display: flex;
   align-items: center;
-  gap: 10px;
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 10px;
-  cursor: pointer;
-  transition: background 0.15s ease;
+  justify-content: space-between;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 12px;
 }
 
-.playlist-lecture-row:hover {
-  background: #f0f1f3;
-}
-
-.playlist-lecture-row.active-playing {
-  background: var(--eg-blue, #1f4f9e);
-}
-
-.playlist-lecture-row.active-playing .lecture-row-title,
-.playlist-lecture-row.active-playing .lecture-row-type {
-  color: #ffffff;
-}
-
-.play-status-icon {
-  flex-shrink: 0;
+.cert-id {
   font-size: 12px;
+  color: #9ca3af;
 }
 
-.lecture-row-details {
-  min-width: 0;
-}
-
-.lecture-row-title {
-  margin: 0;
+.cert-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--eg-text-primary, #1a1d29);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.lecture-row-type {
-  font-size: 11px;
-  color: var(--eg-text-secondary, #5b6472);
+.cert-action-btn:hover {
+  background: #f8fafc;
+  border-color: #9ca3af;
 }
 
-.empty-lecture-notice {
+/* "Completed" state now uses the emerald green from CourseDashboard's price badge */
+.cert-action-btn.is-done {
+  background: #2ecc71;
+  border-color: #2ecc71;
+  color: #ffffff;
+  width: 100%;
+  justify-content: center;
+}
+
+.cert-action-btn.is-done:hover {
+  background: #27ae60;
+}
+
+/* ---- Empty state ---- */
+.cert-empty {
+  text-align: center;
+  padding: 60px 0; /* matches CourseDashboard .empty-state padding */
+  border: 2px dashed #edf2f7;
+  border-radius: 6px;
+  color: #a0aec0;
+}
+
+.cert-empty-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: #1a1a1a;
+}
+
+.cert-empty-body {
+  font-size: 14px;
+  color: #666666;
   margin: 0;
-  font-size: 12px;
-  color: var(--eg-text-secondary, #5b6472);
-  padding: 6px 10px;
 }
 
-/* ---------- Modal responsive ---------- */
+/* ---- Responsive ---- */
+@media (max-width: 900px) {
+  .cert-page {
+    margin-left: 0;    /* mobile pe sidebar collapse/hidden ho jata hai */
+    padding-top: 88px; /* navbar height ke liye adjust karo agar zaroorat ho */
+  }
+}
 
-@media (max-width: 800px) {
-  .course-player-workspace {
+@media (max-width: 768px) {
+  .cert-banner {
+    padding: 20px 20px;
+  }
+
+  .cert-tabs {
+    gap: 16px;
+    overflow-x: auto;
+  }
+
+  .cert-grid {
     grid-template-columns: 1fr;
-  }
-
-  .video-viewport-area {
-    border-right: none;
-    border-bottom: 1px solid var(--eg-border, #e6e8eb);
-  }
-
-  .course-player-modal {
-    max-height: 95vh;
-  }
-}
-
-@media (max-width: 480px) {
-  .course-player-modal__backdrop {
-    padding: 0;
-  }
-
-  .course-player-modal {
-    max-height: 100vh;
-    height: 100vh;
-    border-radius: 0;
   }
 }
