@@ -6,9 +6,17 @@ import Discussion from "../Discussion/DiscussionModule";
 
 
 
-import StudentDashboard from "../Student/Dashboard";
+
+
 
 import Certificates from "../../Progress/Certificate/Certificate";
+
+
+
+// import Discussion from "../Discussion/DiscussionModule";
+
+// import Certificates from "../Student/Certificate";
+
 
 
 import TeacherDashboard from "../Teacher/Dashboard";
@@ -21,9 +29,11 @@ import QuizPerformancePage from "../../Progress/Quiz/Quizperformance";
 import CourseCompletion from "../../Progress/Coursecompletion/CourseCompletion";
 import TimeSpentAnalytics from "../../Progress/Timespent/Timespent";
 
+
 import { LandingPage } from '../lms/pages/LandingPage';
 import { AssignmentDashboard } from '../lms/pages/AssignmentDashboard';
-import { QuizComponent } from '../lms/pages/QuizComponent';
+
+
 
 import { CourseDashboardPage } from "../lms/pages/CourseDashboardPage";
 import { AvailableCourses } from "../lms/pages/AvailableCourses";
@@ -33,6 +43,12 @@ import { CoursePlayerPage } from "../lms/pages/CoursePlayerPage";
 import EnrolledCourses from "../../Progress/Enrolled/Enrolledcourses";
 
 import Downloadcert from "../../Progress/Certificate/Downloadcert";
+
+
+// import { LandingPage } from '../lms/pages/LandingPage';
+// import { AssignmentDashboard } from '../lms/pages/AssignmentDashboard';
+import { QuizComponent } from '../lms/pages/QuizComponent';
+
 
 
 const ElearningRoutes = () => {
@@ -61,6 +77,7 @@ const ElearningRoutes = () => {
       />
 
 
+
       {/* Student */}
       <Route path="student/landingPage" element={<LandingPage />} />
       <Route path="student/courses" element={<CourseDashboardPage />} />
@@ -80,6 +97,7 @@ const ElearningRoutes = () => {
       {/* LMS Core - FIXED: Added /:id parameter */}
       <Route path="/lms/dashboard" element={<CourseDashboardPage />} />
 
+
       <Route path="employee/courses"      element={<AvailableCourses />} />
 
       {/* ── Teacher ── */}
@@ -91,6 +109,27 @@ const ElearningRoutes = () => {
 
       {/* ── LMS ── */}
       <Route path="lms/dashboard"         element={<CourseDashboardPage />} />
+
+
+      {/* Student */}
+      <Route path="student/landingPage" element={<LandingPage />} />
+      <Route path="student/courses" element={<CourseDashboardPage />} />
+      <Route path="student/discussion" element={<Discussion />} />
+      <Route path="student/certificates" element={<Certificates />} />
+      <Route path = "employee/courses" element = {< AvailableCourses />} />
+      <Route path = "student/assignments" element= {<AssignmentDashboard />} />
+
+      {/* Teacher */}
+      <Route path="teacher/dashboard" element={<TeacherDashboard />} />
+      {/* <Route path="teacher/courses" element={<TeacherCourses />} /> */}
+      <Route path = "/student/assignments/:contentId" element= {<QuizComponent/>} />
+      {/* Admin */}
+      <Route path="admin/approval-desk" element={<AdminApprovalDesk />} />
+      <Route path="admin/analytics" element={<Analytics />} />
+    
+      {/* LMS Core - FIXED: Added /:id parameter */}
+      <Route path="/lms/dashboard" element={<CourseDashboardPage />} />
+
 
       <Route path="lms/managecontent/:id" element={<ManageContentPage />} />
       <Route path="learning/course-player/:id" element={<CoursePlayerPage />} />

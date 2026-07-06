@@ -18,7 +18,7 @@ const LearningSidebar = () => {
     {
       name: "Dashboard",
 
-      path: "/learning/student/landingPage",
+     path: "/learning/student/landingPage",
 
       icon: <FiHome />,
     },
@@ -104,16 +104,16 @@ const LearningSidebar = () => {
     <aside className={styles.sidebar}>
       <nav className={styles.nav}>
         {menuItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              isActive ? styles.activeLink : styles.link
-            }
-          >
-            <span className={styles.icon}>{item.icon}</span>
-            {item.name}
-          </NavLink>
+         <NavLink
+  key={item.path}
+  to={item.path}
+  className={({ isActive }) =>
+    isActive ? styles.activeLink : styles.link
+  }
+>
+  <span className={styles.icon}>{item.icon}</span>
+  <span className={styles.label}>{item.name}</span>
+</NavLink>
         ))}
       </nav>
     </aside>

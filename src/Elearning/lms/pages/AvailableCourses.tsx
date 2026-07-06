@@ -8,7 +8,9 @@ import { CourseCard } from '../components/CourseCard';
 import Enrollment from '../../../Progress/Enrollment/Enroll'; 
 
 
+
 import './availableCourses.css';
+
 
 
 
@@ -20,7 +22,7 @@ export const AvailableCourses: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // 🟢 NEW STATES FOR YOUTUBE STREAM
+  //  NEW STATES FOR YOUTUBE STREAM
   const [ytVideos, setYtVideos] = useState<any[]>([]);
   const [ytLoading, setYtLoading] = useState(false);
 
@@ -153,16 +155,25 @@ export const AvailableCourses: React.FC = () => {
                 course={course}
                 isTeacher={false} 
 
+
                 onManageContent={() => {}} 
                 onPublish={() => {}}
                 onRevertToDraft={() => {}}
                 onDelete={() => {}}
+
 
                 isEnrolled={enrolledCourseIds.includes(course.id)}
                 onManageContent={(id: string) => {}} 
                 onPublish={(id: string) => {}}
                 onRevertToDraft={(id: string) => {}}
                 onDelete={(id: string) => {}}
+
+
+                onManageContent={() => {}} 
+                onPublish={() => {}}
+                onRevertToDraft={() => {}}
+                onDelete={() => {}}
+
 
                 onStartLearning={handleStartLearning}
               />

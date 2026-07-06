@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import "./Downloadcert.css";
 
 /* ---------------------------------------------------------------------- */
@@ -19,6 +19,14 @@ type CompletedCertificate = {
   verificationSlug: string;
 };
 
+// Shape of the data we expect in `navigate(path, { state })`
+// when the user clicks "View Certificate" on a course card.
+type DownloadCertLocationState = {
+  certificate?: CompletedCertificate;
+  studentName?: string;
+  institute?: string;
+};
+
 type DownloadCertProps = {
   studentName?: string;
   institute?: string;
@@ -29,7 +37,7 @@ type DownloadCertProps = {
 };
 
 /* ---------------------------------------------------------------------- */
-/*  Mock / fallback data  (replace with real API call if needed)           */
+/*  Mock / fallback data  (used only if nothing else matches)              */
 /* ---------------------------------------------------------------------- */
 
 const DEFAULT_CERTIFICATES: CompletedCertificate[] = [
@@ -55,12 +63,6 @@ const DEFAULT_CERTIFICATES: CompletedCertificate[] = [
   },
 ];
 
-const THEME_LABELS: Record<ThemeKey, string> = {
-  gold: "Gold Classic",
-  emerald: "Emerald",
-  sapphire: "Sapphire",
-};
-
 const ZOOM_MIN = 60;
 const ZOOM_MAX = 140;
 const ZOOM_STEP = 10;
@@ -83,31 +85,52 @@ export default function Downloadcert({
   const { certificateId } = useParams<{ certificateId: string }>();
   const navigate = useNavigate();
 
-  // ── 2. Find the matching certificate  ───────────────────────────────
-  //    Match against `id` OR `credentialId` / `verificationSlug`
-  //    so both patterns work without extra mapping.
+  // ── 1b. Read whatever the "View Certificate" click passed along ─────
+  //    This is the source of truth: whichever course card was clicked,
+  //    its exact certificate object rides along in router state, so we
+  //    don't have to depend on matching ids against a static list.
+  const location = useLocation();
+  const locationState = (location.state ?? {}) as DownloadCertLocationState;
+
+  // ── 2. Decide which certificate to show, in priority order:  ────────
+  //    a) certificate passed via navigate(path, { state }) — most reliable
+  //    b) certificate matched from the `certificates` list using the
+  //       :certificateId URL param (id / credentialId / verificationSlug)
+  //    c) first certificate in the list as a last-resort fallback
   const initialCert = useMemo(() => {
-    if (!certificateId) return certificates[0];
-    return (
-      certificates.find(
+    if (locationState.certificate) return locationState.certificate;
+
+    if (certificateId) {
+      const match = certificates.find(
         (c) =>
           c.id === certificateId ||
           c.credentialId === certificateId ||
           c.verificationSlug === certificateId
-      ) ?? certificates[0]
-    );
-  }, [certificates, certificateId]);
+      );
+      if (match) return match;
+    }
+
+    return certificates[0];
+  }, [certificates, certificateId, locationState.certificate]);
 
   const [selectedId, setSelectedId] = useState(initialCert?.id ?? "");
-  const [displayName, setDisplayName] = useState(studentName);
+  const [displayName, setDisplayName] = useState(
+    locationState.studentName ?? studentName
+  );
+  const [activeInstitute] = useState(locationState.institute ?? institute);
   const [theme, setTheme] = useState<ThemeKey>("gold");
   const [zoom, setZoom] = useState(100);
   const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
 
-  const certificate = useMemo(
-    () => certificates.find((c) => c.id === selectedId) ?? certificates[0],
-    [certificates, selectedId]
-  );
+  // If the certificate came from router state (not from the static list),
+  // it might not exist inside `certificates`. So we resolve the certificate
+  // to actually render from either the state object or the list lookup.
+  const certificate = useMemo(() => {
+    if (locationState.certificate && locationState.certificate.id === selectedId) {
+      return locationState.certificate;
+    }
+    return certificates.find((c) => c.id === selectedId) ?? initialCert;
+  }, [certificates, selectedId, locationState.certificate, initialCert]);
 
   const verificationUrl = certificate
     ? `learnova-verify.org/verify/${certificate.verificationSlug}`
@@ -177,25 +200,6 @@ export default function Downloadcert({
             active courses and adjust designs below.
           </p>
         </div>
-
-        {/* Dropdown — switch between all completed certs without going back */}
-        <div className="dc-header-select">
-          <label htmlFor="dc-cert-select">Select completed certificate</label>
-          <div className="dc-select-wrap">
-            <select
-              id="dc-cert-select"
-              value={selectedId}
-              onChange={(e) => setSelectedId(e.target.value)}
-            >
-              {certificates.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.courseName}
-                </option>
-              ))}
-            </select>
-            <ChevronIcon />
-          </div>
-        </div>
       </header>
 
       {/* ── Toolbar ─────────────────────────────────────────────────── */}
@@ -236,7 +240,7 @@ export default function Downloadcert({
           >
             <CertificateCard
               studentName={displayName}
-              institute={institute}
+              institute={activeInstitute}
               certificate={certificate}
             />
           </div>
@@ -244,44 +248,6 @@ export default function Downloadcert({
 
         {/* Manage & customize panel */}
         <aside className="dc-panel">
-          <h2 className="dc-panel-title">
-            <WrenchIcon /> Manage &amp; customize
-          </h2>
-
-          {/* Display name */}
-          <div className="dc-field">
-            <label htmlFor="dc-display-name">Edit display name</label>
-            <input
-              id="dc-display-name"
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-            />
-            <p className="dc-field-hint">
-              Updates live inside the certificate frame viewport above.
-            </p>
-          </div>
-
-          {/* Theme */}
-          <div className="dc-field">
-            <span className="dc-field-label">Select theme style</span>
-            <div className="dc-theme-row">
-              {(Object.keys(THEME_LABELS) as ThemeKey[]).map((key) => (
-                <button
-                  key={key}
-                  type="button"
-                  className={`dc-theme-swatch ${theme === key ? "is-selected" : ""}`}
-                  data-swatch={key}
-                  onClick={() => setTheme(key)}
-                  aria-pressed={theme === key}
-                >
-                  <span className="dc-swatch-dot" />
-                  {THEME_LABELS[key]}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Actions */}
           <div className="dc-actions">
             <button
@@ -405,20 +371,6 @@ function SparkIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
       <path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2z" />
-    </svg>
-  );
-}
-function ChevronIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <polyline points="6 9 12 15 18 9" />
-    </svg>
-  );
-}
-function WrenchIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M14.7 6.3a4 4 0 1 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z" />
     </svg>
   );
 }

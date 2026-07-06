@@ -14,6 +14,18 @@ type EnrolledCourse = LmsCourse & {
   completedOn: string | null;
 };
 
+// Shape expected by Downloadcert.tsx (kept in sync with that component).
+type CompletedCertificate = {
+  id: string;
+  courseName: string;
+  credentialId: string;
+  dateIssued: string;
+  grade: string;
+  instructorName: string;
+  registrarName: string;
+  verificationSlug: string;
+};
+
 const CATEGORY_COLOR: Record<string, string> = {
   "Software engineering": "amber",
   "Cyber security": "blue",
@@ -31,6 +43,42 @@ function getField<T = string>(course: any, ...keys: string[]): T | undefined {
     if (course?.[key] !== undefined && course?.[key] !== null) return course[key];
   }
   return undefined;
+}
+
+// completed_at from Supabase is usually an ISO timestamp — format it the
+// way the certificate card expects, e.g. "June 20, 2026".
+function formatDateIssued(raw: string | null): string {
+  if (!raw) return "—";
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return raw;
+  return parsed.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+// Builds the exact certificate object Downloadcert.tsx renders, using this
+// specific course's real data instead of any hardcoded/mock values.
+function buildCertificateFromCourse(course: EnrolledCourse): CompletedCertificate {
+  const instructor =
+    getField<string>(course, "instructor", "instructor_name") ?? "Instructor";
+  const registrar =
+    getField<string>(course, "registrar", "registrar_name") ?? "Course Registrar";
+  const grade =
+    getField<string>(course, "grade", "final_grade", "score") ?? "100% (Completion)";
+  const credentialId = course.certificateId ?? course.id;
+
+  return {
+    id: course.id,
+    courseName: course.title,
+    credentialId,
+    dateIssued: formatDateIssued(course.completedOn),
+    grade,
+    instructorName: instructor,
+    registrarName: registrar,
+    verificationSlug: credentialId,
+  };
 }
 
 const TABS: { key: TabKey; label: string }[] = [
@@ -58,6 +106,8 @@ export default function Certificate() {
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [studentName, setStudentName] = useState<string>("");
+  const [institute, setInstitute] = useState<string>("Learnova Institute");
 
   /* ── Fetch real enrolled courses + progress from Supabase ──
      Same approach as EnrolledCourses.tsx: pull the course catalog + this
@@ -78,6 +128,14 @@ export default function Certificate() {
           setCourses([]);
           return;
         }
+
+        // Used to personalize the certificate ("Congratulations, <name>!")
+        setStudentName(
+          (user.user_metadata as any)?.full_name ??
+            (user.user_metadata as any)?.name ??
+            user.email ??
+            "Student"
+        );
 
         const allCourses = await lmsService.fetchCourses("all");
 
@@ -145,8 +203,20 @@ export default function Certificate() {
   }, []);
 
   const handleNavigateToDownloadcertificate = (course: EnrolledCourse) => {
-    if (course.progress >= 100 ) {
-      navigate(`/learning/student/downloadcertificate/${course.certificateId}`);
+    if (course.progress >= 100) {
+      // Build the real certificate for THIS course and carry it along via
+      // router state, so Downloadcert.tsx shows exactly what was clicked —
+      // no id-matching against a static list required.
+      const certificate = buildCertificateFromCourse(course);
+      const routeId = course.certificateId ?? course.id;
+
+      navigate(`/learning/student/downloadcertificate/${routeId}`, {
+        state: {
+          certificate,
+          studentName,
+          institute,
+        },
+      });
     } else {
       // Not yet completed — send them to continue learning instead.
       navigate(`/learning/student/enroll/${course.id}`);
