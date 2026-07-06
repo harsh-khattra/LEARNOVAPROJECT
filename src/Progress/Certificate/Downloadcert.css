@@ -117,7 +117,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
-  background: linear-gradient(135deg, #0c1210 0%, #101d17 48%, #0a1310 100%);
+  background: linear-gradient(135deg, #008cf6 0%, #0263df 52%, #0048cb 100%);
   border-radius: var(--dc-radius-lg);
   padding: 30px 34px;
   color: #f4f6f5;
@@ -127,7 +127,7 @@
  position: center;
   inset: -40% 40% auto -10%;
   height: 60px;
-  background: radial-gradient(circle, rgba(31, 157, 107, 0.35), transparent 65%);
+  background: radial-gradient(circle, rgba(7, 10, 194, 0.35), transparent 65%);
   pointer-events: none;
   
 }

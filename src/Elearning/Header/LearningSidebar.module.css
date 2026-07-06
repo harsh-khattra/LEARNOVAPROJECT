@@ -1,6 +1,6 @@
 .sidebar {
-  width: 260px;
-  min-width: 260px;
+  width: 72px;               /* 👈 default collapsed width */
+  min-width: 72px;
   background: #ffffff;
   border-right: 1px solid #e5e7eb;
   display: flex;
@@ -8,13 +8,20 @@
   padding-top: 20px;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03);
 
-  /* --- Added for Static/Sticky Behavior --- */
   position: fixed;
-  top: 72px;                  /* Starts right below your 72px header */
+  top: 72px;
   left: 0;
-  height: calc(100vh - 72px); /* Spans the exact remaining screen height */
-  overflow-y: auto;           /* Allows sidebar navigation to scroll if it has too many links */
-  z-index: 999;               /* Sits right beneath the header layer (1000) */
+  height: calc(100vh - 72px);
+  overflow-x: hidden;        /* 👈 zaroori hai taaki text overflow na ho */
+  overflow-y: auto;
+  z-index: 999;
+
+  transition: width 0.25s ease;  /* 👈 smooth expand/collapse */
+}
+
+.sidebar:hover {
+  width: 260px;               /* 👈 hover pe expand */
+  min-width: 260px;
 }
 
 .nav {
@@ -34,6 +41,7 @@
   border-radius: 12px;
   font-size: 14px;
   font-weight: 500;
+  white-space: nowrap;        /* 👈 text ek line mein rahe */
   transition: all 0.2s ease;
 }
 
@@ -47,11 +55,7 @@
 }
 
 .activeLink {
-  background: linear-gradient(
-    90deg,
-    #eff6ff 0%,
-    #dbeafe 100%
-  );
+  background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 100%);
   color: #2563eb;
   font-weight: 600;
   position: relative;
@@ -74,15 +78,24 @@
   align-items: center;
   justify-content: center;
   min-width: 20px;
+  flex-shrink: 0;             /* 👈 collapse hone par icon chota na ho */
 }
 
 .activeLink .icon {
   color: #2563eb;
 }
 
-/* ==========================================================================
-   💼 PANEL HEADER STYLES (Matching your Light Theme)
-   ========================================================================== */
+/* 👇 Ye naya class hai — label ko collapsed state mein chupayega */
+.label {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  transition-delay: 0s;
+}
+
+.sidebar:hover .label {
+  opacity: 1;
+  transition-delay: 0.1s;    /* thoda delay taaki icon expand ho, phir text aaye */
+}
 
 .panelHeader {
   padding: 0 24px 18px 24px;

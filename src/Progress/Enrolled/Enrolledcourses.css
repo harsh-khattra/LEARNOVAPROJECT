@@ -38,7 +38,7 @@
 
 .cert-banner-text h1 {
   color: #ffffff;
-  font-size: 0px;
+  font-size: 28px;   /* was 0px — that's why it was invisible */
   font-weight: 700;
   margin: 0 0 6px;
   letter-spacing: -0.3px;

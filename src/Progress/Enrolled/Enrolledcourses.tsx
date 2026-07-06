@@ -531,6 +531,7 @@ export default function EnrolledCourses() {
     <div className="cert-page">
       <div className="cert-banner">
         <div className="cert-banner-text">
+          <h2></h2>
           <h1>Enrolled courses</h1>
           <p>Continue learning from where you left off, track your progress across every course.</p>
         </div>
