@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SupabaseClient } from '../../../Helper/Supabase';
 import './AssignmentDashboard.css';
+import Loader from '../../Header/Loader';
 
 interface AssignmentItem {
   content_id: string;
@@ -16,6 +17,7 @@ export const AssignmentDashboard: React.FC = () => {
   const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'completed'>('all');
+  
 
   useEffect(() => {
     fetchAssignmentsData();
@@ -24,6 +26,7 @@ export const AssignmentDashboard: React.FC = () => {
   const fetchAssignmentsData = async () => {
     try {
       setLoading(true);
+      
       
       // 1. Get Logged in User
       const { data: { user } } = await SupabaseClient.auth.getUser();
@@ -80,8 +83,9 @@ export const AssignmentDashboard: React.FC = () => {
   const completedCount = assignments.filter(a => a.status === 'Completed').length;
   const pendingCount = totalCount - completedCount;
 
-  if (loading) return <div className="asm-loader">Compiling your academic board... 📊</div>;
-
+if (loading) {
+  return <Loader />;
+}
   return (
     <div className="asm-dashboard-layout">
       

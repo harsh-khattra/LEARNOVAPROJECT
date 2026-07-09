@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // 1️⃣ Navigation hook import kiya
+import { useNavigate } from 'react-router-dom'; // 1 Navigation hook import kiya
 import './LandingPage.css';
 
 export const LandingPage: React.FC = () => {
   const [showPromoVideo, setShowPromoVideo] = useState(false);
-  const navigate = useNavigate(); // 2️⃣ Navigate function initialize kiya
+  const navigate = useNavigate(); // 2 Navigate function initialize kiya
 
   const globalStats = [
     { value: '200+', label: 'Premium Courses' },

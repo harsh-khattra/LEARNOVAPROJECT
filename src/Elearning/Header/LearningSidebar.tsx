@@ -23,6 +23,7 @@ interface MenuItem {
 }
 
 const LearningSidebar = () => {
+
   const { user } = useAuth();
 console.log("Sidebar User:", user);
 console.log("Sidebar Role:", JSON.stringify(user?.role));
@@ -95,6 +96,27 @@ const menuItems: MenuItem[] = [
   const visibleMenu = menuItems.filter((item) =>
     item.roles.includes(user?.role ?? "")
   );
+
+
+  
+  
+    
+    // {
+    //   name: "Quiz",
+    //   path: "/learning/student/quiz",
+    //   icon: <FiUser />,
+    // },
+    // {
+    //   name: "Completion",
+    //   path: "/learning/student/completion",
+    //   icon: <FiUser />,
+    // },
+    // {
+    //   name: "Timespent",
+    //   path: "/learning/student/timespent",
+    //   icon: <FiUser />,
+    // }
+  // ];
 
 
   return (

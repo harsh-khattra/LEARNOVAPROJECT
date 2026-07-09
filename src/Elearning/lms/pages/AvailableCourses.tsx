@@ -6,7 +6,9 @@ import type { Course } from '../types/lms';
 import { CourseCard } from '../components/CourseCard';
 
 import Enrollment from '../../../Progress/Enrollment/Enroll'; 
+import CourseSkeleton from '../../Header/CourseSkeleton';
 
+import './courseDashboard.css'
 
 
 
@@ -19,13 +21,14 @@ import './availableCourses.css';
 
 
 
+
 export const AvailableCourses: React.FC = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // 🟢 NEW STATES FOR YOUTUBE STREAM
+  //  NEW STATES FOR YOUTUBE STREAM
   const [ytVideos, setYtVideos] = useState<any[]>([]);
   const [ytLoading, setYtLoading] = useState(false);
 
@@ -119,7 +122,17 @@ export const AvailableCourses: React.FC = () => {
     );
   };
 
-  if (loading) return <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>Opening Student Study Terminal...</div>;
+ if (loading) {
+  return (
+    <div className="dashboard-container">
+      <div className="course-grid">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <CourseSkeleton key={index} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="dashboard-container">

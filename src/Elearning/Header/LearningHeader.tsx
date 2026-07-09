@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
 import { useAuth } from "../../Context/AuthContext"; // adjust path to match this file's location
 import styles from "./LearningHeader.module.css";
+import logo from "../../assets/logo.png"// Adjust this path if your file is in a different folder
 
 const LearningHeader: React.FC = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const LearningHeader: React.FC = () => {
   return (
     <header className={styles.header}>
       <div className={styles.logoSection}>
+        <img src={logo} alt="Learnova Logo" className={styles.logoImage} />
         <span className={styles.logoMain}>LEARNOVA</span>
       </div>
 
