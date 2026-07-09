@@ -51,10 +51,7 @@ const LandingPage = () => {
           <button className="card-cta cta-blue">Open HRMS →</button>
         </div>
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 0b1782d9f638d76aa5fa47571e73f19e3069bbae
         <div className="lp-card" onClick={() => goTo("learning/student/landingPage")}>
 
           <div className="lp-card-icon icon-teal">🎓</div>

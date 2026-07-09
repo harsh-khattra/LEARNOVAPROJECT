@@ -6,14 +6,9 @@ import type { Course } from '../types/lms';
 import { CourseCard } from '../components/CourseCard';
 
 import Enrollment from '../../../Progress/Enrollment/Enroll'; 
+import CourseSkeleton from '../../Header/CourseSkeleton';
 
-
-
-import './availableCourses.css';
-
-
-
-
+import './courseDashboard.css'
 
 
 export const AvailableCourses: React.FC = () => {
@@ -116,7 +111,17 @@ export const AvailableCourses: React.FC = () => {
     );
   };
 
-  if (loading) return <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>Opening Student Study Terminal...</div>;
+ if (loading) {
+  return (
+    <div className="dashboard-container">
+      <div className="course-grid">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <CourseSkeleton key={index} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="dashboard-container">

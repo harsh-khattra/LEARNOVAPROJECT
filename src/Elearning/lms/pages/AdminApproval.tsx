@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { lmsService } from "../services/lmsService";
 import styles from "./AdminApproval.module.css";
-
+import CourseSkeleton from "../../Header/CourseSkeleton";
 export const AdminApprovalDesk: React.FC = () => {
   const [pendingItems, setPendingItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,9 +45,17 @@ export const AdminApprovalDesk: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return <div className={styles.loadingContainer}>Verifying content queue...</div>;
-  }
+if (loading) {
+  return (
+    <div className="dashboard-container">
+      <div className="course-grid">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <CourseSkeleton key={index} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className={styles.container}>

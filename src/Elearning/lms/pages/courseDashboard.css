@@ -1,5 +1,5 @@
 
-/* --- 1. GLOBAL CORE RESETS & BASE TYPOGRAPHY --- */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -16,10 +16,11 @@
 /* --- 2. HERO GRADIENT BANNER PANEL --- */
 .hero-banner {
   /* Exact blue gradient combination from the reference screenshot */
-  background: linear-gradient(135deg, #008cf6 0%, #0263df 52%, #0048cb 100%);
+background: linear-gradient(135deg, var(--ln-blue-primary) 0%, #0040b3 100%);
   color: #ffffff;
   padding-bottom: 20px;
-  width: 100%;
+ width: 100%;
+    margin-left: 0px;
   
 }
 
@@ -130,15 +131,16 @@
 
 /* --- 4. MAIN CATELOG WORKSPACE --- */
 .main-content, .dashboard-container {
-  padding: 0px 50px !important; /* Top/Bottom mein 40px, Left/Right mein 50px equal spacing */
+  padding: 0px !important; /* Top/Bottom mein 40px, Left/Right mein 50px equal spacing */
   box-sizing: border-box;
   background-color: #f8fafc;
-  margin-left: 100px; /* Ek soft professional background layer */
+  margin-left: 0;
+ /* Ek soft professional background layer */
 }
 
 /* 2️⃣ Heading Alignment (Available Academic Programs) */
 .main-content h2, .dashboard-container h2, .workspace-header h2 {
-  margin-left: 0 !important; /* Heading ko grid ke sath exact align karne ke liye */
+  margin-left: 280px !important; /* Heading ko grid ke sath exact align karne ke liye */
   margin-bottom: 3px !important; /* Heading aur cards ke beech ka gap */
   font-size: 26px;
   font-weight: 700;
@@ -182,11 +184,12 @@
 .course-grid {
   display: grid !important;
   /* repeat(auto-fit) cards ko screen size ke hisaab se automatic stretch aur balance karega */
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important; 
-  gap: 35px !important; /* Cards ke beech ka internal gap jo pehle shuruat mein tha */
+  /* grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;  */
+  gap: 50px !important; /* Cards ke beech ka internal gap jo pehle shuruat mein tha */
   width: 100% !important;
   max-width: 1300px; /* Taki bohot badi screen par cards ajeeb se phail na jayein */
   margin-top: 0 !important;
+  margin-left: 200px;
 }
 
 .course-card {
@@ -712,12 +715,7 @@
   font-size: 14px;
 }
 /* 🛠️ Main Grid Overrides */
-.course-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
-  gap: 25px !important;
-  margin-top: 20px;
-}
+
 
 /* 📦 Card Structure */
 .modern-course-card {
@@ -910,7 +908,7 @@
 .course-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 25px;
+  gap: 40px;
   
   /* 🔥 CRITICAL FIX: Stops neighboring cards from moving or stretching when one expands */
   align-items: start; 
@@ -927,7 +925,7 @@
   overflow: hidden;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  height:440px;
+  height:400px;
   overflow-y: scroll;
 }
 
