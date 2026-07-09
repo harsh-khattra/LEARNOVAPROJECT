@@ -152,4 +152,10 @@
   color: #fff;
   font-weight: 500;
   cursor: pointer;
+  
+}
+.lp-nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* space between Sign up and Sign in */
 }

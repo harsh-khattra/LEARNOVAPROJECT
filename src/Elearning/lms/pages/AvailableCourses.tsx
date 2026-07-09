@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { lmsService } from '../services/lmsService';
 import { SupabaseClient } from '../../../Helper/Supabase';
 import type { Course } from '../types/lms';
@@ -11,8 +10,11 @@ import CourseSkeleton from '../../Header/CourseSkeleton';
 import './courseDashboard.css'
 
 
+
+
+
 export const AvailableCourses: React.FC = () => {
-  const navigate = useNavigate();
+  
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');

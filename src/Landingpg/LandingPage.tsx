@@ -17,17 +17,22 @@ const LandingPage = () => {
     <div className="landing-page">
 
       {/* ── Navbar ── */}
-      <nav className="lp-nav">
-        <div className="lp-nav-logo">LEARN<span>OVA</span></div>
-        <div className="lp-nav-right">
-         
-          {!isAuth && (
-            <button className="btn-primary" onClick={() => navigate("/login")}>
-              Sign in
-            </button>
-          )}
-        </div>
-      </nav>
+     <nav className="lp-nav">
+  <div className="lp-nav-logo">LEARN<span>OVA</span></div>
+  <div className="lp-nav-right">
+
+    {!isAuth && (
+      <div className="lp-nav-buttons">
+        <button className="btn-primary" onClick={() => navigate("/signup")}>
+          Sign up
+        </button>
+        <button className="btn-primary" onClick={() => navigate("/login")}>
+          Sign in
+        </button>
+      </div>
+    )}
+  </div>
+</nav>
 
       {/* ── Hero ── */}
       <div className="lp-hero">

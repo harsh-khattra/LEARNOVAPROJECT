@@ -79,20 +79,25 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
-.logoutBtn {
-  width: 42px;
-  height: 42px;
-  border: none;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
+.logoutBtnFull {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #fff;
+  background-color: #dc2626;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 18px;
+  transition: background-color 0.2s ease;
 }
 
-.logoutBtn:hover {
-  background: rgba(255, 255, 255, 0.25);
+.logoutBtnFull:hover {
+  background-color: #b91c1c;
+}
+
+.logoutBtnFull svg {
+  font-size: 1rem;
 }
