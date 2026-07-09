@@ -5,13 +5,19 @@ import { SupabaseClient } from '../../../Helper/Supabase';
 import type { Course } from '../types/lms';
 import { CourseCard } from '../components/CourseCard';
 
-
 import Enrollment from '../../../Progress/Enrollment/Enroll'; 
 
 
 
 
+
 import './availableCourses.css';
+
+// import './availableCourses.css';
+
+
+
+
 
 export const AvailableCourses: React.FC = () => {
   const navigate = useNavigate();
@@ -152,16 +158,25 @@ export const AvailableCourses: React.FC = () => {
                 course={course}
                 isTeacher={false} 
 
+
+                onManageContent={() => {}} 
+                onPublish={() => {}}
+                onRevertToDraft={() => {}}
+                onDelete={() => {}}
+
+
                 isEnrolled={enrolledCourseIds.includes(course.id)}
                 onManageContent={(id: string) => {}} 
                 onPublish={(id: string) => {}}
                 onRevertToDraft={(id: string) => {}}
                 onDelete={(id: string) => {}}
 
+
                 onManageContent={() => {}} 
                 onPublish={() => {}}
                 onRevertToDraft={() => {}}
                 onDelete={() => {}}
+
 
                 onStartLearning={handleStartLearning}
               />

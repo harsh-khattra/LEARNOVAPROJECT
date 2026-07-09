@@ -8,12 +8,17 @@ import { LandingPage } from '../pages/LandingPage';
 import { AssignmentDashboard } from '../pages/AssignmentDashboard';
 
 
+
 import { QuizComponent } from '../pages/QuizComponent';
 
 function LmsRoutes() {
   return (
     <Routes>
       <Route path="/lms/dashboard" element={<CourseDashboardPage />} />
+
+      
+   <Route path="student/landingPage" element={<LandingPage />} />
+
 
        <Route
               path="student/landingPage"
@@ -23,8 +28,10 @@ function LmsRoutes() {
            path="student/assignments"
            element={<AssignmentDashboard />}
          />
+
       
    <Route path="student/landingPage" element={<LandingPage />} />
+
 
       <Route path="/lms/managecontent/:id" element={<ManageContentPage />} />
     <Route path="/course-player/:id" element={<CoursePlayerPage />} />

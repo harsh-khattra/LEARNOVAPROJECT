@@ -5,7 +5,7 @@ import "./Enrolledcourses.css";
 import { lmsService } from "../../Elearning/lms/services/lmsService";
 import type { Course } from "../../Elearning/lms/types/lms";
 import { SupabaseClient } from "../../Helper/Supabase";
-
+import { useAuth } from "../../Context/AuthContext";
 
 
 type TabKey = "enrolled" | "active" | "completed" | "certificates";
@@ -14,6 +14,7 @@ type EnrolledCourse = Course & {
   progress: number; // 0 - 100
   certificateId: string | null;
   completedOn: string | null;
+  enrollmentId?: string;
 };
 
 type ContentRow = {
@@ -116,6 +117,7 @@ function filterCourses(courses: EnrolledCourse[], tab: TabKey): EnrolledCourse[]
   }
 }
 
+
 /**
  * Turns a YouTube "watch" or "playlist" URL into an embeddable URL.
  * Falls back to returning the original URL for direct video files (mp4 etc.)
@@ -154,6 +156,8 @@ function toEmbeddableUrl(rawUrl: string): { kind: "youtube" | "direct"; url: str
 }
 
 export default function EnrolledCourses() {
+
+   console.log("Enrolled Page Loaded");
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>("enrolled");
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
@@ -161,7 +165,7 @@ export default function EnrolledCourses() {
   const [error, setError] = useState<string | null>(null);
   const [player, setPlayer] = useState<PlayerState>(INITIAL_PLAYER_STATE);
   const [employeeId, setEmployeeId] = useState<string | null>(null);
-
+const { user: authUser } = useAuth();
   useEffect(() => {
     const loadEnrolledCourses = async () => {
       try {
@@ -181,62 +185,80 @@ export default function EnrolledCourses() {
 
         const allCourses = await lmsService.fetchCourses("all");
 
-        const enrollments: any[] = await lmsService.fetchEmployeeEnrollments(user.id);
+  let enrollments: any[] = [];
 
-        // Read progress directly from public.course_enrollment (the same
-        // table/columns we write to when a video plays) rather than trusting
-        // whatever shape lmsService.fetchEmployeeEnrollments returns — this
-        // guarantees what shows on refresh matches what was actually saved.
-        const directProgress = new Map<string, { progress: number; completedOn: string | null }>();
-        const { data: enrollmentRows, error: enrollFetchError } = await SupabaseClient
-          .from("course_enrollment")
-          .select("course_id, progress_percentage, completed_at")
-          .eq("employee_id", user.id);
+if (authUser?.role === "Student") {
+  enrollments = await lmsService.fetchEmployeeEnrollments(user.id);
+}
 
-        if (enrollFetchError) {
-          console.error("[course_enrollment] fetch on load FAILED:", enrollFetchError);
-        } else {
-          console.log("[course_enrollment] fetched on load", enrollmentRows);
-          for (const row of enrollmentRows ?? []) {
-            directProgress.set(row.course_id, {
-              progress: Number(row.progress_percentage ?? 0),
-              completedOn: row.completed_at ?? null,
-            });
-          }
-        }
+else if (authUser?.role === "Teacher") {
+  const { data, error } = await SupabaseClient
+    .from("course_enrollment")
+    .select(`
+      *,
+      profiles(full_name,email),
+      courses!inner(
+        id,
+        title,
+        created_by
+      )
+    `)
+    .eq("courses.created_by", user.id);
 
-        const hydrated: EnrolledCourse[] = enrollments
-          .map((enr) => {
-            const courseId =
-              typeof enr === "string" ? enr : enr.course_id ?? enr.courseId ?? enr.id;
-            const course = allCourses.find((c: any) => c.id === courseId);
-            if (!course) return null;
+  if (error) throw error;
 
-            const direct = directProgress.get(courseId);
-            const progress =
-              direct?.progress ??
-              (typeof enr === "object"
-                ? Number(enr.progress ?? enr.progress_percent ?? enr.progress_percentage ?? 0)
-                : 0);
-            const certificateId =
-              typeof enr === "object"
-                ? enr.certificate_id ?? enr.certificateId ?? null
-                : null;
-            const completedOn =
-              direct?.completedOn ??
-              (typeof enr === "object"
-                ? enr.completed_on ?? enr.completedOn ?? null
-                : null);
+  enrollments = data ?? [];
+  console.log("Logged in Role:", authUser?.role);
+console.log("Permissions:", authUser);
+}
 
-            return {
-              ...course,
-              progress,
-              certificateId,
-              completedOn,
-            } as EnrolledCourse;
-          })
-          .filter((c): c is EnrolledCourse => c !== null);
+else if (authUser?.role === "Admin") {
+  const { data, error } = await SupabaseClient
+    .from("course_enrollment")
+    .select(`
+      *,
+      profiles(full_name,email),
+      courses(
+        id,
+        title
+      )
+    `);
 
+  if (error) throw error;
+
+  enrollments = data ?? [];
+}
+
+       
+
+           const hydrated: EnrolledCourse[] = enrollments
+  .map((enr) => {
+    const courseId =
+      typeof enr === "string" ? enr : enr.course_id ?? enr.courseId ?? enr.id;
+    const course = allCourses.find((c: any) => c.id === courseId);
+    if (!course) return null;
+
+    const progress =
+      typeof enr === "object"
+        ? Number(enr.progress ?? enr.progress_percent ?? enr.progress_percentage ?? 0)
+        : 0;
+    const certificateId =
+      typeof enr === "object" ? enr.certificate_id ?? enr.certificateId ?? null : null;
+    const completedOn =
+      typeof enr === "object" ? enr.completed_on ?? enr.completedOn ?? null : null;
+
+    return {
+      ...course,
+      progress,
+      certificateId,
+      completedOn,
+      enrollmentId: typeof enr === "object" ? enr.id : undefined, // 👈 add this
+    } as EnrolledCourse;
+  })
+  .filter((c): c is EnrolledCourse => c !== null);
+
+  console.log("hydrated ids:", hydrated.map(c => c.id));
+console.log("enrollment ids:", hydrated.map(c => (c as any).enrollmentId));
         setCourses(hydrated);
       } catch (err) {
         console.error("Error loading enrolled courses:", err);
@@ -532,12 +554,16 @@ export default function EnrolledCourses() {
       <div className="cert-banner">
         <div className="cert-banner-text">
           <h2></h2>
-          <h1>Enrolled courses</h1>
+          <h1>
+  {authUser?.role === "Admin"
+    ? "All Course Enrollments"
+    : authUser?.role === "Teacher"
+    ? "Students Enrolled in Your Courses"
+    : "My Enrolled Courses"}
+</h1>
           <p>Continue learning from where you left off, track your progress across every course.</p>
         </div>
-        <button className="cert-banner-menu" aria-label="More options">
-          <DotsIcon />
-        </button>
+        
       </div>
 
       {error && <div className="cert-empty" style={{ marginBottom: 16 }}>{error}</div>}
@@ -581,7 +607,7 @@ export default function EnrolledCourses() {
 
             return (
               <article
-                key={course.id}
+                key={course.enrollmentId ?? course.id}
                 className={`cert-card ${isCertificatesTab ? "has-strip" : ""}`}
                 style={
                   isCertificatesTab
@@ -1029,6 +1055,7 @@ function YouTubePlayer({
   }, [embedUrl]);
 
   return (
+    <div className="body1">
     <div style={{ position: "relative", paddingTop: "56.25%" }}>
       <iframe
         ref={iframeRef}
@@ -1046,6 +1073,7 @@ function YouTubePlayer({
           borderRadius: 8,
         }}
       />
+    </div>
     </div>
   );
 }

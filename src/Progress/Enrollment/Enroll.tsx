@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { SupabaseClient } from "../../Helper/Supabase";
 import { lmsService } from "../../Elearning/lms/services/lmsService";
 import "./Enroll.css";
@@ -16,7 +17,13 @@ interface EnrollmentProps {
   onEnrolled: (courseId: string) => void;
 }
 
-const Enrollment: React.FC<EnrollmentProps> = ({ course, onClose, onEnrolled }) => {
+const Enrollment: React.FC<EnrollmentProps> = ({
+  course,
+  onClose,
+  onEnrolled,
+}) => {
+  const navigate = useNavigate();
+
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -32,7 +39,6 @@ const Enrollment: React.FC<EnrollmentProps> = ({ course, onClose, onEnrolled }) 
 
       if (authError || !user) {
         setErrorMsg("Please log in to enroll in this course.");
-        setIsEnrolling(false);
         return;
       }
 
@@ -40,6 +46,8 @@ const Enrollment: React.FC<EnrollmentProps> = ({ course, onClose, onEnrolled }) 
 
       onEnrolled(course.id);
       onClose();
+
+      navigate("/learning/student/enroll");
     } catch (err) {
       console.error("Enrollment failed:", err);
       setErrorMsg("Something went wrong. Please try again.");
@@ -50,15 +58,21 @@ const Enrollment: React.FC<EnrollmentProps> = ({ course, onClose, onEnrolled }) 
 
   return (
     <div className="card-wrapper">
-      <button className="modal-close-btn" onClick={onClose} aria-label="Close">
+      <button
+        className="modal-close-btn"
+        onClick={onClose}
+        aria-label="Close"
+      >
         ✕
       </button>
 
       <div className="card-header">
         <div className="card-icon">⚡</div>
+
         <div className="card-header-text">
           <h2 className="card-title">{course.title}</h2>
           <p className="card-subtitle">{course.description}</p>
+
           <div className="card-meta">
             <span className="cert-badge">🎓 Certificate</span>
           </div>
@@ -70,14 +84,17 @@ const Enrollment: React.FC<EnrollmentProps> = ({ course, onClose, onEnrolled }) 
         onClick={handleEnrollClick}
         disabled={isEnrolling}
       >
-        {isEnrolling ? "Enrolling…" : "Enroll now"}
+        {isEnrolling ? "Enrolling..." : "Enroll now"}
       </button>
+
       <button className="btn-wishlist" disabled={isEnrolling}>
         ♡ Add to wishlist
       </button>
 
       {errorMsg && (
-        <p style={{ color: "red", marginTop: "8px" }}>{errorMsg}</p>
+        <p style={{ color: "red", marginTop: "8px" }}>
+          {errorMsg}
+        </p>
       )}
 
       <ul className="features-list">
@@ -86,6 +103,7 @@ const Enrollment: React.FC<EnrollmentProps> = ({ course, onClose, onEnrolled }) 
         <li>♾️ Lifetime access</li>
         <li>🎓 Certificate of completion</li>
       </ul>
+
       <p className="money-back">♡ 30-day money-back guarantee</p>
 
       <div className="share-row">

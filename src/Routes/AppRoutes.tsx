@@ -11,6 +11,8 @@ import ElearningRoutes from "../Elearning/Router/ElearningRoutes";
 // import { ProtectedRoute } from "../Helper/ProtectedRoute";
 import type { Locale } from "../App";
 import type { Dispatch, SetStateAction } from "react";
+import SignUp from "../Hrms/Authentication/SignUp";
+
 interface AppRoutesProps {
   locale: Locale;
   setLocale: Dispatch<SetStateAction<Locale>>;
@@ -28,7 +30,7 @@ const AppRoutes = ({ locale, setLocale }: AppRoutesProps) => {
       {/* Public — no layout */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />  {/* just Login, not all HrmsRoutes */}
-
+      <Route path="/signup" element={<SignUp />} />
       {/* HRMS zone — layout wraps content via <Outlet /> */}
       <Route
         path="/hrms"
