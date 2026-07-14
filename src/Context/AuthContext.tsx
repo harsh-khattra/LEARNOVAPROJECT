@@ -47,6 +47,7 @@ interface Permissions {
 
   viewCompletion: boolean;
   viewTimespent: boolean;
+  viewResources:boolean;
 
   adminPanel: boolean;
 }
@@ -92,6 +93,7 @@ const defaultPermission: Permissions = {
 
   viewCompletion: false,
   viewTimespent: false,
+  viewResources:false,
 
   adminPanel: false,
 };
@@ -159,6 +161,7 @@ lms_role,
 
     can_view_completion,
     can_view_timespent,
+    can_view_resources,
 
     can_access_admin_panel 
 ),
@@ -219,7 +222,7 @@ departments!profiles_department_id_fkey(empDepartment)
 
   viewForum: role.can_view_forum,
   manageForum: role.can_manage_forum,
-
+viewResources:role.can_view_resources,
   viewCompletion: role.can_view_completion,
   viewTimespent: role.can_view_timespent,
 

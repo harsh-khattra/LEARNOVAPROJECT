@@ -168,3 +168,95 @@
   color: #64748b;
   font-size: 14px;
 }
+.asm-skeleton-header,
+.asm-skeleton-subtitle,
+.asm-skeleton-stat,
+.asm-skeleton-filter,
+.asm-skeleton-badge,
+.asm-skeleton-title,
+.asm-skeleton-text,
+.asm-skeleton-btn {
+  background: linear-gradient(
+    90deg,
+    #ececec 25%,
+    #f7f7f7 50%,
+    #ececec 75%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.3s infinite;
+}
+
+.asm-skeleton-header {
+  width: 320px;
+  height: 32px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.asm-skeleton-subtitle {
+  width: 520px;
+  height: 16px;
+  border-radius: 6px;
+  margin-bottom: 30px;
+}
+
+.asm-skeleton-stat {
+  height: 110px;
+  border-radius: 14px;
+}
+
+.asm-skeleton-filter {
+  width: 140px;
+  height: 42px;
+  border-radius: 10px;
+}
+
+.asm-skeleton-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.06);
+}
+
+.asm-skeleton-left {
+  width: 70%;
+}
+
+.asm-skeleton-badge {
+  width: 80px;
+  height: 26px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+}
+
+.asm-skeleton-title {
+  width: 300px;
+  height: 22px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.asm-skeleton-text {
+  width: 220px;
+  height: 14px;
+  border-radius: 6px;
+}
+
+.asm-skeleton-btn {
+  width: 140px;
+  height: 44px;
+  border-radius: 10px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}

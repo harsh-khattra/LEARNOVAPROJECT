@@ -9,6 +9,7 @@ import {
   FiUsers,
   FiShield,
   FiCreditCard,
+ FiBookmark,
 } from "react-icons/fi";
 
 import { useAuth } from "../../Context/AuthContext"; // Change path if needed
@@ -42,11 +43,18 @@ const menuItems: MenuItem[] = [
     icon: <FiBookOpen />,
     roles: ["Admin", "Teacher"],
   },
+  
   {
     name: "Courses Available",
     path: "/learning/student/courses",
     icon: <FiUsers />,
     roles: ["Admin", "Student"],
+  },
+  {
+    name: "Saved Resources",
+    path: "student/sandbox",
+    icon: <FiBookmark />,
+    roles: ["Studet","Admin"],
   },
   {
     name: "Admin Panel",

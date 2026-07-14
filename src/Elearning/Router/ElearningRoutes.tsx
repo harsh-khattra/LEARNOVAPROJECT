@@ -36,6 +36,7 @@ import { CoursePlayerPage } from "../lms/pages/CoursePlayerPage";
 import EnrolledCourses from "../../Progress/Enrolled/Enrolledcourses";
 
 import Downloadcert from "../../Progress/Certificate/Downloadcert";
+import { MySandbox } from "../lms/pages/MySandbox";
 
 
 
@@ -94,7 +95,7 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
       <Route
         path="student/assignments/:contentId"
         element={
-          <ProtectedRoute allow={permissions.viewQuiz}>
+          <ProtectedRoute allow={permissions.manageAssignments}>
             <QuizComponent />
           </ProtectedRoute>
         }
@@ -123,6 +124,7 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
         }
       />
 
+
       <Route
         path="student/downloadcertificate/:certId"
         element={
@@ -150,7 +152,7 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
       <Route path="student/certificates" element={<Certificates />} />
       <Route path = "employee/courses" element = {< AvailableCourses />} />
       <Route path = "student/assignments" element= {<AssignmentDashboard />} />
-
+<Route path = "student/sandbox" element={<MySandbox />} />
       <Route
         path="student/completion"
         element={
@@ -159,7 +161,14 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
           </ProtectedRoute>
         }
       />
-
+ <Route
+        path="student/sandbox"
+        element={
+          <ProtectedRoute allow={permissions.viewResources}>
+            <MySandbox />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="student/timespent"
