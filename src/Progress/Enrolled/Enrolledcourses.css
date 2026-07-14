@@ -26,7 +26,8 @@
 
 /* ---- Banner ---- */
 .cert-banner {
-  background: linear-gradient(135deg, #008cf6 0%, #0263df 52%, #0048cb 100%);
+  background: linear-gradient(135deg, var(--ln-blue-primary) 0%, #0040b3 100%);
+  /* 1linear-gradient(35deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%) */
   color: #ffffff;
   padding-bottom: 60px;
   padding-top: 60px;
@@ -84,11 +85,25 @@
  margin-left: 400px;
 }
 
+.search-input {
+  width: 100%;
+  max-width: 480px;
+  padding: 13px 26px;
+  font-size: 14px;
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 30px; /* Perfect pill/capsule shape */
+  outline: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.25s ease-in-out;
+}
+
 .cert-tab {
   border: none;
   background: none;
   padding: 10px 2px;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   color: #606266;
   border-bottom: 2px solid transparent;
@@ -231,28 +246,28 @@
   padding: 10px 16px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
-  background: #ffffff;
+  background: #26ca3f;
   color: #1a1a1a;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .cert-action-btn:hover {
-  background: #f8fafc;
-  border-color: #9ca3af;
+  background: #229624;
+  /* border-color: #9ca3af; */
 }
 
 /* "Completed" state now uses the emerald green from CourseDashboard's price badge */
 .cert-action-btn.is-done {
-  background: #2ecc71;
-  border-color: #2ecc71;
+  background:#2563eb ;
+  border-color:#2563eb ;
   color: #ffffff;
   width: 100%;
   justify-content: center;
 }
 
 .cert-action-btn.is-done:hover {
-  background: #27ae60;
+  background-color: rgb(13, 93, 143);
 }
 
 /* ---- Empty state ---- */

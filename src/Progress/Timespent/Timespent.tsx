@@ -1,11 +1,8 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import "./Timespent.css";
 import { SupabaseClient as supabase } from "../../Helper/Supabase";
+import CourseSkeleton from "../../Elearning/Header/CourseSkeleton";
 
-/* =========================================================================
-   TIME SPENT ANALYTICS — Fully Dynamic Version
-   All data fetched from watch_sessions table in Supabase.
-   ========================================================================= */
 
 type Period = "day" | "week" | "month";
 type AccentColor = "blue" | "green";
@@ -197,6 +194,12 @@ const Heatmap: React.FC<{ cells: number[] }> = ({ cells }) => {
   const cols: number[][] = [];
   for (let w = 0; w < weeks; w++) cols.push(cells.slice(w * days, w * days + days));
 
+
+
+
+
+
+  
   return (
     <div className="heatmap">
       <div className="heatmap__grid">
@@ -601,6 +604,19 @@ const TimeSpentAnalytics: React.FC = () => {
     { id: "insights", label: "Insights" },
   ];
 
+
+
+  if (loading) {
+  return (
+    <div className="dashboard-container">
+      <div className="course-grid">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <CourseSkeleton key={index} />
+        ))}
+      </div>
+    </div>
+  );
+}
   /* ── RENDER ── */
   return (
     <div className="tsa-root" data-theme={theme}>

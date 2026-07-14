@@ -388,6 +388,73 @@ select.input {
   margin-bottom: 20px;
 }
 
+/* ===== Social Login (added) ===== */
+
+.ortext {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  margin: 14px 0 10px;
+  position: relative;
+}
+
+.ortext::before,
+.ortext::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.ortext::before {
+  left: 0;
+}
+
+.ortext::after {
+  right: 0;
+}
+
+.googleBtn,
+.githubBtn,
+.facebookBtn {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 20px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+
+.googleBtn:hover,
+.githubBtn:hover,
+.facebookBtn:hover {
+  background: var(--bg-page);
+  border-color: var(--text-secondary);
+  transform: translateY(-1px);
+}
+
+.logo {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 @media (max-width: 850px) {
   .container {
     flex-direction: column;

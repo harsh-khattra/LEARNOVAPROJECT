@@ -1,6 +1,6 @@
 .sidebar {
-  width: 72px;               /* 👈 default collapsed width */
-  min-width: 72px;
+  width: 65px;               /* 👈 default collapsed width */
+  min-width: 7px;
   background: #ffffff;
   border-right: 1px solid #e5e7eb;
   display: flex;
@@ -27,7 +27,7 @@
 .nav {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 15px;
   padding: 0 12px;
 }
 
@@ -39,7 +39,7 @@
   text-decoration: none;
   padding: 14px 18px;
   border-radius: 12px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   white-space: nowrap;        /* 👈 text ek line mein rahe */
   transition: all 0.2s ease;
@@ -154,3 +154,61 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 } */
+ 
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin: 8px 12px 12px;
+  border-top: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.profileIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 50%;
+  background: #eef2ff;
+  color: #2563eb;
+}
+
+.profileText {
+  display: flex;
+  flex-direction: column;
+}
+
+.profileGreeting {
+  font-weight: 600;
+  font-size: 18px;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.profileEmail {
+  font-size: 16px;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 160px;
+}
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin: 0 12px 12px;      /* removed top margin, auto will handle spacing */
+  margin-top: auto;         /* 👈 this pushes it to the bottom */
+  border-top: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.profileIcon{
+
+  margin-left:-10px;
+}
