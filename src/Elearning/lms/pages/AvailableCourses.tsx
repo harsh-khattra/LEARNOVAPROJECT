@@ -8,10 +8,6 @@ import Enrollment from '../../../Progress/Enrollment/Enroll';
 
 import './courseDashboard.css'
 
-
-
-
-
 export const AvailableCourses: React.FC = () => {
       const YT_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY; 
   const [courses, setCourses] = useState<Course[]>([]);

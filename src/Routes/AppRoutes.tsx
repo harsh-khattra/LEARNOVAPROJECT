@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
+import LoginCallback from "../Hrms/Authentication/LoginCallback";
+import AuthCallback from "../Hrms/Authentication/AuthCallback";
 
 import HrmsLayout from "../Hrms/Layout/HrmsLayout";
 import LearningLayout from "../Elearning/Layout/ElearningLayout";
@@ -31,6 +33,8 @@ const AppRoutes = ({ locale, setLocale }: AppRoutesProps) => {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />  {/* just Login, not all HrmsRoutes */}
       <Route path="/signup" element={<SignUp />} />
+       <Route path="/auth/callback" element={<AuthCallback />} />
+       <Route path="/auth/login-callback" element={<LoginCallback />} />
       {/* HRMS zone — layout wraps content via <Outlet /> */}
       <Route
         path="/hrms"

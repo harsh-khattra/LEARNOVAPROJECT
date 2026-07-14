@@ -43,6 +43,57 @@ const SignUpPortal: React.FC = () => {
     setIsStudent((prev) => !prev);
   };
 
+  // ---- Social Login handlers ----
+  // redirectTo points at a dedicated /auth/callback route (see AuthCallback.tsx)
+  // that creates the `profiles` row on first login and redirects by role.
+  // ?role=Student|Teacher tells that callback which role to assign if this
+  // is a brand-new account (matches whichever form the user is on).
+  const buildRedirectTo = (role: 'Student' | 'Teacher') =>
+    `${window.location.origin}/auth/callback?role=${role}`;
+
+  const googleLogin = async (role: 'Student' | 'Teacher') => {
+    const { error } = await SupabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: buildRedirectTo(role),
+      },
+    });
+    if (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const facebookLogin = async (role: 'Student' | 'Teacher') => {
+    const { error } = await SupabaseClient.auth.signInWithOAuth({
+      provider: 'facebook',
+      options: {
+        redirectTo: buildRedirectTo(role),
+        queryParams: {
+          prompt: 'consent',
+        },
+      },
+    });
+    if (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const signInWithGitHub = async (role: 'Student' | 'Teacher') => {
+    const { error } = await SupabaseClient.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: buildRedirectTo(role),
+        queryParams: {
+          prompt: 'consent',
+        },
+      },
+    });
+    if (error) {
+      toast.error(error.message);
+    }
+  };
+  // ---------------------------------------------------------
+
   // Student Form — wired to Formik + Yup + Supabase, same signup pattern as Teacher below.
   // ASSUMPTION: your `roles` table has a row where emprole = "Student" — adjust the string
   // below to match whatever value you actually use for the student role in Supabase.
@@ -71,69 +122,82 @@ const SignUpPortal: React.FC = () => {
 
     onSubmit: async (values) => {
       setLoading(true);
+
       try {
+        // Save current admin session (if an admin is creating accounts)
         const { data: sessionData } = await SupabaseClient.auth.getSession();
         const adminSession = sessionData.session;
 
+        // Create auth user
         const { data, error } = await SupabaseClient.auth.signUp({
           email: values.email,
           password: values.password,
+          options: {
+            emailRedirectTo: "http://localhost:5173/login", // Change if needed
+          },
         });
 
         if (error) {
           toast.error(error.message);
           return;
         }
-        const userId = data?.user?.id;
+
+        const userId = data.user?.id;
+
         if (!userId) {
-          toast.error('Signup failed, try again.');
+          toast.error("Signup failed. Please try again.");
           return;
         }
 
-        const { data: roleData } = await SupabaseClient.from('roles')
-          .select('id')
-          .eq('emprole', 'Student')
+        // Get Student role
+        const { data: roleData, error: roleError } = await SupabaseClient
+          .from("roles")
+          .select("id")
+          .eq("emprole", "Student")
           .maybeSingle();
 
-        if (!roleData) {
-          toast.error('Student role not found');
+        if (roleError || !roleData) {
+          toast.error("Student role not found");
           return;
         }
 
-        const { data: profileData, error: profileError } = await SupabaseClient
-          .from('profiles')
-          .upsert([
-            {
-              id: userId,
-              full_name: values.name,
-              role_id: roleData.id,
-              email: values.email,
-              avatar_url: null,
-            },
-          ])
-          .select()
-          .single();
+        // Insert profile
+        const { error: profileError } = await SupabaseClient
+          .from("profiles")
+          .upsert({
+            id: userId,
+            full_name: values.name,
+            email: values.email,
+            role_id: roleData.id,
+            avatar_url: null,
+          });
 
         if (profileError) {
-          console.error('Profile insert error:', profileError);
+          console.error(profileError);
           toast.error(profileError.message);
           return;
         }
-        if (!profileData) {
-          toast.error('Profile creation failed');
-          return;
-        }
 
-        toast.success('Signup successful!');
-        setSuccessMsg(`Welcome, ${values.name}! Your student registration is complete.`);
-        studentFormik.resetForm();
+        // Restore admin session if needed
         if (adminSession) {
           await SupabaseClient.auth.setSession(adminSession);
         }
-        navigate('/signup');
+
+        toast.success(
+          "Account created successfully! Please verify your email before logging in."
+        );
+
+        setSuccessMsg(
+          `Hi ${values.name}, we've sent a verification email to ${values.email}. Please verify your email before logging in.`
+        );
+
+        studentFormik.resetForm();
+
+        // Redirect to login page
+        navigate("/login");
       } catch (err) {
         console.error(err);
-        toast.error('Something went wrong');
+        toast.error("Something went wrong");
       } finally {
         setLoading(false);
       }
@@ -308,6 +372,26 @@ const SignUpPortal: React.FC = () => {
     setIsStudent(true);
   };
 
+  // Reusable social login block, both forms use this — role tells the OAuth
+  // callback which role to assign if this turns out to be a brand-new account.
+  const SocialLoginButtons = ({ role }: { role: 'Student' | 'Teacher' }) => (
+    <>
+      <p className={styles.ortext}>or</p>
+      <button className={styles.googleBtn} onClick={() => googleLogin(role)} type="button">
+        <img src="/google.png" alt="google" className={styles.logo} />
+        SIGNUP VIA GOOGLE
+      </button>
+      <button className={styles.githubBtn} onClick={() => signInWithGitHub(role)} type="button">
+        <img src="/github.png" alt="github" className={styles.logo} />
+        SIGNUP VIA GITHUB
+      </button>
+      <button className={styles.facebookBtn} onClick={() => facebookLogin(role)} type="button">
+        <img src="/facebook.png" alt="facebook" className={styles.logo} />
+        SIGNUP VIA FACEBOOK
+      </button>
+    </>
+  );
+
   return (
     <div className={styles['app-body']}>
       <div className={styles.container}>
@@ -318,10 +402,13 @@ const SignUpPortal: React.FC = () => {
           {/* Left branding pane with dynamic single outlined toggle */}
           <div className={styles['left-pane']}>
             <div className={styles['brand-title']}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '2px' }}>
-                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-                <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
-              </svg>
+              <img
+                src="/src/assets/logo.png"
+                width={34}
+                height={30}
+                alt="Logo"
+                style={{ marginRight: '2px' }}
+              />
               LEARNOVA
             </div>
 
@@ -478,6 +565,9 @@ const SignUpPortal: React.FC = () => {
                       </div>
 
                       <button type="submit" className={styles['action-btn-pill-solid']}>Register Student</button>
+
+                      {/* Social Login */}
+                      <SocialLoginButtons role="Student" />
                     </form>
                   </div>
                 ) : (
@@ -646,6 +736,9 @@ const SignUpPortal: React.FC = () => {
                       </div>
 
                       <button type="submit" className={styles['action-btn-pill-solid']}>Submit Registration</button>
+
+                      {/* Social Login */}
+                      <SocialLoginButtons role="Teacher" />
                     </form>
                   </div>
                 )}

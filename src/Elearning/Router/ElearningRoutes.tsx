@@ -1,9 +1,11 @@
 import { Routes, Route } from "react-router-dom";
 
 
+
 // import Discussion from "../Discussion/DiscussionModule";
 
 // import Certificates from "../Student/Certificate";
+
 
 
 
@@ -23,9 +25,17 @@ import CourseCompletion from "../../Progress/Coursecompletion/CourseCompletion";
 import TimeSpentAnalytics from "../../Progress/Timespent/Timespent";
 
 
+import EnrolledCourses from "../../Progress/Enrolled/Enrolledcourses";
+import Downloadcert from "../../Progress/Certificate/Downloadcert";
+
+
 import { LandingPage } from "../lms/pages/LandingPage";
-import { AssignmentDashboard } from "../lms/pages/AssignmentDashboard";
+// import { AssignmentDashboard } from "../lms/pages/AssignmentDashboard";
 import { QuizComponent } from "../lms/pages/QuizComponent";
+
+
+import { AssignmentDashboard } from '../lms/pages/AssignmentDashboard';
+
 
 import { CourseDashboardPage } from "../lms/pages/CourseDashboardPage";
 import { AvailableCourses } from "../lms/pages/AvailableCourses";
@@ -33,10 +43,10 @@ import { AdminApprovalDesk } from "../lms/pages/AdminApproval";
 import { ManageContentPage } from "../lms/pages/ManageContentPage";
 import { CoursePlayerPage } from "../lms/pages/CoursePlayerPage";
 
-import EnrolledCourses from "../../Progress/Enrolled/Enrolledcourses";
 
-import Downloadcert from "../../Progress/Certificate/Downloadcert";
+
 import { MySandbox } from "../lms/pages/MySandbox";
+
 
 
 
@@ -103,7 +113,9 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
 
 
 
+
       <Route path="employee/courses"      element={<AvailableCourses />} />
+
 
       <Route
         path="student/discussion"
@@ -113,6 +125,11 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
           </ProtectedRoute>
         }
       />
+
+
+
+      <Route path="employee/courses"      element={<AvailableCourses />} />
+
 
 
       <Route
@@ -141,7 +158,9 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
             <QuizPerformancePage />
           </ProtectedRoute>
         }
-      />
+      
+/>
+
 
 
 
@@ -153,6 +172,7 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
       <Route path = "employee/courses" element = {< AvailableCourses />} />
       <Route path = "student/assignments" element= {<AssignmentDashboard />} />
 <Route path = "student/sandbox" element={<MySandbox />} />
+
       <Route
         path="student/completion"
         element={
@@ -161,6 +181,7 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
           </ProtectedRoute>
         }
       />
+
  <Route
         path="student/sandbox"
         element={
@@ -169,6 +190,18 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
           </ProtectedRoute>
         }
       />
+
+
+
+      {/* Student */}
+      <Route path="student/landingPage" element={<LandingPage />} />
+      <Route path="student/courses" element={<CourseDashboardPage />} />
+      <Route path="student/discussion" element={<Discussion />} />
+      <Route path="student/certificates" element={<Certificates />} />
+      <Route path = "employee/courses" element = {< AvailableCourses />} />
+      <Route path = "student/assignments" element= {<AssignmentDashboard />} />
+
+
 
       <Route
         path="student/timespent"
@@ -181,10 +214,12 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
 
 
 
+
       <Route path="lms/managecontent/:id" element={<ManageContentPage />} />
       <Route path="learning/course-player/:id" element={<CoursePlayerPage />} />
       <Route path="/lms/dashboard"        element={<CourseDashboardPage />} />
       <Route path="/course-player/:id"    element={<CoursePlayerPage />} />
+
 
       <Route
         path="student/enroll"
@@ -194,6 +229,14 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
           </ProtectedRoute>
         }
       />
+
+
+
+      <Route path="lms/managecontent/:id" element={<ManageContentPage />} />
+      <Route path="learning/course-player/:id" element={<CoursePlayerPage />} />
+      <Route path="/lms/dashboard"        element={<CourseDashboardPage />} />
+      <Route path="/course-player/:id"    element={<CoursePlayerPage />} />
+
 
 
       {/* ---------------- TEACHER ---------------- */}

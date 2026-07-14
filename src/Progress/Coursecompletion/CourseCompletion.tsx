@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import CourseSkeleton from "../../Elearning/Header/CourseSkeleton";
 import {
   FiCheckCircle,
   FiClock,
@@ -310,12 +311,17 @@ const CourseCompletion = () => {
   ];
 
   if (loading) {
-    return (
-      <div className={styles.container}>
-        <p style={{ color: "#9b958c", fontSize: 14 }}>Loading your progress…</p>
+  return (
+    <div className="dashboard-container">
+      <div className="course-grid">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <CourseSkeleton key={index} />
+        ))}
       </div>
-    );
-  }
+    </div>
+  );
+}
+
 
   if (error) {
     return (
@@ -324,6 +330,8 @@ const CourseCompletion = () => {
       </div>
     );
   }
+
+
 
   return (
     <div className={styles.container}>

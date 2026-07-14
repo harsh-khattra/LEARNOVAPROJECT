@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import CourseSkeleton from "../../Elearning/Header/CourseSkeleton";
 import "./Enrolledcourses.css";
 import { lmsService } from "../../Elearning/lms/services/lmsService";
 import type { Course } from "../../Elearning/lms/types/lms";
@@ -37,6 +37,7 @@ type PlayerState = {
   queueIndex: number;
   watchSeconds: Map<string, number>; // best seconds_watched per content id, for this employee
   durationOverrides: Map<string, number>; // browser-detected durations, used when contents.duration_seconds is NULL/0
+  completed: Set<string>; // content ids explicitly marked "ended" — bypasses duration ratio math entirely
 };
 
 const INITIAL_PLAYER_STATE: PlayerState = {
@@ -49,6 +50,7 @@ const INITIAL_PLAYER_STATE: PlayerState = {
   queueIndex: 0,
   watchSeconds: new Map(),
   durationOverrides: new Map(),
+  completed: new Set(),
 };
 
 /**
@@ -61,14 +63,25 @@ const INITIAL_PLAYER_STATE: PlayerState = {
  * the <video> element or the YouTube player) when contents.duration_seconds
  * is NULL/0 in the database — otherwise that lesson could never contribute
  * to progress no matter how much of it was watched.
+ *
+ * `completed` is an explicit "this lesson's ended event fired" flag, checked
+ * BEFORE the ratio math. This matters for lessons where duration/watched
+ * numbers are unreliable — most notably a YouTube *playlist* embed, where
+ * the player's reported duration is only ever for the currently-playing
+ * video within the playlist, not the whole thing, so a plain watched/duration
+ * ratio can land anywhere and never cleanly hit 1.0 even after the entire
+ * playlist has finished. The "ended" event still fires correctly once the
+ * whole playlist completes, so we use that as the source of truth instead.
  */
 function computeProgressPercent(
   queue: ContentRow[],
   watchSeconds: Map<string, number>,
-  durationOverrides: Map<string, number>
+  durationOverrides: Map<string, number>,
+  completed: Set<string>
 ): number {
   if (queue.length === 0) return 0;
   const totalRatio = queue.reduce((sum, c) => {
+    if (completed.has(c.id)) return sum + 1; // explicit completion always wins
     const duration = (c.duration_seconds && c.duration_seconds > 0)
       ? c.duration_seconds
       : durationOverrides.get(c.id) ?? 0;
@@ -158,6 +171,8 @@ function toEmbeddableUrl(rawUrl: string): { kind: "youtube" | "direct"; url: str
 export default function EnrolledCourses() {
 
    console.log("Enrolled Page Loaded");
+   const [searchQuery, setSearchQuery] = useState('');
+   
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>("enrolled");
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
@@ -276,10 +291,23 @@ console.log("enrollment ids:", hydrated.map(c => (c as any).enrollmentId));
     [courses]
   );
 
-  const visibleCourses = useMemo(
-    () => filterCourses(courses, activeTab),
-    [courses, activeTab]
-  );
+const visibleCourses = useMemo(() => {
+  const tabFiltered = filterCourses(courses, activeTab);
+  const q = searchQuery.trim().toLowerCase();
+  if (!q) return tabFiltered;
+
+  return tabFiltered.filter((course) => {
+    const title = course.title?.toLowerCase() ?? "";
+    const category = getField<string>(course, "category")?.toLowerCase() ?? "";
+    const instructor =
+      getField<string>(course, "instructor", "instructor_name")?.toLowerCase() ?? "";
+    return (
+      title.includes(q) ||
+      category.includes(q) ||
+      instructor.includes(q)
+    );
+  });
+}, [courses, activeTab, searchQuery]);
 
   const isCertificatesTab = activeTab === "certificates";
 
@@ -357,10 +385,28 @@ console.log("enrollment ids:", hydrated.map(c => (c as any).enrollmentId));
         }
       }
 
+      // Approximate initial "completed" set from persisted watch_sessions:
+      // a lesson counts as already-completed if we've recorded watched time
+      // at or beyond ~90% of its known duration. This is a best-effort
+      // reconstruction only — it can't recover true "ended" events from a
+      // past session, but it keeps the resume/checkmark UI reasonably
+      // accurate for lessons with reliable duration data. Lessons whose
+      // duration was never resolved (e.g. a playlist) will re-derive their
+      // completed status the next time they're played to the end.
+      const initialCompleted = new Set<string>();
+      for (const c of queue) {
+        const duration = c.duration_seconds ?? 0;
+        const watched = watchSeconds.get(c.id) ?? 0;
+        if (duration > 0 && watched >= duration * 0.9) {
+          initialCompleted.add(c.id);
+        }
+      }
+
       // Resume from the first lesson that isn't ~fully watched yet, or the
       // first item (rewatch from the start) if everything is already done.
       const resumeIndex = Math.max(
         queue.findIndex((c) => {
+          if (initialCompleted.has(c.id)) return false;
           const duration = c.duration_seconds ?? 0;
           const watched = watchSeconds.get(c.id) ?? 0;
           return duration <= 0 || watched < duration * 0.9;
@@ -378,6 +424,7 @@ console.log("enrollment ids:", hydrated.map(c => (c as any).enrollmentId));
         queueIndex: resumeIndex,
         watchSeconds,
         durationOverrides: new Map(),
+        completed: initialCompleted,
       });
     } catch (err) {
       console.error("Error loading course content:", err);
@@ -453,9 +500,17 @@ console.log("enrollment ids:", hydrated.map(c => (c as any).enrollmentId));
    * recomputes the course's overall progress as the average watched-ratio
    * across all lessons (partial credit — no need to finish a video to see
    * progress move), and writes that back to public.course_enrollment.
+   *
+   * isFinal=true means this call came from an actual "ended" event (video
+   * onEnded, or the YouTube player's ENDED state) rather than a periodic
+   * heartbeat. When true, the lesson is added to the `completed` set, which
+   * makes it count as 100% in computeProgressPercent regardless of whether
+   * the watched/duration ratio is reliable (e.g. a YouTube playlist, where
+   * the reported duration only ever reflects whichever video within the
+   * playlist happens to be playing at that moment).
    */
-  async function recordProgress(contentId: string, secondsWatched: number) {
-    console.log("[recordProgress] called", { contentId, secondsWatched, employeeId });
+  async function recordProgress(contentId: string, secondsWatched: number, isFinal: boolean = false) {
+    console.log("[recordProgress] called", { contentId, secondsWatched, employeeId, isFinal });
     if (!employeeId) {
       console.warn("[recordProgress] skipped: no employeeId yet");
       return;
@@ -471,19 +526,33 @@ console.log("enrollment ids:", hydrated.map(c => (c as any).enrollmentId));
 
     setPlayer((prev) => {
       const prevBest = prev.watchSeconds.get(contentId) ?? 0;
-      if (secondsWatched <= prevBest) {
-        // No new ground covered — nothing to recompute.
+      const alreadyCompleted = prev.completed.has(contentId);
+
+      // Nothing new to record: not a final/ended call, and no new watch
+      // time either.
+      if (secondsWatched <= prevBest && !isFinal) {
+        return prev;
+      }
+      // Final call but this lesson was already marked completed and there's
+      // no new watch time — avoid redundant writes.
+      if (isFinal && alreadyCompleted && secondsWatched <= prevBest) {
         return prev;
       }
 
       const nextWatchSeconds = new Map(prev.watchSeconds);
-      nextWatchSeconds.set(contentId, secondsWatched);
+      if (secondsWatched > prevBest) {
+        nextWatchSeconds.set(contentId, secondsWatched);
+      }
 
-      const newProgress = computeProgressPercent(prev.queue, nextWatchSeconds, prev.durationOverrides);
+      const nextCompleted = new Set(prev.completed);
+      if (isFinal) nextCompleted.add(contentId);
+
+      const newProgress = computeProgressPercent(prev.queue, nextWatchSeconds, prev.durationOverrides, nextCompleted);
       console.log("[recordProgress] new progress", {
         newProgress,
         contentDuration: prev.queue.find((c) => c.id === contentId)?.duration_seconds,
         durationOverride: prev.durationOverrides.get(contentId),
+        isFinal,
       });
 
       if (prev.course) {
@@ -505,6 +574,13 @@ console.log("enrollment ids:", hydrated.map(c => (c as any).enrollmentId));
           }, { count: "exact" })
           .eq("employee_id", employeeId)
           .eq("course_id", prev.course.id)
+          // Guard against a race between overlapping heartbeat/complete
+          // calls: their network requests can resolve out of order, so a
+          // stale lower-progress request could otherwise land AFTER the
+          // real final 100% write and silently overwrite it. Only apply
+          // this write if it doesn't decrease progress from what's already
+          // stored (or the row has no progress yet).
+          .or(`progress_percentage.lt.${newProgress},progress_percentage.is.null`)
           .select()
           .then(({ error: enrollError, data, count }) => {
             if (enrollError) {
@@ -528,7 +604,7 @@ console.log("enrollment ids:", hydrated.map(c => (c as any).enrollmentId));
         );
       }
 
-      return { ...prev, watchSeconds: nextWatchSeconds };
+      return { ...prev, watchSeconds: nextWatchSeconds, completed: nextCompleted };
     });
   }
 
@@ -541,13 +617,17 @@ console.log("enrollment ids:", hydrated.map(c => (c as any).enrollmentId));
     openPlayer(course);
   }
 
-  if (loading) {
-    return (
-      <div style={{ padding: "40px", textAlign: "center", color: "#666" }}>
-        Loading your enrolled courses...
+ if (loading) {
+  return (
+    <div className="dashboard-container">
+      <div className="course-grid">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <CourseSkeleton key={index} />
+        ))}
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <div className="cert-page">
@@ -562,8 +642,19 @@ console.log("enrollment ids:", hydrated.map(c => (c as any).enrollmentId));
     : "My Enrolled Courses"}
 </h1>
           <p>Continue learning from where you left off, track your progress across every course.</p>
+          <br/>
+          <div className="search-container">
+            <input 
+              type="text"
+              className="search-input"
+              placeholder="Search active catalog..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
         </div>
-        
+       
       </div>
 
       {error && <div className="cert-empty" style={{ marginBottom: 16 }}>{error}</div>}
@@ -664,8 +755,8 @@ console.log("enrollment ids:", hydrated.map(c => (c as any).enrollmentId));
           player={player}
           onClose={closePlayer}
           onSelect={playQueueIndex}
-          onComplete={recordProgress}
-          onHeartbeat={recordProgress}
+          onComplete={(contentId, secondsWatched) => recordProgress(contentId, secondsWatched, true)}
+          onHeartbeat={(contentId, secondsWatched) => recordProgress(contentId, secondsWatched, false)}
           onDurationKnown={recordDuration}
         />
       )}
@@ -689,7 +780,7 @@ function VideoPlayerModal({
   onHeartbeat: (contentId: string, secondsWatched: number) => void;
   onDurationKnown: (contentId: string, durationSeconds: number) => void;
 }) {
-  const { loading, error, course, content, queue, queueIndex, watchSeconds, durationOverrides } = player;
+  const { loading, error, course, content, queue, queueIndex, watchSeconds, durationOverrides, completed } = player;
 
   return (
     <div
@@ -786,7 +877,7 @@ function VideoPlayerModal({
                     ? item.duration_seconds
                     : durationOverrides.get(item.id) ?? 0;
                   const watched = watchSeconds.get(item.id) ?? 0;
-                  const isDone = duration > 0 && watched >= duration * 0.9;
+                  const isDone = completed.has(item.id) || (duration > 0 && watched >= duration * 0.9);
                   return (
                     <li key={item.id}>
                       <button
@@ -938,6 +1029,13 @@ function DirectVideoPlayer({
  * heartbeat rows into watch_sessions. A plain
  * <iframe src="...youtube.com/embed/..."> gives neither on its own, which
  * is why progress never moved before.
+ *
+ * For a *playlist* embed specifically: YouTube auto-advances through videos
+ * within the same iframe, so `currentTime`/`duration` reset with each new
+ * video and don't represent "progress through the whole playlist" — only
+ * the final ENDED event (state 0, fired once when the whole playlist is
+ * done) is trustworthy here. onComplete's caller marks this lesson as
+ * explicitly `completed` in that case, sidestepping the unreliable ratio.
  */
 function YouTubePlayer({
   embedUrl,
@@ -1055,7 +1153,6 @@ function YouTubePlayer({
   }, [embedUrl]);
 
   return (
-    <div className="body1">
     <div style={{ position: "relative", paddingTop: "56.25%" }}>
       <iframe
         ref={iframeRef}
@@ -1073,7 +1170,6 @@ function YouTubePlayer({
           borderRadius: 8,
         }}
       />
-    </div>
     </div>
   );
 }

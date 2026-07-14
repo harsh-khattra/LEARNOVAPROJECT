@@ -171,6 +171,10 @@ departments!profiles_department_id_fkey(empDepartment)
         .single();
 
       // console.log("profile result:", profile, "error:", error);
+            console.log("User ID:", userId);
+console.log("Profile:", profile);
+console.log("Error:", error);
+
 
       if (error || !profile || !profile.roles) {
         setLoading(false);
@@ -255,10 +259,12 @@ console.log("Permissions:", {
   }
   useEffect(() => {
     // console.log("useEffect fired");
-
+console.log("AuthContext Mounted");
     const { data: listener } = SupabaseClient.auth.onAuthStateChange(
       (event, session) => {
         // console.log("event:", event);
+ console.log("EVENT:", event);
+      console.log("SESSION:", session);
 
 
         if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
