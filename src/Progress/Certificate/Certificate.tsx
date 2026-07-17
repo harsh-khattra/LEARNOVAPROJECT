@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Loader2 from "../../Elearning/Header/Loader2";
 import CourseSkeleton from "../../Elearning/Header/CourseSkeleton";
 import "./Certificate.css";
 import { lmsService } from "../../Elearning/lms/services/lmsService";
@@ -235,18 +236,11 @@ export default function Certificate() {
 
   const isCertificatesTab = activeTab === "certificates";
 
-   if (loading) {
-  return (
-    <div className="dashboard-container">
-      <div className="course-grid">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <CourseSkeleton key={index} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
+  if (loading) {
+  
+    return <Loader2 />;
+    
+  }
 
   return (
     <div className="cert-page">

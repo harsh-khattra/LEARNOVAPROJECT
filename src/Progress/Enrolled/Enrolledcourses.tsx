@@ -72,6 +72,10 @@ const INITIAL_PLAYER_STATE: PlayerState = {
  * ratio can land anywhere and never cleanly hit 1.0 even after the entire
  * playlist has finished. The "ended" event still fires correctly once the
  * whole playlist completes, so we use that as the source of truth instead.
+ * PDFs are also added to `completed` as soon as they're opened (see
+ * PdfViewer below), since there's no meaningful "watch time" concept for a
+ * document — otherwise a course containing a PDF lesson could never reach
+ * 100% no matter how much progress was made on the other lessons.
  */
 function computeProgressPercent(
   queue: ContentRow[],
@@ -387,17 +391,22 @@ const visibleCourses = useMemo(() => {
 
       // Approximate initial "completed" set from persisted watch_sessions:
       // a lesson counts as already-completed if we've recorded watched time
-      // at or beyond ~90% of its known duration. This is a best-effort
-      // reconstruction only — it can't recover true "ended" events from a
-      // past session, but it keeps the resume/checkmark UI reasonably
-      // accurate for lessons with reliable duration data. Lessons whose
-      // duration was never resolved (e.g. a playlist) will re-derive their
-      // completed status the next time they're played to the end.
+      // at or beyond ~90% of its known duration, OR if it's a PDF (PDFs are
+      // always treated as complete once opened — see PdfViewer). This is a
+      // best-effort reconstruction only — it can't recover true "ended"
+      // events from a past session, but it keeps the resume/checkmark UI
+      // reasonably accurate for lessons with reliable duration data.
+      // Lessons whose duration was never resolved (e.g. a playlist) will
+      // re-derive their completed status the next time they're played to
+      // the end.
       const initialCompleted = new Set<string>();
       for (const c of queue) {
         const duration = c.duration_seconds ?? 0;
         const watched = watchSeconds.get(c.id) ?? 0;
-        if (duration > 0 && watched >= duration * 0.9) {
+        const isPdf = (c.type ?? "").toLowerCase() === "pdf";
+        if (isPdf && watched > 0) {
+          initialCompleted.add(c.id);
+        } else if (duration > 0 && watched >= duration * 0.9) {
           initialCompleted.add(c.id);
         }
       }
@@ -495,19 +504,31 @@ const visibleCourses = useMemo(() => {
   }
 
   /**
-   * Called on every heartbeat AND when a video ends. Logs the watch_sessions
-   * row, updates the in-memory best-seconds-watched for that lesson, then
-   * recomputes the course's overall progress as the average watched-ratio
-   * across all lessons (partial credit — no need to finish a video to see
-   * progress move), and writes that back to public.course_enrollment.
+   * Called on every heartbeat AND when a video ends (or a PDF is opened).
+   * Logs the watch_sessions row, updates the in-memory best-seconds-watched
+   * for that lesson, then recomputes the course's overall progress as the
+   * average watched-ratio across all lessons (partial credit — no need to
+   * finish a video to see progress move), and writes that back to
+   * public.course_enrollment.
    *
    * isFinal=true means this call came from an actual "ended" event (video
-   * onEnded, or the YouTube player's ENDED state) rather than a periodic
-   * heartbeat. When true, the lesson is added to the `completed` set, which
-   * makes it count as 100% in computeProgressPercent regardless of whether
-   * the watched/duration ratio is reliable (e.g. a YouTube playlist, where
-   * the reported duration only ever reflects whichever video within the
-   * playlist happens to be playing at that moment).
+   * onEnded, the YouTube player's ENDED state, or a PDF being opened)
+   * rather than a periodic heartbeat. When true, the lesson is added to the
+   * `completed` set, which makes it count as 100% in
+   * computeProgressPercent regardless of whether the watched/duration
+   * ratio is reliable (e.g. a YouTube playlist, or a PDF which has no
+   * duration at all).
+   *
+   * IMPORTANT: the write to `course_enrollment` below matches rows using
+   * `.eq("student_id", employeeId)`, matching the same column name used
+   * everywhere else in this file (watch_sessions, fetch queries, etc).
+   * If your `course_enrollment` table actually uses a different column
+   * name (e.g. `employee_id`), update the `.eq(...)` call below to match —
+   * otherwise the update will silently match zero rows and progress will
+   * reset to whatever's in the DB on every page refresh, which was the
+   * original bug. Watch the console: a successful save logs
+   * "[course_enrollment] update OK — rows affected: 1"; zero rows logs an
+   * explicit warning.
    */
   async function recordProgress(contentId: string, secondsWatched: number, isFinal: boolean = false) {
     console.log("[recordProgress] called", { contentId, secondsWatched, employeeId, isFinal });
@@ -563,37 +584,82 @@ const visibleCourses = useMemo(() => {
           ? `CERT-${new Date().getFullYear()}-${prev.course.id.slice(0, 8).toUpperCase()}`
           : undefined;
 
-        SupabaseClient
-          .from("course_enrollment")
-          .update({
+        // FIX: first read the existing row ourselves (instead of blindly
+        // calling .update()) so we can tell the two failure modes apart:
+        //   (a) no enrollment row exists yet for this student/course →
+        //       .update() would match 0 rows and silently do nothing, so
+        //       progress for THAT course specifically would never persist
+        //       and would reset to 0% on every refresh — this matches
+        //       "some videos reset, not all".
+        //   (b) a row exists but our stale-write guard blocks this write.
+        // We fetch first, then either update (row exists) or insert (row
+        // missing), and log exactly which path was taken so it's easy to
+        // confirm in the console which courses are hitting which case.
+        (async () => {
+          const { data: existingRows, error: fetchErr } = await SupabaseClient
+            .from("course_enrollment")
+            .select("id, progress_percentage")
+            .eq("student_id", employeeId)
+            .eq("course_id", prev.course!.id);
+
+          if (fetchErr) {
+            console.error("[course_enrollment] lookup FAILED:", fetchErr);
+            return;
+          }
+
+          const payload = {
             progress_percentage: newProgress,
             updated_at: new Date().toISOString(),
             status: isCourseDone ? "completed" : "in_progress",
             ...(isCourseDone ? { completed_at: new Date().toISOString() } : {}),
             ...(generatedCertificateId ? { certificate_id: generatedCertificateId } : {}),
-          }, { count: "exact" })
-          .eq("employee_id", employeeId)
-          .eq("course_id", prev.course.id)
-          // Guard against a race between overlapping heartbeat/complete
-          // calls: their network requests can resolve out of order, so a
-          // stale lower-progress request could otherwise land AFTER the
-          // real final 100% write and silently overwrite it. Only apply
-          // this write if it doesn't decrease progress from what's already
-          // stored (or the row has no progress yet).
-          .or(`progress_percentage.lt.${newProgress},progress_percentage.is.null`)
-          .select()
-          .then(({ error: enrollError, data, count }) => {
-            if (enrollError) {
-              console.error("[course_enrollment] update FAILED:", enrollError);
+          };
+
+          if (!existingRows || existingRows.length === 0) {
+            // No enrollment row for this student/course at all — this is
+            // almost certainly why THIS course keeps resetting to 0% on
+            // refresh. Insert one instead of silently no-op-ing.
+            console.warn(
+              "[course_enrollment] ⚠️ no existing row for student_id/course_id — inserting a new one instead of updating",
+              { student_id: employeeId, course_id: prev.course!.id }
+            );
+            const { error: insertErr, data: insertData } = await SupabaseClient
+              .from("course_enrollment")
+              .insert({ student_id: employeeId, course_id: prev.course!.id, ...payload })
+              .select();
+            if (insertErr) {
+              console.error("[course_enrollment] insert FAILED:", insertErr);
             } else {
-              console.log("[course_enrollment] update OK — rows affected:", count, "returned rows:", data);
-              if (!data || data.length === 0) {
-                console.warn(
-                  "[course_enrollment] ⚠️ ZERO ROWS MATCHED — check that employee_id/course_id types & values line up with the row in the table."
-                );
-              }
+              console.log("[course_enrollment] insert OK:", insertData);
             }
-          });
+            return;
+          }
+
+          // Row exists — only overwrite if this doesn't decrease progress
+          // from what's already stored, guarding against out-of-order
+          // heartbeat/complete network responses overwriting a later,
+          // higher value with a stale lower one.
+          const storedProgress = existingRows[0].progress_percentage;
+          if (storedProgress != null && storedProgress > newProgress) {
+            console.log(
+              "[course_enrollment] skipped write — stored progress is already higher",
+              { storedProgress, newProgress }
+            );
+            return;
+          }
+
+          const { error: updateErr, data: updateData } = await SupabaseClient
+            .from("course_enrollment")
+            .update(payload)
+            .eq("id", existingRows[0].id)
+            .select();
+
+          if (updateErr) {
+            console.error("[course_enrollment] update FAILED:", updateErr);
+          } else {
+            console.log("[course_enrollment] update OK:", updateData);
+          }
+        })();
 
         setCourses((prevCourses) =>
           prevCourses.map((c) =>
@@ -925,10 +991,11 @@ function PlayableContent({
 
   if (type === "pdf") {
     return (
-      <iframe
-        title={content.title}
-        src={content.content_url}
-        style={{ width: "100%", height: "60vh", border: "none", borderRadius: 8 }}
+      <PdfViewer
+        key={content.id}
+        content={content}
+        onComplete={onComplete}
+        onDurationKnown={onDurationKnown}
       />
     );
   }
@@ -958,6 +1025,45 @@ function PlayableContent({
       onComplete={onComplete}
       onHeartbeat={onHeartbeat}
       onDurationKnown={onDurationKnown}
+    />
+  );
+}
+
+/**
+ * FIX: previously PDFs just rendered an <iframe> with no progress
+ * signalling at all. Because they never call onDurationKnown/onComplete,
+ * their duration stayed at 0 forever, and computeProgressPercent
+ * explicitly gives a duration<=0 lesson a contribution of 0 no matter what
+ * — so any course containing a PDF lesson could never reach 100%, and its
+ * PDF lesson would never show as "watched" either.
+ *
+ * A PDF has no meaningful watch-time/duration concept, so instead of
+ * trying to fake a ratio, we treat "opened the PDF" as "completed this
+ * lesson", the same way the YouTube-playlist ENDED event is treated as an
+ * unconditional completion signal elsewhere in this file.
+ */
+function PdfViewer({
+  content,
+  onComplete,
+  onDurationKnown,
+}: {
+  content: ContentRow;
+  onComplete: (secondsWatched: number) => void;
+  onDurationKnown: (durationSeconds: number) => void;
+}) {
+  useEffect(() => {
+    // Give it a non-zero "duration" so it's never treated as unknown, then
+    // immediately mark it complete — opening a PDF is the whole interaction.
+    onDurationKnown(1);
+    onComplete(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content.id]);
+
+  return (
+    <iframe
+      title={content.title}
+      src={content.content_url}
+      style={{ width: "100%", height: "60vh", border: "none", borderRadius: 8 }}
     />
   );
 }

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SupabaseClient } from '../../../Helper/Supabase';
 import './AssignmentDashboard.css';
-import Loader from '../../Header/Loader';
+import Loader2 from '../../Header/Loader2';
 
 interface AssignmentItem {
   content_id: string;
@@ -84,7 +84,9 @@ export const AssignmentDashboard: React.FC = () => {
   const pendingCount = totalCount - completedCount;
 
 if (loading) {
-  return <Loader />;
+
+  return <Loader2 />;
+  
 }
   return (
     <div className="asm-dashboard-layout">

@@ -140,7 +140,7 @@ background: linear-gradient(135deg, var(--ln-blue-primary) 0%, #0040b3 100%);
 
 /* 2️⃣ Heading Alignment (Available Academic Programs) */
 .main-content h2, .dashboard-container h2, .workspace-header h2 {
-  margin-left: 280px !important; /* Heading ko grid ke sath exact align karne ke liye */
+  margin-left: 450px !important; /* Heading ko grid ke sath exact align karne ke liye */
   margin-bottom: 3px !important; /* Heading aur cards ke beech ka gap */
   font-size: 26px;
   font-weight: 700;
@@ -188,7 +188,7 @@ background: linear-gradient(135deg, var(--ln-blue-primary) 0%, #0040b3 100%);
   gap: 50px !important; /* Cards ke beech ka internal gap jo pehle shuruat mein tha */
   width: 100% !important;
   max-width: 1300px; /* Taki bohot badi screen par cards ajeeb se phail na jayein */
-  margin-top: 0 !important;
+  margin-top: -5px !important;
   margin-left: 200px;
 }
 
@@ -925,7 +925,7 @@ background: linear-gradient(135deg, var(--ln-blue-primary) 0%, #0040b3 100%);
   overflow: hidden;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  height:400px;
+  height:437px;
   overflow-y: scroll;
 }
 

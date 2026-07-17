@@ -1,0 +1,215 @@
+/* ==========================================================================
+   📁 LEARNOVA FLUID SANDBOX STYLESHEET (FULL WIDTH & OPTIMIZED HEIGHT)
+   ========================================================================== */
+
+/* Outer Framework Wrapper */
+.sandbox-dashboard-container {
+  width: 100%;
+  margin: 0 auto;
+  font-family: system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
+}
+
+/* 🔵 Blue Hero Banner - Bleeds 100% Edge-to-Edge Across the Viewport */
+.sandbox-hero-banner {
+  background: linear-gradient(135deg, var(--ln-blue-primary) 0%, #0040b3 100%);
+  width: 100%;
+  padding: 55px 0; /* Tall layout adjustment */
+  margin-bottom: 40px;
+  color: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative Glow Backdrop Pattern */
+.sandbox-hero-banner::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -5%;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Inner Core Layout Alignment Guard */
+.hero-body {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-title {
+  font-size: 38px;
+  font-weight: 800;
+  margin: 0 0 14px 0;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hero-subtitle {
+  font-size: 18px;
+  color: #bfdbfe; /* Contrast soft light blue text */
+  margin: 0px;
+  max-width: 1200px;
+  line-height: 1.6;
+  
+}
+
+/* ⬜ Main Workspace Alignment Envelope */
+.sandbox-main-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 40px 60px 10px;
+  box-sizing: border-box;
+}
+
+/* Content Area Workspace Header */
+.workspace-header {
+  margin-bottom: 28px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 14px;
+  margin-left: -200px;
+}
+
+.workspace-title {
+  color: #0f172a;
+  font-size: 22px;
+  font-weight: 700;
+
+ 
+}
+
+/* 🌀 Loading and Zero-State Placeholders */
+.sandbox-loading, 
+.empty-sandbox {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 2px dashed #cbd5e1;
+  margin-top: 20px;
+}
+
+.empty-sandbox h3 {
+  color: #334155;
+  font-size: 18px;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.empty-sandbox p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Grid Pipeline for Video Cards */
+.sandbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 28px;
+}
+
+/* Responsive Card Module Components */
+.sandbox-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+}
+
+/* Elevate card slightly on interactive hover */
+.sandbox-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 24px -8px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.03);
+}
+
+/* Embedded Resource Thumbnail Framework */
+.sandbox-thumbnail {
+  width: 100%;
+  height: 175px;
+  object-fit: cover;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Card Body Context Blocks */
+.sandbox-card-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-between;
+}
+
+.sandbox-video-title {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #1e293b;
+  font-weight: 600;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Truncates long text to exactly 2 lines safely */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sandbox-channel-name {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 24px 0;
+  font-weight: 500;
+}
+
+/* Action Control Engine */
+.sandbox-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: auto; /* Forces action buttons to stick to the card base */
+}
+
+/* Watch/Stream Trigger Interface Button */
+.sandbox-watch-btn {
+  flex: 1.3;
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  padding: 11px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.sandbox-watch-btn:hover { 
+  background: #1e293b; 
+}
+
+/* Purge/Remove Item Action Control */
+.sandbox-remove-btn {
+  flex: 1;
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+  padding: 11px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.sandbox-remove-btn:hover { 
+  background: #fee2e2;
+  border-color: #fca5a5;
+}

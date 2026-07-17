@@ -117,50 +117,13 @@
   gap: 10px;
 }
 
-
-.profileSection {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  margin-top: auto;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.profileIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: #e0e0e0;
-  color: #333;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.profileImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-/* .profileEmail {
-  font-size: 0.85rem;
-  color: #ccc;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-} */
- 
 .profileSection {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  margin: 8px 12px 12px;
+  margin: 0 12px 12px;
+  margin-top: auto;           /* pushes it to the bottom */
   border-top: 1px solid #e5e7eb;
   border-radius: 10px;
 }
@@ -175,6 +138,16 @@
   border-radius: 50%;
   background: #eef2ff;
   color: #2563eb;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-left: -10px;
+}
+
+.profileImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .profileText {
@@ -197,18 +170,150 @@
   white-space: nowrap;
   max-width: 160px;
 }
-.profileSection {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  margin: 0 12px 12px;      /* removed top margin, auto will handle spacing */
-  margin-top: auto;         /* 👈 this pushes it to the bottom */
-  border-top: 1px solid #e5e7eb;
-  border-radius: 10px;
+
+/* =========================================================================
+   RESPONSIVE BREAKPOINTS
+
+   Desktop  (> 1024px): unchanged, hover-to-expand vertical sidebar.
+   Tablet   (769px–1024px): same vertical sidebar, narrower hover-expand
+            width so it doesn't eat too much of the viewport. Touch
+            tablets get a real first-tap-triggers-hover fallback for free
+            (a well-known mobile-browser quirk — first tap fires :hover,
+            second tap follows the link), so this still works without JS.
+   Phone    (<= 768px): sidebar becomes a FIXED BOTTOM TAB BAR — icons
+            only, horizontal, no hover dependency. This is the standard
+            mobile pattern and avoids relying on hover at all on small
+            touch screens.
+   ========================================================================= */
+
+/* ---- Tablet ---- */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 60px;
+    top: 72px;
+    height: calc(100vh - 72px);
+  }
+
+  .sidebar:hover {
+    width: 220px;
+    min-width: 220px;
+  }
+
+  .link,
+  .activeLink {
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+
+  .panelHeader {
+    padding: 0 16px 14px 16px;
+  }
 }
 
-.profileIcon{
+/* ---- Phone: sidebar becomes a bottom tab bar ---- */
+@media (max-width: 768px) {
+  .sidebar {
+    /* switch from a left column to a bottom bar */
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    min-width: 0;
+    height: 64px;
+    max-height: 64px;
+    flex-direction: row;
+    align-items: center;
+    padding-top: 0;
+    border-right: none;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+    overflow-y: hidden;
+    transition: none;         /* no width animation needed in bar mode */
+  }
 
-  margin-left:-10px;
+  /* Hover-expand no longer makes sense as a bottom bar — disable it */
+  .sidebar:hover {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Hide the panel header/title (branding) — no room in a bottom bar */
+  .panelHeader {
+    display: none;
+  }
+
+  .nav {
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    gap: 4px;
+    padding: 0 6px;
+    width: 100%;
+  }
+
+  .link,
+  .activeLink {
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .activeLink::before {
+    /* left-edge accent bar doesn't make sense horizontally — use an
+       underline-style indicator instead */
+    left: 50%;
+    top: auto;
+    bottom: 2px;
+    width: 20px;
+    height: 3px;
+    transform: translateX(-50%);
+    border-radius: 4px 4px 0 0;
+  }
+
+  .icon {
+    font-size: 20px;
+  }
+
+  /* Always show labels in bar mode — small text under each icon,
+     like a native app tab bar — instead of the hover-reveal behavior */
+  .label {
+    opacity: 1;
+    transition-delay: 0s;
+    font-size: 10px;
+  }
+
+  /* Profile section doesn't fit in a bottom bar — hide it here.
+     If you want account access on mobile, surface it in your top
+     navbar (e.g. an avatar button) instead. */
+  .profileSection {
+    display: none;
+  }
+}
+
+/* ---- Small phones ---- */
+@media (max-width: 420px) {
+  .sidebar {
+    height: 58px;
+    max-height: 58px;
+  }
+
+  .link,
+  .activeLink {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+
+  .icon {
+    font-size: 18px;
+  }
+
+  .label {
+    font-size: 9px;
+  }
 }

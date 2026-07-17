@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // 1 Navigation hook import kiya
+import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';
 
 export const LandingPage: React.FC = () => {
   const [showPromoVideo, setShowPromoVideo] = useState(false);
-  const navigate = useNavigate(); // 2 Navigate function initialize kiya
+  const navigate = useNavigate(); 
 
   const globalStats = [
     { value: '200+', label: 'Premium Courses' },
@@ -19,7 +19,7 @@ export const LandingPage: React.FC = () => {
     { name: 'Adrian Cruz', role: 'Backend Architecture Expert', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=256' }
   ];
 
-  // 3️⃣ Common helper function navigation handle karne ke liye
+  //  Common helper function navigation handle karne ke liye
   const handleNavigateToCourses = () => {
     navigate('/learning/employee/courses'); 
   };

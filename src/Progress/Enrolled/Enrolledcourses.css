@@ -1,5 +1,5 @@
 /* =========================================================================
-   CERTIFICATES / ENROLLED PAGE — STATIC STYLES
+   CERTIFICATES / ENROLLED PAGE — RESPONSIVE STYLES
    (Re-themed to match CourseDashboard.css design system)
    ========================================================================= */
 
@@ -10,39 +10,36 @@
   --c-teal: #0f766e;
   --c-coral: #e2542d;
 
-  /* max-width: 1280px;
-  margin: 0 auto;
-  padding: 24px;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color: #1a1a1a; */
+  --sidebar-width: 200px;   /* single source of truth for sidebar offset */
+  --navbar-height: 64px;    /* single source of truth for navbar offset */
 
-  /* ✅ FIX: sidebar + navbar overlap ko avoid karne ke liye offset */
-  margin-left: 200px;   /* sidebar ki actual width se replace karo */
-  padding-top: 24px;    /* navbar ki actual height se replace karo */
   box-sizing: border-box;
   min-height: 100vh;
   background-color: #f8fafc; /* matches CourseDashboard's workspace bg */
+
+  /* Desktop default: offset for sidebar + navbar */
+  margin-left: var(--sidebar-width);
+  padding: var(--navbar-height) 24px 24px;
+}
+
+.cert-page *,
+.cert-page *::before,
+.cert-page *::after {
+  box-sizing: border-box;
 }
 
 /* ---- Banner ---- */
 .cert-banner {
-  background: linear-gradient(135deg, var(--ln-blue-primary) 0%, #0040b3 100%);
-  /* 1linear-gradient(35deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%) */
+  background: linear-gradient(135deg, var(--ln-blue-primary, #1d4ed8) 0%, #0040b3 100%);
   color: #ffffff;
-  padding-bottom: 60px;
-  padding-top: 60px;
-  margin-top: -22px;
-
-  /* Break out of .cert-page's padding + max-width */
-  width: 100vw;
-  margin-left: calc(-1 * (100vw - 100%) / 2 - 24px); 
-  /* fallback simpler approach below is more reliable */
+  padding: 48px 24px;
+  margin: -24px -24px 24px; /* bleed to edges of .cert-page's own padding, no 100vw hacks */
+  border-radius: 0 0 12px 12px;
 }
-
 
 .cert-banner-text h1 {
   color: #ffffff;
-  font-size: 28px;   /* was 0px — that's why it was invisible */
+  font-size: 28px;
   font-weight: 700;
   margin: 0 0 6px;
   letter-spacing: -0.3px;
@@ -82,7 +79,9 @@
   gap: 24px;
   border-bottom: 1px solid #edf2f7;
   margin-bottom: 24px;
- margin-left: 400px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
 
 .search-input {
@@ -93,10 +92,12 @@
   color: #ffffff;
   background-color: rgba(255, 255, 255, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 30px; /* Perfect pill/capsule shape */
+  border-radius: 30px;
   outline: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: all 0.25s ease-in-out;
+  margin: 16px auto 0;
+  display: block;
 }
 
 .cert-tab {
@@ -111,8 +112,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: color 0.15s ease, border-color 0.15s ease;
-   ;
 }
 
 .cert-tab:hover {
@@ -121,7 +123,7 @@
 
 .cert-tab.is-active {
   color: #1a1a1a;
-  border-bottom-color: #2b96d6; /* CourseDashboard action blue */
+  border-bottom-color: #2b96d6;
 }
 
 .cert-tab-badge {
@@ -132,14 +134,13 @@
   padding: 1px 7px;
   border-radius: 10px;
   line-height: 1.5;
-  
 }
 
 /* ---- Grid ---- */
 .cert-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 50px; /* matches CourseDashboard's .course-grid gap */
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
 }
 
 /* ---- Card ---- */
@@ -167,13 +168,13 @@
 .cert-card-thumb {
   width: 100%;
   height: 140px;
-  background-color: #f3f4f6; /* matches CourseDashboard thumbnail wrapper bg */
+  background-color: #f3f4f6;
   background-size: cover;
   background-position: center;
 }
 
 .cert-card-body {
-  padding: 10px; /* aligned with CourseDashboard's card-body-content padding */
+  padding: 14px;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -203,7 +204,7 @@
 }
 
 .cert-progress-track {
-  height: 5px; /* matches CourseDashboard progress-track height */
+  height: 5px;
   background: #e2e8f0;
   border-radius: 10px;
   overflow: hidden;
@@ -228,6 +229,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
   border-top: 1px solid #f3f4f6;
   padding-top: 12px;
 }
@@ -240,6 +243,7 @@
 .cert-action-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   font-size: 13px;
   font-weight: 600;
@@ -254,16 +258,13 @@
 
 .cert-action-btn:hover {
   background: #229624;
-  /* border-color: #9ca3af; */
 }
 
-/* "Completed" state now uses the emerald green from CourseDashboard's price badge */
 .cert-action-btn.is-done {
-  background:#2563eb ;
-  border-color:#2563eb ;
+  background: #2563eb;
+  border-color: #2563eb;
   color: #ffffff;
   width: 100%;
-  justify-content: center;
 }
 
 .cert-action-btn.is-done:hover {
@@ -273,7 +274,7 @@
 /* ---- Empty state ---- */
 .cert-empty {
   text-align: center;
-  padding: 60px 0; /* matches CourseDashboard .empty-state padding */
+  padding: 60px 20px;
   border: 2px dashed #edf2f7;
   border-radius: 6px;
   color: #a0aec0;
@@ -292,26 +293,102 @@
   margin: 0;
 }
 
-/* ---- Responsive ---- */
-@media (max-width: 900px) {
+/* =========================================================================
+   RESPONSIVE BREAKPOINTS
+   Desktop: > 1024px (default styles above)
+   Tablet:  601px – 1024px
+   Phone:   <= 600px
+   ========================================================================= */
+
+/* ---- Tablet (portrait tablets, small laptops) ---- */
+@media (max-width: 1024px) {
   .cert-page {
-    margin-left: 0;    /* mobile pe sidebar collapse/hidden ho jata hai */
-    padding-top: 88px; /* navbar height ke liye adjust karo agar zaroorat ho */
+    margin-left: 0;              /* sidebar typically collapses/overlays at this width */
+    padding: var(--navbar-height) 20px 20px;
+  }
+
+  .cert-banner {
+    margin: -20px -20px 20px;
+    padding: 40px 20px;
+  }
+
+  .cert-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
   }
 }
 
+/* ---- Phone / small tablet ---- */
 @media (max-width: 768px) {
+  .cert-page {
+    padding: var(--navbar-height) 16px 16px;
+  }
+
   .cert-banner {
-    padding: 20px 20px;
+    margin: -16px -16px 20px;
+    padding: 32px 16px;
+  }
+
+  .cert-banner-text h1 {
+    font-size: 22px;
+  }
+
+  .cert-banner-text p {
+    font-size: 14px;
   }
 
   .cert-tabs {
-    gap: 50px;
-    overflow-x: auto;
+    gap: 20px;
+  }
 
+  .search-input {
+    padding: 11px 20px;
+    font-size: 13px;
   }
 
   .cert-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* ---- Small phones ---- */
+@media (max-width: 420px) {
+  .cert-page {
+    padding: var(--navbar-height) 12px 12px;
+  }
+
+  .cert-banner {
+    margin: -12px -12px 16px;
+    padding: 28px 12px;
+  }
+
+  .cert-banner-text h1 {
+    font-size: 19px;
+  }
+
+  .cert-tabs {
+    gap: 14px;
+  }
+
+  .cert-tab {
+    font-size: 14px;
+  }
+
+  .cert-card-thumb {
+    height: 120px;
+  }
+
+  .cert-card-body {
+    padding: 12px;
+  }
+
+  .cert-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cert-action-btn {
+    width: 100%;
   }
 }

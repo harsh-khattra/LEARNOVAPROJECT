@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { lmsService } from '../services/lmsService';
-import type { Course, CourseStatus } from '../types/lms';
+import type { Course } from '../types/lms';
 import { CURRENT_USER, formatCoursePrice, getStatusBadgeStyles } from '../utils/lmsShared';
 import './courseDashboard.css';
-import CourseSkeleton from '../../Header/CourseSkeleton';
+import Loader2 from '../../Header/Loader2';
 export const CourseDashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
@@ -118,16 +118,10 @@ export const CourseDashboardPage: React.FC = () => {
     course.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
- if (loading) {
-  return (
-    <div className="dashboard-container">
-      <div className="course-grid">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <CourseSkeleton key={index} />
-        ))}
-      </div>
-    </div>
-  );
+if (loading) {
+
+  return <Loader2 />;
+  
 }
 
   return (

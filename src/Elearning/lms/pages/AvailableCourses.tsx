@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { lmsService } from '../services/lmsService';
 import { SupabaseClient } from '../../../Helper/Supabase';
 import type { Course } from '../types/lms';
 import { CourseCard } from '../components/CourseCard';
-
+import Loader2 from '../../Header/Loader2';
 import Enrollment from '../../../Progress/Enrollment/Enroll'; 
-import CourseSkeleton from '../../Header/CourseSkeleton';
 
 import './courseDashboard.css'
+
 
 
 
@@ -22,8 +21,9 @@ import './availableCourses.css';
 
 
 
+
 export const AvailableCourses: React.FC = () => {
-  const navigate = useNavigate();
+      const YT_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY; 
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -69,10 +69,7 @@ export const AvailableCourses: React.FC = () => {
       setYtVideos([]); // Agar search box khali hai toh data clear karo
       return;
     }
-
-    // Pulling the hidden key from Vite's environment variables safely
-    const YT_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY; 
-    
+ 
     const fetchYouTubeData = async () => {
       try {
         setYtLoading(true);
@@ -90,7 +87,7 @@ export const AvailableCourses: React.FC = () => {
         setYtLoading(false);
       }
     };
-
+  
     //  Quota Saver: Timer triggers endpoint only if user stops typing for 600ms
     const delayDebounceTimer = setTimeout(() => {
       fetchYouTubeData();
@@ -110,6 +107,47 @@ export const AvailableCourses: React.FC = () => {
     setSelectedCourse(course);
     setShowEnrollModal(true);
   };
+      // Function to save a video to the sandbox
+const handleSaveToPlaylist = async (video: any) => {
+  try {
+    const { data: { user } } = await SupabaseClient.auth.getUser();
+    
+    if (!user) {
+      alert("Please log in to save resources to your sandbox!");
+      return;
+    }
+
+    // Check for duplicates first
+    const { data: existing } = await SupabaseClient
+      .from('student_playlists')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('video_id', video.id.videoId)
+      .maybeSingle();
+
+    if (existing) {
+      alert("This resource is already in your Learnova Sandbox! 📚");
+      return;
+    }
+
+    // Save to database
+    const { error } = await SupabaseClient
+      .from('student_playlists')
+      .insert({
+        user_id: user.id,
+        video_id: video.id.videoId,
+        video_title: video.snippet.title,
+        thumbnail_url: video.snippet.thumbnails.medium.url,
+        channel_title: video.snippet.channelTitle
+      });
+
+    if (error) throw error;
+    alert("🎉 Successfully added to your Personal Sandbox!");
+
+  } catch (err) {
+    console.error("Failed to save resource:", err);
+  }
+};
 
   const closeEnrollModal = () => {
     setShowEnrollModal(false);
@@ -123,15 +161,9 @@ export const AvailableCourses: React.FC = () => {
   };
 
  if (loading) {
-  return (
-    <div className="dashboard-container">
-      <div className="course-grid">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <CourseSkeleton key={index} />
-        ))}
-      </div>
-    </div>
-  );
+
+  return <Loader2 />;
+  
 }
 
   return (
@@ -172,11 +204,6 @@ export const AvailableCourses: React.FC = () => {
                 isTeacher={false} 
 
 
-                onManageContent={() => {}} 
-                onPublish={() => {}}
-                onRevertToDraft={() => {}}
-                onDelete={() => {}}
-
 
                 isEnrolled={enrolledCourseIds.includes(course.id)}
                 onManageContent={(id: string) => {}} 
@@ -185,10 +212,7 @@ export const AvailableCourses: React.FC = () => {
                 onDelete={(id: string) => {}}
 
 
-                onManageContent={() => {}} 
-                onPublish={() => {}}
-                onRevertToDraft={() => {}}
-                onDelete={() => {}}
+               
 
 
                 onStartLearning={handleStartLearning}
@@ -243,17 +267,20 @@ export const AvailableCourses: React.FC = () => {
                 </p>
               </div>
 
-              <button
-                className="youtube-watch-btn"
-                onClick={() =>
-                  window.open(
-                    `https://www.youtube.com/watch?v=${video.id.videoId}`,
-                    "_blank"
-                  )
-                }
-              >
-                Stream Live 📺
-              </button>
+             <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+  <button 
+    onClick={() => window.open(`https://www.youtube.com/watch?v=${video.id.videoId}`, '_blank')}
+    style={{ flex: 1, padding: '10px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+  >
+    Watch 📺
+  </button>
+  <button 
+    onClick={() => handleSaveToPlaylist(video)}
+    style={{ flex: 1, padding: '10px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+  >
+    Save 📁
+  </button>
+</div>
             </div>
           </div>
         ))}

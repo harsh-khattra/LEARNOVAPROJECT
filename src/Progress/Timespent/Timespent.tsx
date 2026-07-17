@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import "./Timespent.css";
 import { SupabaseClient as supabase } from "../../Helper/Supabase";
-import CourseSkeleton from "../../Elearning/Header/CourseSkeleton";
-
+import Loader2 from "../../Elearning/Header/Loader2";
 
 type Period = "day" | "week" | "month";
 type AccentColor = "blue" | "green";
@@ -606,17 +605,10 @@ const TimeSpentAnalytics: React.FC = () => {
 
 
 
-  if (loading) {
-  return (
-    <div className="dashboard-container">
-      <div className="course-grid">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <CourseSkeleton key={index} />
-        ))}
-      </div>
-    </div>
-  );
+ if (loading) {
+  return <Loader2 />
 }
+
   /* ── RENDER ── */
   return (
     <div className="tsa-root" data-theme={theme}>

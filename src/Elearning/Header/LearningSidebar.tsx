@@ -9,6 +9,7 @@ import {
   FiUsers,
   FiShield,
   FiCreditCard,
+ FiBookmark,
 } from "react-icons/fi";
 
 import { useAuth } from "../../Context/AuthContext"; // Change path if needed
@@ -24,71 +25,86 @@ interface MenuItem {
 
 const LearningSidebar = () => {
 
-  const { user } = useAuth();
-  console.log("Sidebar User:", user);
-  console.log("Sidebar Role:", JSON.stringify(user?.role));
-  const menuItems: MenuItem[] = [
-    {
-      name: "Dashboard",
-      path: "/learning/student/landingPage",
-      icon: <FiHome />,
-      roles: ["Admin", "Teacher", "Student"],
-    },
-    {
-      name: "Upload Courses",
-      path: "/learning/teacher/courses",
-      icon: <FiBookOpen />,
-      roles: ["Admin", "Teacher"],
-    },
-    {
-      name: "Courses Available",
-      path: "/learning/student/courses",
-      icon: <FiUsers />,
-      roles: ["Admin", "Student"],
-    },
-    {
-      name: "Admin Panel",
-      path: "/learning/admin/approval-desk",
-      icon: <FiShield />,
-      roles: ["Admin"],
-    },
-    {
-      name: "Assignments",
-      path: "/learning/student/assignments",
-      icon: <FiClipboard />,
-      roles: ["Admin", "Teacher", "Student"],
-    },
-    {
-      name: "Certificates",
-      path: "/learning/student/certificates",
-      icon: <FiAward />,
-      roles: ["Admin", "Teacher", "Student"],
-    },
-    {
-      name: "Forum",
-      path: "/learning/student/discussion",
-      icon: <FiMessageCircle />,
-      roles: ["Admin", "Teacher", "Student"],
-    },
+  
+  
 
-    {
-      name: "Completion",
-      path: "/learning/student/completion",
-      icon: <FiClipboard />,
-      roles: ["Student"],
-    },
-    {
-      name: "Time Spent",
-      path: "/learning/student/timespent",
-      icon: <FiUser />,
-      roles: ["Student"],
-    },
-    {
-      name: "Enrolled",
-      path: "/learning/student/enroll",
-      icon: <FiCreditCard />,
-      roles: ["Admin", "Teacher", "Student"],
-    },
+
+
+
+  const { user } = useAuth();
+console.log("Sidebar User:", user);
+console.log("Sidebar Role:", JSON.stringify(user?.role));
+const menuItems: MenuItem[] = [
+  {
+    name: "Dashboard",
+    path: "/learning/student/landingPage",
+    icon: <FiHome />,
+    roles: ["Admin", "Teacher", "Student"],
+  },
+  {
+    name: "Upload Courses",
+    path: "/learning/teacher/courses",
+    icon: <FiBookOpen />,
+    roles: ["Admin", "Teacher"],
+  },
+  
+  {
+    name: "Courses Available",
+    path: "/learning/student/courses",
+    icon: <FiUsers />,
+    roles: ["Admin", "Student"],
+  },
+  {
+    name: "Saved Resources",
+    path: "student/sandbox",
+    icon: <FiBookmark />,
+    roles: ["Studet","Admin"],
+  },
+  {
+    name: "Admin Panel",
+    path: "/learning/admin/approval-desk",
+    icon: <FiShield />,
+    roles: ["Admin"],
+  },
+  {
+    name: "Assignments",
+    path: "/learning/student/assignments",
+    icon: <FiClipboard />,
+    roles: ["Admin", "Teacher", "Student"],
+  },
+  {
+    name: "Certificates",
+    path: "/learning/student/certificates",
+    icon: <FiAward />,
+    roles: ["Admin", "Teacher", "Student"],
+  },
+  {
+    name: "Forum",
+    path: "/learning/student/discussion",
+    icon: <FiMessageCircle />,
+    roles: ["Admin", "Teacher", "Student"],
+  },
+ 
+  {
+    name: "Completion",
+    path: "/learning/student/completion",
+    icon: <FiClipboard />,
+    roles: ["Student"],
+  },
+  {
+    name: "Time Spent",
+    path: "/learning/student/timespent",
+    icon: <FiUser />,
+    roles: ["Student"],
+  },
+  {
+    name: "Enrolled",
+    path: "/learning/student/enroll",
+    icon: <FiCreditCard />,
+    roles: ["Admin", "Teacher", "Student"],
+  },
+ 
+ 
 
 
 
@@ -96,6 +112,7 @@ const LearningSidebar = () => {
   const visibleMenu = menuItems.filter((item) =>
     item.roles.includes(user?.role ?? "")
   );
+
 
 
 
@@ -117,6 +134,8 @@ const LearningSidebar = () => {
   //   icon: <FiUser />,
   // }
   // ];
+
+
 
 
   return (

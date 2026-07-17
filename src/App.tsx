@@ -17,7 +17,7 @@ const App = () => {
 
   return (
     <IntlProvider locale={locale} messages={messages[locale]}>
-      <AppRoutes locale={locale} setLocale={setLocale}/>
+         <AppRoutes locale={locale} setLocale={setLocale}/>      
       <Toaster position="top-right" reverseOrder={false} />
     </IntlProvider>
   );

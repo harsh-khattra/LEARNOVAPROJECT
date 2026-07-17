@@ -20,11 +20,16 @@ const AuthCallback = () => {
   }
 
   // Get role id
+   console.log("Selected Role:", selectedRole);
   const { data: roleData, error: roleError } = await SupabaseClient
     .from("roles")
     .select("id")
     .eq("emprole", selectedRole)
     .single();
+
+   
+    console.log("Role Data:", roleData);
+console.log("Role Error:", roleError);
 
   if (roleError || !roleData) {
     toast.error("Role not found");
@@ -63,14 +68,37 @@ const AuthCallback = () => {
         data: { user },
       } = await SupabaseClient.auth.getUser();
 
-      if (!user) {
-        toast.error("Google login failed");
-        navigate("/signup");
-        return;
-      }
+      
 
-      setGoogleUser(user);
-      setShowRolePopup(true);
+
+   if (!user) {
+  toast.error("Google login failed");
+  navigate("/signup");
+  return;
+}
+
+console.log("Google User ID:", user.id);
+console.log("Google Email:", user.email);
+
+// Check if profile already exists
+const { data: existingProfile } = await SupabaseClient
+  .from("profiles")
+  .select("id, email")
+  .eq("id", user.id)
+  .maybeSingle();
+
+console.log("Existing Profile:", existingProfile);
+
+// If profile exists, don't allow signup again
+if (existingProfile) {
+  toast.error("Account already exists. Please login.");
+  navigate("/login");
+  return;
+}
+
+// New user → show role popup
+setGoogleUser(user);
+setShowRolePopup(true);
     };
 
     handleLogin();

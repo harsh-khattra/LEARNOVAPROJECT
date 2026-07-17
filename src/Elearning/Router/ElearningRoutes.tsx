@@ -18,25 +18,26 @@ import EnrolledCourses from "../../Progress/Enrolled/Enrolledcourses";
 import Downloadcert from "../../Progress/Certificate/Downloadcert";
 
 import { LandingPage } from "../lms/pages/LandingPage";
-// import { AssignmentDashboard } from "../lms/pages/AssignmentDashboard";
 import { QuizComponent } from "../lms/pages/QuizComponent";
-
-import { AssignmentDashboard } from '../lms/pages/AssignmentDashboard';
-
+import { AssignmentDashboard } from "../lms/pages/AssignmentDashboard";
 import { CourseDashboardPage } from "../lms/pages/CourseDashboardPage";
 import { AvailableCourses } from "../lms/pages/AvailableCourses";
 import { AdminApprovalDesk } from "../lms/pages/AdminApproval";
 import { ManageContentPage } from "../lms/pages/ManageContentPage";
 import { CoursePlayerPage } from "../lms/pages/CoursePlayerPage";
-
-
-
-
+import { MySandbox } from "../lms/pages/MySandbox";
 
 const ElearningRoutes = () => {
-  const { permissions } = useAuth();
+  // const { permissions } = useAuth();
+
+  
+  // const { loading, isAuth, permissions } = useAuth();
+
+const { loading, isAuth, permissions } = useAuth();
+
+console.log("Loading:", loading);
+console.log("isAuth:", isAuth);
 console.log("Permissions:", permissions);
-console.log("viewEnrollments:", permissions.viewEnrollments);
   return (
     <Routes>
       {/* Unauthorized */}
@@ -52,7 +53,6 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
           </ProtectedRoute>
         }
       />
-
 
       <Route
         path="teacher/courses"
@@ -72,9 +72,6 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
         }
       />
 
-
-
-
       <Route
         path="student/assignments"
         element={
@@ -87,12 +84,13 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
       <Route
         path="student/assignments/:contentId"
         element={
-          <ProtectedRoute allow={permissions.viewQuiz}>
+          <ProtectedRoute allow={permissions.manageAssignments}>
             <QuizComponent />
           </ProtectedRoute>
         }
       />
 
+      <Route path="employee/courses" element={<AvailableCourses />} />
 
       <Route
         path="student/discussion"
@@ -102,10 +100,6 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
           </ProtectedRoute>
         }
       />
-
-
-      <Route path="employee/courses"      element={<AvailableCourses />} />
-
 
       <Route
         path="student/certificates"
@@ -132,8 +126,16 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
             <QuizPerformancePage />
           </ProtectedRoute>
         }
-      
-/>
+      />
+
+      <Route
+        path="student/sandbox"
+        element={
+          <ProtectedRoute allow={permissions.viewResources}>
+            <MySandbox />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="student/completion"
@@ -144,16 +146,6 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
         }
       />
 
-
-      {/* Student */}
-      <Route path="student/landingPage" element={<LandingPage />} />
-      <Route path="student/courses" element={<CourseDashboardPage />} />
-      <Route path="student/discussion" element={<Discussion />} />
-      <Route path="student/certificates" element={<Certificates />} />
-      <Route path = "employee/courses" element = {< AvailableCourses />} />
-      <Route path = "student/assignments" element= {<AssignmentDashboard />} />
-
-
       <Route
         path="student/timespent"
         element={
@@ -163,7 +155,6 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
         }
       />
 
-
       <Route
         path="student/enroll"
         element={
@@ -172,13 +163,6 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
           </ProtectedRoute>
         }
       />
-
-
-      <Route path="lms/managecontent/:id" element={<ManageContentPage />} />
-      <Route path="learning/course-player/:id" element={<CoursePlayerPage />} />
-      <Route path="/lms/dashboard"        element={<CourseDashboardPage />} />
-      <Route path="/course-player/:id"    element={<CoursePlayerPage />} />
-
 
       {/* ---------------- TEACHER ---------------- */}
 
@@ -233,15 +217,9 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
 
       {/* Course Player (Public after enrollment logic) */}
 
-      <Route
-        path="learning/course-player/:id"
-        element={<CoursePlayerPage />}
-      />
+      <Route path="learning/course-player/:id" element={<CoursePlayerPage />} />
 
-      <Route
-        path="course-player/:id"
-        element={<CoursePlayerPage />}
-      />
+      <Route path="course-player/:id" element={<CoursePlayerPage />} />
     </Routes>
   );
 };

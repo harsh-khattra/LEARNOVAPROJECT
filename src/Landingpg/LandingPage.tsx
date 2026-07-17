@@ -2,7 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import "./LandingPage.css";
-
+import logo2 from "../../src/assets/logo2.png"
 const LandingPage = () => {
   const navigate = useNavigate();
   const { isAuth } = useAuth();
@@ -18,7 +18,12 @@ const LandingPage = () => {
 
       {/* ── Navbar ── */}
      <nav className="lp-nav">
-  <div className="lp-nav-logo">LEARN<span>OVA</span></div>
+<div className="lp-nav-logo">
+  <img src={logo2} alt="Learnova Logo" className="lp-logo-img" />
+  <p>
+    LEARN<span>OVA</span>
+  </p>
+</div>
   <div className="lp-nav-right">
 
     {!isAuth && (
