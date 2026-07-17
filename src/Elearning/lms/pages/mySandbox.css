@@ -1,6 +1,4 @@
-/* ==========================================================================
-   📁 LEARNOVA FLUID SANDBOX STYLESHEET (FULL WIDTH & OPTIMIZED HEIGHT)
-   ========================================================================== */
+
 
 /* Outer Framework Wrapper */
 .sandbox-dashboard-container {
@@ -77,7 +75,7 @@
   margin-left: -200px;
 }
 
-.workspace-title {
+.workspace-titlebar {
   color: #0f172a;
   font-size: 22px;
   font-weight: 700;
@@ -212,4 +210,145 @@
 .sandbox-remove-btn:hover { 
   background: #fee2e2;
   border-color: #fca5a5;
+}
+/* ===================================================
+   RESPONSIVE OVERRIDES
+   Paste at the END of the CSS
+=================================================== */
+
+/* Large Laptop */
+@media (max-width: 1200px) {
+
+  .hero-body,
+  .sandbox-main-content {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .workspace-header {
+    margin-left: 0 !important;
+  }
+
+}
+
+/* Tablet */
+@media (max-width: 992px) {
+
+  .sandbox-hero-banner {
+    padding: 45px 0;
+  }
+
+  .hero-body {
+    padding: 0 20px;
+  }
+
+  .hero-title {
+    font-size: 32px;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+  }
+
+  .sandbox-main-content {
+    padding: 0 20px 40px;
+  }
+
+  .workspace-header {
+    margin-left: 0 !important;
+    text-align: center;
+  }
+
+  .workspace-titlebar {
+    font-size: 20px;
+    margin-left: -20px;
+  }
+
+  .sandbox-grid {
+    grid-template-columns: repeat(2, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+  .sandbox-hero-banner {
+    padding: 35px 0;
+    margin-bottom: 25px;
+  }
+
+  .hero-body {
+    padding: 0 16px;
+  }
+
+  .hero-title {
+    font-size: 26px;
+    line-height: 1.3;
+  }
+
+  .hero-subtitle {
+    font-size: 14px;
+  }
+
+  .sandbox-main-content {
+    padding: 0 16px 30px;
+  }
+
+  /* ⭐ THIS FIXES YOUR TITLE HIDING */
+  .workspace-header {
+    margin-left: 0 !important;
+    padding-bottom: 10px;
+    text-align: left;
+  }
+
+  .workspace-titlebar{
+    font-size: 18px;
+    word-break: break-word;
+  }
+
+  .sandbox-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .sandbox-card-content {
+    padding: 16px;
+  }
+
+  .sandbox-actions {
+    flex-direction: column;
+  }
+
+  .sandbox-watch-btn,
+  .sandbox-remove-btn {
+    width: 100%;
+  }
+
+}
+
+/* Small Phones */
+@media (max-width: 480px) {
+
+  .hero-title {
+    font-size: 22px;
+  }
+
+  .hero-subtitle {
+    font-size: 13px;
+  }
+
+  .workspace-titlebar{
+    font-size: 17px;
+  }
+
+  .sandbox-main-content {
+    padding: 0 12px 24px;
+  }
+
+  .sandbox-thumbnail {
+    height: 160px;
+  }
+
 }

@@ -44,7 +44,7 @@ const Login = () => {
         } else {
 
           toast.success("Login successful!");
-          navigate("learning/student/landingPage");
+          navigate("/");
 
         }
       } catch (err) {

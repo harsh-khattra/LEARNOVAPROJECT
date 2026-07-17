@@ -11,6 +11,7 @@ import {
   FiCreditCard,
  FiBookmark,
 } from "react-icons/fi";
+import { useState } from "react";
 
 import { useAuth } from "../../Context/AuthContext"; // Change path if needed
 import styles from "./LearningSidebar.module.css";
@@ -22,10 +23,8 @@ interface MenuItem {
   icon: React.ReactNode;
   roles: string[];
 }
-
 const LearningSidebar = () => {
- 
- 
+ const [isOpen, setIsOpen] = useState(false);
 
   const { user } = useAuth();
   console.log("Sidebar User:", user);
@@ -47,6 +46,12 @@ const LearningSidebar = () => {
       name: "Courses Available",
       path: "/learning/student/courses",
       icon: <FiUsers />,
+      roles: ["Admin", "Student"],
+    },
+     {
+      name: "Saved Resources",
+      path: "/learning/student/sandbox",
+      icon: <FiBookmark />,
       roles: ["Admin", "Student"],
     },
     {
@@ -125,12 +130,30 @@ const LearningSidebar = () => {
 
 
   return (
-    <aside className={styles.sidebar}>
+  <>
+    <button
+      className={styles.menuButton}
+      onClick={() => setIsOpen(!isOpen)}
+    >
+      ☰
+    </button>
+
+    {isOpen && (
+      <div
+        className={styles.overlay}
+        onClick={() => setIsOpen(false)}
+      />
+    )}
+
+    <aside
+      className={`${styles.sidebar} ${isOpen ? styles.open : ""}`}
+    >
       <nav className={styles.nav}>
         {visibleMenu.map((item) => (
           <NavLink
-            key={item.path}
-            to={item.path}
+  key={item.path}
+  to={item.path}
+  onClick={() => setIsOpen(false)}
             className={({ isActive }) =>
               `${isActive ? styles.activeLink : styles.link} ${item.name === "My Profile" ? styles.spaced : ""
               }`
@@ -155,6 +178,7 @@ const LearningSidebar = () => {
   </div>
 )}
     </aside>
+    </>
   );
 };
 

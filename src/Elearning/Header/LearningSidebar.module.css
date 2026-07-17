@@ -15,8 +15,8 @@
   overflow-x: hidden;        /* 👈 zaroori hai taaki text overflow na ho */
   overflow-y: auto;
   z-index: 999;
-
-  transition: width 0.25s ease;  /* 👈 smooth expand/collapse */
+border-top:none;
+  transition: width 0.25s ease;  /*  smooth expand/collapse */
 }
 
 .sidebar:hover {
@@ -211,4 +211,119 @@
 .profileIcon{
 
   margin-left:-10px;
+}
+/* ==============================
+   Mobile Menu Button
+============================== */
+
+.menuButton {
+  display: none;          /* Hidden by default (Desktop) */
+  position: fixed;
+  top: 15px;
+  left: 12px;
+  z-index: 1300;
+
+  width: 42px;
+  height: 42px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: #fff;
+
+  font-size: 22px;
+  cursor: pointer;
+
+  box-shadow: 0 5px 12px rgba(0,0,0,.15);
+}
+
+/* ==============================
+   Tablet
+============================== */
+
+@media (max-width:992px){
+
+.sidebar{
+
+    width:60px;
+    min-width:60px;
+
+}
+
+.sidebar:hover{
+
+    width:220px;
+    min-width:220px;
+
+}
+
+}
+
+/* ==============================
+   Mobile
+============================== */
+
+@media (max-width:768px){
+
+.menuButton{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.sidebar{
+
+    width:240px;
+    min-width:240px;
+
+    left:-240px;
+
+    transition:left .3s ease;
+
+}
+
+.open{
+
+    left:0 !important;
+
+}
+
+.sidebar:hover{
+
+    width:240px;
+    min-width:240px;
+
+}
+
+.label{
+
+    opacity:1;
+
+}
+
+}
+
+/* ==============================
+   Small Phones
+============================== */
+
+@media (max-width:480px){
+
+.sidebar{
+
+    width:220px;
+    min-width:220px;
+
+    left:-220px;
+
+}
+
+.sidebar:hover{
+
+    width:220px;
+    min-width:220px;
+
+}
+
 }
