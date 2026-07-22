@@ -1,4 +1,4 @@
-import React, { useMemo, useState,useRef } from "react";
+import  { useMemo, useState,useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import "./Downloadcert.css";
 // import React, { useMemo, useState, useRef } from "react";
@@ -116,14 +116,12 @@ export default function Downloadcert({
     return certificates[0];
   }, [certificates, certificateId, locationState.certificate]);
 
-  const [selectedId, setSelectedId] = useState(initialCert?.id ?? "");
-  const [displayName, setDisplayName] = useState(
-    locationState.studentName ?? studentName
-  );
+const selectedId = initialCert?.id ?? "";
+ const displayName = locationState.studentName ?? studentName;
   const certRef = useRef<HTMLDivElement>(null);
 const [downloading, setDownloading] = useState(false);
   const [activeInstitute] = useState(locationState.institute ?? institute);
-  const [theme, setTheme] = useState<ThemeKey>("gold");
+const theme: ThemeKey = "gold";
   const [zoom, setZoom] = useState(100);
   const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
 

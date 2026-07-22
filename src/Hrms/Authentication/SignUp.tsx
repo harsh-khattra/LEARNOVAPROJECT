@@ -1,4 +1,5 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState } from 'react';
+import type { ChangeEvent } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';

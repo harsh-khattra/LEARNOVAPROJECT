@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { type Dispatch, type SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../Header/Header";
 import Sidebar from "../Header/Sidebar";

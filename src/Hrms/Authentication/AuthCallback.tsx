@@ -49,7 +49,7 @@ console.log("Role Error:", roleError);
         "",
       email: googleUser.email,
       avatar_url: googleUser.user_metadata.avatar_url,
-      role_id: roleData.id,
+      _role_id: roleData.id,
     });
 
   if (error) {

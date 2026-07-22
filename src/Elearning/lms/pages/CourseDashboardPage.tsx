@@ -57,7 +57,21 @@ const [userId, setUserId] = useState<string | null>(null);
     alert("User not found");
     return;
 }
+useEffect(() => {
+  const initialize = async () => {
+    const {
+      data: { user },
+    } = await SupabaseClient.auth.getUser();
 
+    if (user) {
+      setUserId(user.id);
+    }
+
+    loadDashboardData();
+  };
+
+  initialize();
+}, []);
 await lmsService.createCourse(
     {
         title: formTitle,
