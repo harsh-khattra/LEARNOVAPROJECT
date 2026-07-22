@@ -20,7 +20,7 @@ const LandingPage = () => {
      <nav className="lp-nav">
 <div className="lp-nav-logo">
   <img src={logo2} alt="Learnova Logo" className="lp-logo-img" />
-  <p>
+  <p style={{color:"black"}}>
     LEARN<span>OVA</span>
   </p>
 </div>

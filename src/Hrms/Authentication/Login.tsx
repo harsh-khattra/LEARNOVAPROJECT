@@ -60,7 +60,7 @@ if (error) {
         } else {
 
           toast.success("Login successful!");
-          navigate("learning/student/landingPage");
+          navigate("/");
 
         }
       } catch (err) {

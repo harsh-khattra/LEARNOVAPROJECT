@@ -1,11 +1,23 @@
 import { Routes, Route } from "react-router-dom";
 
+import ScrollToTop from "../lms/pages/ScrollToTop";
+
+
+// import Discussion from "../Discussion/DiscussionModule";
+
+// import Certificates from "../Student/Certificate";
+
+
+
+
+
 import { useAuth } from "../../Context/AuthContext";
 import ProtectedRoute from "../ProtectedRoute";
 
 import Discussion from "../Discussion/DiscussionModule";
 import Certificates from "../../Progress/Certificate/Certificate";
 import Unauthorized from "../Unauthorized";
+
 
 import TeacherDashboard from "../Teacher/Dashboard";
 import Analytics from "../Admin/Analytics";
@@ -14,18 +26,46 @@ import QuizPerformancePage from "../../Progress/Quiz/Quizperformance";
 import CourseCompletion from "../../Progress/Coursecompletion/CourseCompletion";
 import TimeSpentAnalytics from "../../Progress/Timespent/Timespent";
 
+
 import EnrolledCourses from "../../Progress/Enrolled/Enrolledcourses";
 import Downloadcert from "../../Progress/Certificate/Downloadcert";
 
+
+
+
+
+
 import { LandingPage } from "../lms/pages/LandingPage";
 import { QuizComponent } from "../lms/pages/QuizComponent";
+
 import { AssignmentDashboard } from "../lms/pages/AssignmentDashboard";
+
+
+
+// import { AssignmentDashboard } from '../lms/pages/AssignmentDashboard';
+
+
+
 import { CourseDashboardPage } from "../lms/pages/CourseDashboardPage";
 import { AvailableCourses } from "../lms/pages/AvailableCourses";
 import { AdminApprovalDesk } from "../lms/pages/AdminApproval";
 import { ManageContentPage } from "../lms/pages/ManageContentPage";
 import { CoursePlayerPage } from "../lms/pages/CoursePlayerPage";
+
 import { MySandbox } from "../lms/pages/MySandbox";
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const ElearningRoutes = () => {
   // const { permissions } = useAuth();
@@ -39,6 +79,8 @@ console.log("Loading:", loading);
 console.log("isAuth:", isAuth);
 console.log("Permissions:", permissions);
   return (
+    <>
+    <ScrollToTop/>
     <Routes>
       {/* Unauthorized */}
       <Route path="/unauthorized" element={<Unauthorized />} />
@@ -72,6 +114,7 @@ console.log("Permissions:", permissions);
         }
       />
 
+
       <Route
         path="student/assignments"
         element={
@@ -90,7 +133,14 @@ console.log("Permissions:", permissions);
         }
       />
 
+
       <Route path="employee/courses" element={<AvailableCourses />} />
+
+
+
+      <Route path="employee/courses"      element={<AvailableCourses />} />
+
+
 
       <Route
         path="student/discussion"
@@ -100,6 +150,12 @@ console.log("Permissions:", permissions);
           </ProtectedRoute>
         }
       />
+
+
+
+
+      <Route path="employee/courses"      element={<AvailableCourses />} />
+
 
       <Route
         path="student/certificates"
@@ -128,14 +184,28 @@ console.log("Permissions:", permissions);
         }
       />
 
-      <Route
-        path="student/sandbox"
-        element={
-          <ProtectedRoute allow={permissions.viewResources}>
-            <MySandbox />
-          </ProtectedRoute>
-        }
-      />
+
+     <Route
+  path="/student/sandbox"
+  element={
+    <ProtectedRoute allow={permissions.viewResources}>
+      <MySandbox />
+    </ProtectedRoute>
+  }
+/>
+
+
+
+
+      {/* Student */}
+      <Route path="student/landingPage" element={<LandingPage />} />
+      <Route path="student/courses" element={<CourseDashboardPage />} />
+      <Route path="student/discussion" element={<Discussion />} />
+      <Route path="student/certificates" element={<Certificates />} />
+      <Route path = "employee/courses" element = {< AvailableCourses />} />
+      <Route path = "student/assignments" element= {<AssignmentDashboard />} />
+<Route path = "/student/sandbox" element={<MySandbox />} />
+
 
       <Route
         path="student/completion"
@@ -146,6 +216,20 @@ console.log("Permissions:", permissions);
         }
       />
 
+
+
+
+      {/* Student */}
+      <Route path="student/landingPage" element={<LandingPage />} />
+      <Route path="student/courses" element={<CourseDashboardPage />} />
+      <Route path="student/discussion" element={<Discussion />} />
+      <Route path="student/certificates" element={<Certificates />} />
+      <Route path = "employee/courses" element = {< AvailableCourses />} />
+      <Route path = "student/assignments" element= {<AssignmentDashboard />} />
+
+
+
+
       <Route
         path="student/timespent"
         element={
@@ -155,6 +239,18 @@ console.log("Permissions:", permissions);
         }
       />
 
+
+
+
+
+
+      <Route path="lms/managecontent/:id" element={<ManageContentPage />} />
+      <Route path="learning/course-player/:id" element={<CoursePlayerPage />} />
+      <Route path="/lms/dashboard"        element={<CourseDashboardPage />} />
+      <Route path="/course-player/:id"    element={<CoursePlayerPage />} />
+
+
+
       <Route
         path="student/enroll"
         element={
@@ -163,6 +259,16 @@ console.log("Permissions:", permissions);
           </ProtectedRoute>
         }
       />
+
+
+
+
+      <Route path="lms/managecontent/:id" element={<ManageContentPage />} />
+      <Route path="learning/course-player/:id" element={<CoursePlayerPage />} />
+      <Route path="/lms/dashboard"        element={<CourseDashboardPage />} />
+      <Route path="/course-player/:id"    element={<CoursePlayerPage />} />
+
+
 
       {/* ---------------- TEACHER ---------------- */}
 
@@ -221,6 +327,7 @@ console.log("Permissions:", permissions);
 
       <Route path="course-player/:id" element={<CoursePlayerPage />} />
     </Routes>
+    </>
   );
 };
 

@@ -172,6 +172,9 @@ const DonutChart = ({ percent }: { percent: number }) => {
   const filled = (percent / 100) * circumference;
 
   return (
+
+    
+    
     <svg width="180" height="180" viewBox="0 0 180 180">
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e8e4d9" strokeWidth="14" />
       <circle
@@ -325,7 +328,19 @@ const CourseCompletion = () => {
 
 
 
-  return (
+ return (
+  <>
+   <div className="hero-banner student-theme">
+  <div className="hero-body">
+    <h1 className="hero-title">🎓 Course Completeion</h1>
+    <p className="hero-subtitle">
+      Browse corporate academic courses approved by your organization's experts. Learn at your own pace.
+    </p>
+    <br/>
+  
+  </div>
+</div>
+
     <div className={styles.container}>
       {/* ── Stat cards ── */}
       <div className={styles.statsGrid}>
@@ -432,7 +447,8 @@ const CourseCompletion = () => {
         )}
       </div>
     </div>
-  );
+  </>
+);
 };
 
 export default CourseCompletion;

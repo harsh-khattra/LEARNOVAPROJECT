@@ -1,43 +1,29 @@
 .header {
-  /* Replace position: fixed with these lines */
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 1000;
-  width: 100%;
+  left: 0;
+  right: 0;
 
+  width: 100%;
   height: 72px;
+
+  z-index: 1200;
+
   background: linear-gradient(
     135deg,
     #1d4ed8 0%,
     #2563eb 50%,
     #3b82f6 100%
   );
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 24px;
-  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
-  box-sizing: border-box;
-}.header {
-  /* Replace position: fixed with these lines */
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  width: 100%;
 
-  height: 72px;
-  background: linear-gradient(
-    135deg,
-    #1d4ed8 0%,
-    #2563eb 50%,
-    #3b82f6 100%
-  );
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   padding: 0 24px;
-  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
   box-sizing: border-box;
+
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
 }
 .logoSection {
   display: flex;
@@ -100,4 +86,105 @@
 
 .logoutBtnFull svg {
   font-size: 1rem;
+}
+/* ==========================
+   Tablet
+========================== */
+
+@media (max-width:992px){
+
+.logoImage{
+    width:48px;
+    height:48px;
+}
+
+.logoMain{
+    font-size:22px;
+}
+
+.switchBtn{
+
+    padding:8px 14px;
+    font-size:13px;
+
+}
+
+.logoutBtnFull{
+
+    padding:8px 14px;
+    font-size:13px;
+
+}
+
+}
+
+/* ==========================
+   Mobile
+========================== */
+
+@media (max-width: 768px) {
+
+  .logoSection {
+    margin-left: 50px;   /* Space for hamburger */
+  }
+
+  .logoImage {
+    width: 34px;
+    height: 34px;
+  }
+
+  .logoMain {
+    font-size: 16px;
+  }
+
+  .actions {
+    gap: 6px;
+  }
+
+  .switchBtn {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .logoutBtnFull {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}
+
+/* ==========================
+   Small Phones
+========================== */
+
+@media (max-width:480px){
+
+.logoMain{
+
+    display:none;
+
+}
+
+.logoImage{
+
+    width:34px;
+    height:34px;
+
+}
+
+.switchBtn{
+
+    padding:6px 8px;
+
+    font-size:10px;
+
+}
+
+.logoutBtnFull{
+
+    padding:6px 8px;
+
+    font-size:10px;
+
+}
+
 }

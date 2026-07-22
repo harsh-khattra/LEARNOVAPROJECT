@@ -374,7 +374,18 @@ const visibleCourses = useMemo(() => {
           .select("lesson_id, seconds_watched")
           .eq("student_id", employeeId)
           .eq("course_id", course.id);
+             
 
+        console.log("Current Employee ID:", employeeId);
+        console.log("Current Course ID:", course.id);
+        console.log("Watch Sessions:", sessionRows);
+        console.log("Watch Session Error:", sessionError);
+
+
+        if (!employeeId) {
+  console.warn("[watch_sessions] skipped: no employeeId yet");
+  return;
+}
         if (sessionError) {
           console.error("Error loading watch sessions:", sessionError);
         } else {
@@ -462,30 +473,24 @@ const visibleCourses = useMemo(() => {
    * video plays and for the final "completed" entry.
    */
   async function logWatchSession(course: EnrolledCourse, contentId: string, secondsWatched: number) {
-    if (!employeeId) {
-      console.warn("[watch_sessions] skipped: no employeeId yet");
-      return;
-    }
-    console.log("[watch_sessions] inserting", {
+  if (!employeeId) {
+    console.warn("[watch_sessions] skipped: no employeeId yet");
+    return;
+  }
+  try {
+    const { error: insertError, data } = await SupabaseClient.from("watch_sessions").insert({
       student_id: employeeId,
       course_id: course.id,
       lesson_id: contentId,
-      seconds_watched: Math.floor(secondsWatched),
-    });
-    try {
-      const { error: insertError, data } = await SupabaseClient.from("watch_sessions").insert({
-        student_id: employeeId,
-        course_id: course.id,
-        lesson_id: contentId,
-        seconds_watched: Math.max(0, Math.floor(secondsWatched)),
-        watched_at: new Date().toISOString(),
-      });
-      if (insertError) throw insertError;
-      console.log("[watch_sessions] insert OK", data);
-    } catch (err) {
-      console.error("[watch_sessions] insert FAILED:", err);
-    }
+      seconds_watched: Math.max(0, Math.floor(secondsWatched)),
+      watched_at: new Date().toISOString(),
+    }).select();   // 👈 sirf isi insert ke end mein lagana tha
+    if (insertError) throw insertError;
+    console.log("[watch_sessions] insert OK", data);
+  } catch (err) {
+    console.error("[watch_sessions] insert FAILED:", err);
   }
+}
 
   /**
    * Called once a video's real duration is known from the browser (either
@@ -493,15 +498,38 @@ const visibleCourses = useMemo(() => {
    * fallback when contents.duration_seconds is NULL/0 in the database.
    */
   function recordDuration(contentId: string, durationSeconds: number) {
-    if (!durationSeconds || durationSeconds <= 0) return;
-    setPlayer((prev) => {
-      if (prev.durationOverrides.has(contentId)) return prev;
-      console.log("[recordDuration]", { contentId, durationSeconds });
-      const next = new Map(prev.durationOverrides);
-      next.set(contentId, durationSeconds);
-      return { ...prev, durationOverrides: next };
-    });
-  }
+  if (!durationSeconds || durationSeconds <= 0) return;
+
+  setPlayer((prev) => {
+    if (prev.durationOverrides.has(contentId)) return prev;
+    console.log("[recordDuration]", { contentId, durationSeconds });
+    const next = new Map(prev.durationOverrides);
+    next.set(contentId, durationSeconds);
+
+    const existingContent = prev.queue.find((c) => c.id === contentId);
+    const dbDurationMissing = !existingContent?.duration_seconds || existingContent.duration_seconds <= 0;
+
+    if (dbDurationMissing) {
+      (async () => {
+        const { error } = await SupabaseClient
+          .from("contents")
+          .update({ duration_seconds: Math.round(durationSeconds) })
+          .eq("id", contentId);
+
+        if (error) {
+          console.error("[contents] duration_seconds update FAILED:", error);
+        } else {
+          console.log("[contents] duration_seconds saved permanently:", {
+            contentId,
+            durationSeconds: Math.round(durationSeconds),
+          });
+        }
+      })();
+    }
+
+    return { ...prev, durationOverrides: next };
+  });
+}
 
   /**
    * Called on every heartbeat AND when a video ends (or a PDF is opened).
@@ -598,9 +626,9 @@ const visibleCourses = useMemo(() => {
         (async () => {
           const { data: existingRows, error: fetchErr } = await SupabaseClient
             .from("course_enrollment")
-            .select("id, progress_percentage")
-            .eq("student_id", employeeId)
-            .eq("course_id", prev.course!.id);
+  .select("id, progress_percentage")
+  .eq("employee_id", employeeId)   // 👈 student_id → employee_id
+  .eq("course_id", prev.course!.id);
 
           if (fetchErr) {
             console.error("[course_enrollment] lookup FAILED:", fetchErr);
@@ -619,14 +647,15 @@ const visibleCourses = useMemo(() => {
             // No enrollment row for this student/course at all — this is
             // almost certainly why THIS course keeps resetting to 0% on
             // refresh. Insert one instead of silently no-op-ing.
-            console.warn(
-              "[course_enrollment] ⚠️ no existing row for student_id/course_id — inserting a new one instead of updating",
-              { student_id: employeeId, course_id: prev.course!.id }
-            );
-            const { error: insertErr, data: insertData } = await SupabaseClient
-              .from("course_enrollment")
-              .insert({ student_id: employeeId, course_id: prev.course!.id, ...payload })
-              .select();
+           console.warn(
+  "[course_enrollment] ⚠️ no existing row for employee_id/course_id — inserting a new one instead of updating",
+  { employee_id: employeeId, course_id: prev.course!.id }
+);
+
+         const { error: insertErr, data: insertData } = await SupabaseClient
+  .from("course_enrollment")
+  .insert({ employee_id: employeeId, course_id: prev.course!.id, ...payload })  // 👈 yahan bhi
+  .select();
             if (insertErr) {
               console.error("[course_enrollment] insert FAILED:", insertErr);
             } else {
@@ -640,13 +669,13 @@ const visibleCourses = useMemo(() => {
           // heartbeat/complete network responses overwriting a later,
           // higher value with a stale lower one.
           const storedProgress = existingRows[0].progress_percentage;
-          if (storedProgress != null && storedProgress > newProgress) {
-            console.log(
-              "[course_enrollment] skipped write — stored progress is already higher",
-              { storedProgress, newProgress }
-            );
-            return;
-          }
+         if (storedProgress != null && storedProgress > newProgress) {
+    console.log(
+    "[course_enrollment] skipped write — stored progress is already higher",
+    { storedProgress, newProgress }
+  );
+  return;
+}
 
           const { error: updateErr, data: updateData } = await SupabaseClient
             .from("course_enrollment")
@@ -699,7 +728,7 @@ const visibleCourses = useMemo(() => {
     <div className="cert-page">
       <div className="cert-banner">
         <div className="cert-banner-text">
-          <h2></h2>
+    
           <h1>
   {authUser?.role === "Admin"
     ? "All Course Enrollments"
@@ -1068,7 +1097,7 @@ function PdfViewer({
   );
 }
 
-const HEARTBEAT_INTERVAL_MS = 10000;
+const HEARTBEAT_INTERVAL_MS = 30000; // har 30 second mein progress update
 // Don't bother resuming into the last few seconds of a video — treat it as
 // finished and just start over instead of seeking to 0:00 remaining.
 const RESUME_END_BUFFER_SECONDS = 5;
@@ -1090,6 +1119,22 @@ function DirectVideoPlayer({
   const lastHeartbeatRef = useRef(resumeSeconds);
   const hasSeekedRef = useRef(false);
 
+  // Har 30 second mein ek baar current position check karke save karo —
+  // play ho ya pause, dono states mein chalta rahega (jaise wall-clock timer).
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const current = videoRef.current?.currentTime;
+      if (current && current > 0) {
+        console.log("[DirectVideoPlayer] 30s interval heartbeat", current);
+        lastHeartbeatRef.current = current;
+        onHeartbeat(current);
+      }
+    }, HEARTBEAT_INTERVAL_MS);
+
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <video
       ref={videoRef}
@@ -1110,13 +1155,6 @@ function DirectVideoPlayer({
             console.log("[DirectVideoPlayer] resuming at", safeResume);
             e.currentTarget.currentTime = safeResume;
           }
-        }
-      }}
-      onTimeUpdate={(e) => {
-        const current = e.currentTarget.currentTime;
-        if (current - lastHeartbeatRef.current >= HEARTBEAT_INTERVAL_MS / 1000) {
-          lastHeartbeatRef.current = current;
-          onHeartbeat(current);
         }
       }}
       onEnded={(e) => {
@@ -1215,6 +1253,12 @@ function YouTubePlayer({
 
       if (data?.event === "onStateChange") {
         console.log("[YouTubePlayer] onStateChange", data.info);
+
+        // PAUSED (state 2) — turant heartbeat, 10 second wait nahi karna.
+        if (data.info === 2 && lastKnownTimeRef.current > 0) {
+          console.log("[YouTubePlayer] paused, sending immediate heartbeat", lastKnownTimeRef.current);
+          onHeartbeat(lastKnownTimeRef.current);
+        }
       }
 
       // YT.PlayerState.ENDED === 0
@@ -1233,9 +1277,6 @@ function YouTubePlayer({
         "*"
       );
       postToPlayer("addEventListener", ["onStateChange"]);
-      // Ask for the duration a couple of times shortly after load — the
-      // player sometimes isn't ready to answer on the very first request.
-      // The duration response is also what triggers the resume-seek above.
       setTimeout(() => postToPlayer("getDuration"), 500);
       setTimeout(() => postToPlayer("getDuration"), 1500);
     };
@@ -1244,7 +1285,6 @@ function YouTubePlayer({
     const heartbeat = setInterval(() => {
       postToPlayer("getCurrentTime");
       if (!durationReportedRef.current) postToPlayer("getDuration");
-      // Give the response a moment to arrive via postMessage, then log it.
       setTimeout(() => {
         if (lastKnownTimeRef.current > 0) onHeartbeat(lastKnownTimeRef.current);
       }, 300);
