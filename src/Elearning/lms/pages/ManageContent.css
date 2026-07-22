@@ -1,6 +1,3 @@
-/* =========================
-   MAIN LAYOUT
-========================= */
 
 .manage-content-container {
   padding: 30px;
@@ -598,4 +595,296 @@
 
 .cancel-btn:hover {
   background: #cbd5e1;
+}
+/* ======================================================
+   RESPONSIVE DESIGN
+   Add this at the END of your existing CSS
+====================================================== */
+
+/* Large Desktop */
+@media (min-width: 1400px) {
+  .manage-content-container {
+    max-width: 1400px;
+    padding: 40px;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr 420px;
+    gap: 40px;
+  }
+}
+
+/* Laptop */
+@media (max-width: 1200px) {
+  .manage-content-container {
+    padding: 24px;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+  }
+
+  .preview-modal {
+    width: 95%;
+  }
+}
+
+/* Tablet */
+@media (max-width: 992px) {
+
+  .manage-content-container {
+    padding: 20px;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .right-panel {
+    order: -1;
+  }
+
+  .playlist-sidebar {
+    display: none;
+  }
+
+  .preview-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .video-section {
+    padding: 15px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .chapter-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .chapter-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* Mobile Landscape */
+@media (max-width: 768px) {
+
+  .manage-content-container {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .page-title {
+    font-size: 22px;
+  }
+
+  .section-title {
+    font-size: 17px;
+  }
+
+  .card,
+  .asset-form-card {
+    padding: 16px;
+  }
+
+  .chapter-header {
+    padding: 14px;
+  }
+
+  .chapter-content {
+    padding: 12px;
+  }
+
+  .asset-row {
+    padding: 12px;
+  }
+
+  .asset-title {
+    font-size: 14px;
+  }
+
+  .asset-badge {
+    font-size: 10px;
+  }
+
+  .preview-modal {
+    width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .modal-header {
+    padding: 14px;
+  }
+
+  .video-section {
+    padding: 12px;
+  }
+
+  .description-content {
+    max-height: 120px;
+  }
+
+  .form-input,
+  .primary-btn,
+  .cancel-btn {
+    width: 100%;
+  }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+
+  .manage-content-container {
+    padding: 12px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .section-title {
+    font-size: 16px;
+  }
+
+  .chapter-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .chapter-main-title {
+    width: 100%;
+  }
+
+  .chapter-actions {
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .add-asset-btn {
+    width: 100%;
+  }
+
+  .asset-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .asset-info {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .asset-title {
+    width: 100%;
+    word-break: break-word;
+    white-space: normal;
+  }
+
+  .asset-row-actions {
+    width: 100%;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .edit-small-btn,
+  .delete-small-btn {
+    flex: 1;
+    text-align: center;
+  }
+
+  .modal-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .modal-header-left {
+    width: 100%;
+  }
+
+  .modal-close-btn {
+    align-self: flex-end;
+  }
+
+  .description-box {
+    padding: 12px;
+  }
+
+  .description-content {
+    font-size: 12px;
+  }
+
+  .video-section {
+    padding: 10px;
+  }
+
+  .form-column {
+    gap: 10px;
+  }
+
+  .form-input {
+    font-size: 14px;
+  }
+
+  .primary-btn,
+  .cancel-btn {
+    padding: 12px;
+  }
+
+  .empty-state {
+    padding: 25px 15px;
+  }
+}
+
+/* Very Small Phones */
+@media (max-width: 360px) {
+
+  .manage-content-container {
+    padding: 10px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .chapter-header,
+  .card,
+  .asset-form-card {
+    padding: 12px;
+  }
+
+  .asset-row {
+    padding: 10px;
+  }
+
+  .preview-badge {
+    font-size: 10px;
+  }
+
+  .modal-header h3 {
+    font-size: 14px;
+  }
+
+  .primary-btn,
+  .cancel-btn,
+  .add-asset-btn {
+    font-size: 13px;
+  }
 }

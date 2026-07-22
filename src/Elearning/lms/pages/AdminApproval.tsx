@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { lmsService } from "../services/lmsService";
 import styles from "./AdminApproval.module.css";
-
+import Loader2 from "../../Header/Loader2";
 export const AdminApprovalDesk: React.FC = () => {
   const [pendingItems, setPendingItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,9 +45,11 @@ export const AdminApprovalDesk: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return <div className={styles.loadingContainer}>Verifying content queue...</div>;
-  }
+if (loading) {
+
+  return <Loader2 />;
+  
+}
 
   return (
     <div className={styles.container}>

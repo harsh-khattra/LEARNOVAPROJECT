@@ -1,0 +1,172 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family: inherit;
+}
+
+/* ── Stat cards ─────────────────────────────────────── */
+.statsRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.statsCards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  flex: 1;
+}
+
+.statCard {
+  background-color: #f3efe3;
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.statLabel {
+  font-size: 13px;
+  color: #6b6660;
+}
+
+.statValue {
+  font-size: 26px;
+  font-weight: 600;
+  color: #1f1d1a;
+}
+
+.menuButton {
+  background: none;
+  border: none;
+  color: #8a857d;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 6px;
+  margin-top: 4px;
+}
+
+/* ── Chart card ─────────────────────────────────────── */
+.chartCard {
+  background-color: #ffffff;
+  border: 1px solid #ece9e1;
+  border-radius: 14px;
+  padding: 20px 20px 8px;
+}
+
+.chartTitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: #2a2824;
+  margin: 0 0 8px;
+}
+
+/* ── Quiz history ───────────────────────────────────── */
+.historySection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.historyTitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: #2a2824;
+  margin: 0;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.historyCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background-color: #ffffff;
+  border: 1px solid #e9e6de;
+  border-radius: 12px;
+  padding: 14px 18px;
+}
+
+.statusIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.statusPass {
+  background-color: #dcefe1;
+  color: #3a9d57;
+}
+
+.statusWarning {
+  background-color: #f6ecd6;
+  color: #c9952f;
+}
+
+.statusFail {
+  background-color: #fbdfdf;
+  color: #d6435a;
+}
+
+.historyText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.historyItemTitle {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #1f1d1a;
+}
+
+.historyItemSubtitle {
+  font-size: 13px;
+  color: #8a857d;
+}
+
+.historyScore {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.scorePass {
+  color: #1f9d5a;
+}
+
+.scoreFail {
+  color: #c23a4e;
+}
+
+/* ── Load more button ───────────────────────────────── */
+.loadMoreButton {
+  align-self: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 1px solid #e3e0d8;
+  color: #6b6660;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.loadMoreButton:hover {
+  background-color: #f7f5f0;
+}

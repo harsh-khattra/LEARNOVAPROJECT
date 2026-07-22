@@ -1,5 +1,4 @@
-import { useLocation } from "react-router-dom";
-import { useAuth } from "./Context/AuthContext";
+
 import { Toaster } from "react-hot-toast";
 import { useState} from "react";
 import { IntlProvider } from "react-intl";
@@ -17,7 +16,7 @@ const App = () => {
 
   return (
     <IntlProvider locale={locale} messages={messages[locale]}>
-      <AppRoutes locale={locale} setLocale={setLocale}/>
+         <AppRoutes locale={locale} setLocale={setLocale}/>      
       <Toaster position="top-right" reverseOrder={false} />
     </IntlProvider>
   );

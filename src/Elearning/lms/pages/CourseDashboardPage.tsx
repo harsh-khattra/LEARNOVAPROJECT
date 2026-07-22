@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { lmsService } from '../services/lmsService';
-import type { Course, CourseStatus } from '../types/lms';
+import type { Course } from '../types/lms';
 import { CURRENT_USER, formatCoursePrice, getStatusBadgeStyles } from '../utils/lmsShared';
 import './courseDashboard.css';
-
+import { SupabaseClient } from '../../../Helper/Supabase';
+import Loader2 from '../../Header/Loader2';
 export const CourseDashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-
+const [userId, setUserId] = useState<string | null>(null);
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formTitle, setFormTitle] = useState('');
@@ -22,15 +23,18 @@ export const CourseDashboardPage: React.FC = () => {
   const isTeacher = CURRENT_USER.role === 'teacher' || CURRENT_USER.role === 'admin' || CURRENT_USER.role === 'employee';
 
   const loadDashboardData = async () => {
+ const { data: { user } } = await SupabaseClient.auth.getUser();
+
+  console.log("Supabase User:", user);
+  console.log("Supabase User ID:", user?.id);
+  console.log("CURRENT_USER:", CURRENT_USER);
+  console.log("CURRENT_USER ID:", CURRENT_USER.id);
+    
     try {
       setLoading(true);
       let data: Course[] = [];
       
-      if (isTeacher) {
-        data = await lmsService.fetchTeacherCourses(CURRENT_USER.id);
-      } else {
-        data = await lmsService.fetchCourses('all'); 
-      }
+   data = await lmsService.fetchAllCourses();
       setCourses(data);
     } catch (err) {
       console.error("Error loading courses:", err);
@@ -49,15 +53,34 @@ export const CourseDashboardPage: React.FC = () => {
 
     try {
       setSubmitting(true);
-      await lmsService.createCourse(
-        {
-          title: formTitle,
-          description: formDescription,
-          category: formCategory,
-          thumbnail_file: formFile
-        },
-        CURRENT_USER.id
-      );
+    if (!userId) {
+    alert("User not found");
+    return;
+}
+useEffect(() => {
+  const initialize = async () => {
+    const {
+      data: { user },
+    } = await SupabaseClient.auth.getUser();
+
+    if (user) {
+      setUserId(user.id);
+    }
+
+    loadDashboardData();
+  };
+
+  initialize();
+}, []);
+await lmsService.createCourse(
+    {
+        title: formTitle,
+        description: formDescription,
+        category: formCategory,
+        thumbnail_file: formFile
+    },
+    userId
+);
       
       setFormTitle('');
       setFormDescription('');
@@ -73,7 +96,7 @@ export const CourseDashboardPage: React.FC = () => {
     }
   };
 
-  // 🚀 BULK PUBLISH: Jab course ko publish karenge toh internal videos automatic sync hongi
+  //  BULK PUBLISH: Jab course ko publish karenge toh internal videos automatic sync hongi
   const handlePublishCourseClick = async (courseId: string) => {
     const confirmPublish = window.confirm(
       "all modules will go for approval to admin."
@@ -91,7 +114,7 @@ export const CourseDashboardPage: React.FC = () => {
     }
   };
 
-  // ⚡ DRAFT TOGGLE: Agar published se wapas draft par lekar jaana ho
+  //  DRAFT TOGGLE: Agar published se wapas draft par lekar jaana ho
   const handleRevertToDraft = async (id: string) => {
     try {
       await lmsService.updateCourseStatus(id, 'draft');
@@ -118,7 +141,11 @@ export const CourseDashboardPage: React.FC = () => {
     course.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) return <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>Loading Workspace...</div>;
+if (loading) {
+
+  return <Loader2 />;
+  
+}
 
   return (
     <div className="dashboard-container">
@@ -159,7 +186,7 @@ export const CourseDashboardPage: React.FC = () => {
           )}
         </div>
 
-        {/* 📦 CLEAN UNIFORM GRID */}
+        {/* CLEAN UNIFORM GRID */}
         <div className="course-grid">
           {filteredCourses.length === 0 ? (
             <div className="empty-state">No courses found matching your criteria.</div>

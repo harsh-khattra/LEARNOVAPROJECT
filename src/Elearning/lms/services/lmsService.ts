@@ -41,8 +41,18 @@ export const lmsService = {
       throw error;
     }
   },
+  async fetchAllCourses(): Promise<Course[]> {
+  const { data, error } = await SupabaseClient
+    .from('courses')
+    .select('*')
+    .order('created_at', { ascending: false });
 
-async fetchCourses(filter?: string) {
+  if (error) throw error;
+
+  return data as Course[];
+},
+
+async fetchCourses(_filter?: string) {
   const { data, error } = await SupabaseClient
     .from('courses')
     .select(`
@@ -293,7 +303,40 @@ async fetchCourses(filter?: string) {
 
     return data;
   },
-  
+
+async fetchEmployeeEnrollments(employeeId: string) {
+  const { data, error } = await SupabaseClient
+    .from('course_enrollment')
+    .select('*')                    // 👈 poori row, sirf course_id nahi
+    .eq('employee_id', employeeId);
+
+  if (error) {
+    console.error("Enrollment data fetch failed:", error);
+    throw error;
+  }
+   return data?.map(item => item.course_id) ?? [];
+   // 👈 ab objects ka array return hoga, strings nahi
+},
+
+async enrollEmployeeInCourse(employeeId: string, courseId: string) {
+  const { data, error } = await SupabaseClient
+    .from('course_enrollment')
+    .insert([
+      {
+        employee_id: employeeId,
+        course_id: courseId,
+        progress_percentage: 0,
+      },
+    ])
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Enrollment insert failed:", error);
+    throw error;
+  }
+  return data;
+},
 async updateContent(assetId: string, updates: any) {
     const { data, error } = await SupabaseClient
       .from('contents')
@@ -325,6 +368,26 @@ async updateContent(assetId: string, updates: any) {
       .eq('id', chapterId);
     if (error) throw error;
   },
+  async updateChapter(
+  chapterId: string,
+  updates: { title: string }
+) {
+  const { data, error } = await SupabaseClient
+    .from('chapters')
+    .update({
+      title: updates.title,
+    })
+    .eq('id', chapterId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating chapter:", error);
+    throw error;
+  }
+
+  return data;
+},
 
   async publishCourseAndSubmitAllVideos(courseId: string): Promise<void> {
     try {

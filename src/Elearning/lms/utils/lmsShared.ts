@@ -17,7 +17,7 @@ export const uploadFileToSupabase = async (
     const fileName = `${folderName}/${Date.now()}-${Math.floor(Math.random() * 1000)}.${fileExt}`;
 
     // Supabase bucket me file upload karein
-    const { data, error } = await SupabaseClient.storage
+    const {  error } = await SupabaseClient.storage
       .from(bucketName)
       .upload(fileName, file, {
         cacheControl: '3600',
@@ -123,9 +123,7 @@ export const getYouTubeEmbedUrl = (url: string | undefined): string => {
 
     
 
-};/* =========================================================
-   🔥 REUSABLE CUSTOM HOOK FOR YOUTUBE DATA FETCHING
-   ========================================================= */
+};
 
 const YOUTUBE_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY || '';
 
