@@ -34,11 +34,27 @@ const Login = () => {
       password: Yup.string().min(6, "password must be atleast 6 chracter").required("password is required")
     }),
     onSubmit: async (values) => {
-      try {
-        const {  error } = await SupabaseClient.auth.signInWithPassword({
-          email: values.email,
-          password: values.password,
-        })
+      try 
+      {
+        const { error } = await SupabaseClient.auth.signInWithPassword({
+  email: values.email,
+  password: values.password,
+});
+
+if (error) {
+  toast.error(error.message);
+} else {
+  const {
+    data: { session },
+  } = await SupabaseClient.auth.getSession();
+
+  console.log("Session:", session);
+
+  toast.success("Login successful!");
+
+  navigate("/learning/student/landingPage");
+}
+    
         if (error) {
           toast.error(error.message);
         } else {

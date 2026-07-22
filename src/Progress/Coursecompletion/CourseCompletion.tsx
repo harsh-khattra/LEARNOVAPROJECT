@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import CourseSkeleton from "../../Elearning/Header/CourseSkeleton";
+import Loader2 from "../../Elearning/Header/Loader2";
 import {
   FiCheckCircle,
   FiClock,
@@ -172,6 +172,9 @@ const DonutChart = ({ percent }: { percent: number }) => {
   const filled = (percent / 100) * circumference;
 
   return (
+
+    
+    
     <svg width="180" height="180" viewBox="0 0 180 180">
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e8e4d9" strokeWidth="14" />
       <circle
@@ -311,17 +314,9 @@ const CourseCompletion = () => {
   ];
 
   if (loading) {
-  return (
-    <div className="dashboard-container">
-      <div className="course-grid">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <CourseSkeleton key={index} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
+   return <Loader2 />
+ }
+ 
 
   if (error) {
     return (
@@ -333,7 +328,19 @@ const CourseCompletion = () => {
 
 
 
-  return (
+ return (
+  <>
+   <div className="hero-banner student-theme">
+  <div className="hero-body">
+    <h1 className="hero-title">🎓 Course Completeion</h1>
+    <p className="hero-subtitle">
+      Browse corporate academic courses approved by your organization's experts. Learn at your own pace.
+    </p>
+    <br/>
+  
+  </div>
+</div>
+
     <div className={styles.container}>
       {/* ── Stat cards ── */}
       <div className={styles.statsGrid}>
@@ -440,7 +447,8 @@ const CourseCompletion = () => {
         )}
       </div>
     </div>
-  );
+  </>
+);
 };
 
 export default CourseCompletion;

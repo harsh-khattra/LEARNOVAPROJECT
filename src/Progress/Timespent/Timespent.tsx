@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import "./Timespent.css";
 import { SupabaseClient as supabase } from "../../Helper/Supabase";
-import CourseSkeleton from "../../Elearning/Header/CourseSkeleton";
-
+import Loader2 from "../../Elearning/Header/Loader2";
 
 type Period = "day" | "week" | "month";
 type AccentColor = "blue" | "green";
@@ -606,38 +605,29 @@ const TimeSpentAnalytics: React.FC = () => {
 
 
 
-  if (loading) {
-  return (
-    <div className="dashboard-container">
-      <div className="course-grid">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <CourseSkeleton key={index} />
-        ))}
-      </div>
-    </div>
-  );
+ if (loading) {
+  return <Loader2 />
 }
+
   /* ── RENDER ── */
   return (
     <div className="tsa-root" data-theme={theme}>
+      <div className="hero-banner student-theme">
+      <div className="hero-body">
+        <h1 className="hero-title">⏱️ Time Spent Analytics</h1>
+        <p className="hero-subtitle">
+          Track your study habits, streaks, and focus time — all in one place.
+        </p>
+      </div>
+    </div>
       <div className="tsa-shell">
-        <aside className="tsa-sidebar">
-          <div className="tsa-sidebar__brand">
-            <span className="tsa-sidebar__mark">◐</span>
-            <span>LearnTrack</span>
-          </div>
-          <nav className="tsa-sidebar__nav">
-            {navItems.map((item, i) => (
-              <a
-                key={item.id}
-                href={`#${item.id}`}
-                className={i === 0 ? "is-active" : ""}
-                onClick={(e) => handleNavClick(e, item.id)}
-              >
-                {item.label}
-              </a>
-            ))}
-          </nav>
+       
+
+
+
+
+     
+          
           <button
             className="tsa-theme-toggle"
             onClick={() => setTheme(t => t === "light" ? "dark" : "light")}
@@ -646,14 +636,11 @@ const TimeSpentAnalytics: React.FC = () => {
             {theme === "light" ? <Icon.Moon /> : <Icon.Sun />}
             <span>{theme === "light" ? "Dark mode" : "Light mode"}</span>
           </button>
-        </aside>
+      
 
         <div className="tsa-main" ref={mainRef}>
           <header className="tsa-topbar" id="overview">
-            <div>
-              <h1>Time Spent Analytics</h1>
-              <p>Track your study habits and stay on pace with your goals.</p>
-            </div>
+            
             <div className="tsa-filters">
               <select value={dateRange} onChange={e => setDateRange(e.target.value)}>
                 <option value="7d">Last 7 days</option>

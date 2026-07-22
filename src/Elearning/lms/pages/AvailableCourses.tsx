@@ -8,6 +8,22 @@ import Enrollment from '../../../Progress/Enrollment/Enroll';
 
 import './courseDashboard.css'
 
+
+
+
+
+
+import './availableCourses.css';
+
+// import './availableCourses.css';
+
+
+
+
+
+
+
+
 export const AvailableCourses: React.FC = () => {
       const YT_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY; 
   const [courses, setCourses] = useState<Course[]>([]);
@@ -190,11 +206,6 @@ const handleSaveToPlaylist = async (video: any) => {
                 isTeacher={false} 
 
 
-                onManageContent={() => {}} 
-                onPublish={() => {}}
-                onRevertToDraft={() => {}}
-                onDelete={() => {}}
-
 
                 isEnrolled={enrolledCourseIds.includes(course.id)}
                 onManageContent={(id: string) => {}} 
@@ -203,10 +214,7 @@ const handleSaveToPlaylist = async (video: any) => {
                 onDelete={(id: string) => {}}
 
 
-                onManageContent={() => {}} 
-                onPublish={() => {}}
-                onRevertToDraft={() => {}}
-                onDelete={() => {}}
+               
 
 
                 onStartLearning={handleStartLearning}

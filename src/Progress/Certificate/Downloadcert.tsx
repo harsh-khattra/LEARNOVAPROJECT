@@ -1,6 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState,useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import "./Downloadcert.css";
+// import React, { useMemo, useState, useRef } from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 /* ---------------------------------------------------------------------- */
 /*  Types                                                                  */
@@ -117,6 +120,8 @@ export default function Downloadcert({
   const [displayName, setDisplayName] = useState(
     locationState.studentName ?? studentName
   );
+  const certRef = useRef<HTMLDivElement>(null);
+const [downloading, setDownloading] = useState(false);
   const [activeInstitute] = useState(locationState.institute ?? institute);
   const [theme, setTheme] = useState<ThemeKey>("gold");
   const [zoom, setZoom] = useState(100);
@@ -131,6 +136,43 @@ export default function Downloadcert({
     }
     return certificates.find((c) => c.id === selectedId) ?? initialCert;
   }, [certificates, selectedId, locationState.certificate, initialCert]);
+
+
+async function handleDownloadPdf() {
+  if (!certRef.current || !certificate) return;
+  setDownloading(true);
+  try {
+    const canvas = await html2canvas(certRef.current, {
+      scale: 2, // sharp/high-res output ke liye
+      backgroundColor: "#ffffff",
+      useCORS: true,
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+
+    // Certificate ka aspect ratio landscape hota hai, isliye landscape PDF
+    const pdf = new jsPDF({
+      orientation: "landscape",
+      unit: "px",
+      format: [canvas.width, canvas.height],
+    });
+
+    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+
+    const fileSafeName = displayName.replace(/\s+/g, "_");
+    const fileSafeCourse = certificate.courseName.replace(/\s+/g, "_");
+    pdf.save(`Certificate_${fileSafeName}_${fileSafeCourse}.pdf`);
+
+    onDownloadPdf?.(certificate, displayName); // agar parent bhi kuch karna chahe, wo bhi chal jayega
+  } catch (err) {
+    console.error("PDF generation failed:", err);
+  } finally {
+    setDownloading(false);
+  }
+}
+
+
+
 
   const verificationUrl = certificate
     ? `learnova-verify.org/verify/${certificate.verificationSlug}`
@@ -236,16 +278,18 @@ export default function Downloadcert({
 
         {/* Certificate viewer */}
         <div className="dc-viewer">
-          <div
-            className="dc-viewer-scale"
-            style={{ transform: `scale(${zoom / 100})` }}
-          >
-            <CertificateCard
-              studentName={displayName}
-              institute={activeInstitute}
-              certificate={certificate}
-            />
-          </div>
+         <div
+  className="dc-viewer-scale"
+  style={{ transform: `scale(${zoom / 100})` }}
+>
+  <div ref={certRef}>
+    <CertificateCard
+      studentName={displayName}
+      institute={activeInstitute}
+      certificate={certificate}
+    />
+  </div>
+</div>
         </div>
 
         {/* Manage & customize panel */}
@@ -253,12 +297,13 @@ export default function Downloadcert({
           {/* Actions */}
           <div className="dc-actions">
             <button
-              type="button"
-              className="dc-btn dc-btn-primary"
-              onClick={() => onDownloadPdf?.(certificate, displayName)}
-            >
-              <DownloadIcon /> Download PDF certificate
-            </button>
+  type="button"
+  className="dc-btn dc-btn-primary"
+  onClick={handleDownloadPdf}
+  disabled={downloading}
+>
+  <DownloadIcon /> {downloading ? "Generating PDF..." : "Download PDF certificate"}
+</button>
             <button
               type="button"
               className="dc-btn dc-btn-secondary"

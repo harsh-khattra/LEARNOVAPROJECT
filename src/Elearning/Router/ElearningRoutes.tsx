@@ -1,10 +1,12 @@
 import { Routes, Route } from "react-router-dom";
 
+import ScrollToTop from "../lms/pages/ScrollToTop";
 
 
 // import Discussion from "../Discussion/DiscussionModule";
 
 // import Certificates from "../Student/Certificate";
+
 
 
 
@@ -29,12 +31,19 @@ import EnrolledCourses from "../../Progress/Enrolled/Enrolledcourses";
 import Downloadcert from "../../Progress/Certificate/Downloadcert";
 
 
+
+
+
+
 import { LandingPage } from "../lms/pages/LandingPage";
-// import { AssignmentDashboard } from "../lms/pages/AssignmentDashboard";
 import { QuizComponent } from "../lms/pages/QuizComponent";
 
+import { AssignmentDashboard } from "../lms/pages/AssignmentDashboard";
 
-import { AssignmentDashboard } from '../lms/pages/AssignmentDashboard';
+
+
+// import { AssignmentDashboard } from '../lms/pages/AssignmentDashboard';
+
 
 
 import { CourseDashboardPage } from "../lms/pages/CourseDashboardPage";
@@ -42,8 +51,6 @@ import { AvailableCourses } from "../lms/pages/AvailableCourses";
 import { AdminApprovalDesk } from "../lms/pages/AdminApproval";
 import { ManageContentPage } from "../lms/pages/ManageContentPage";
 import { CoursePlayerPage } from "../lms/pages/CoursePlayerPage";
-
-
 
 import { MySandbox } from "../lms/pages/MySandbox";
 
@@ -53,11 +60,27 @@ import { MySandbox } from "../lms/pages/MySandbox";
 
 
 
+
+
+
+
+
+
+
 const ElearningRoutes = () => {
-  const { permissions } = useAuth();
+  // const { permissions } = useAuth();
+
+  
+  // const { loading, isAuth, permissions } = useAuth();
+
+const { loading, isAuth, permissions } = useAuth();
+
+console.log("Loading:", loading);
+console.log("isAuth:", isAuth);
 console.log("Permissions:", permissions);
-console.log("viewEnrollments:", permissions.viewEnrollments);
   return (
+    <>
+    <ScrollToTop/>
     <Routes>
       {/* Unauthorized */}
       <Route path="/unauthorized" element={<Unauthorized />} />
@@ -72,7 +95,6 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
           </ProtectedRoute>
         }
       />
-
 
       <Route
         path="teacher/courses"
@@ -112,9 +134,12 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
       />
 
 
+      <Route path="employee/courses" element={<AvailableCourses />} />
+
 
 
       <Route path="employee/courses"      element={<AvailableCourses />} />
+
 
 
       <Route
@@ -128,8 +153,8 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
 
 
 
-      <Route path="employee/courses"      element={<AvailableCourses />} />
 
+      <Route path="employee/courses"      element={<AvailableCourses />} />
 
 
       <Route
@@ -140,7 +165,6 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
           </ProtectedRoute>
         }
       />
-
 
       <Route
         path="student/downloadcertificate/:certId"
@@ -158,7 +182,16 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
             <QuizPerformancePage />
           </ProtectedRoute>
         }
-      
+      />
+
+
+     <Route
+  path="/student/sandbox"
+  element={
+    <ProtectedRoute allow={permissions.viewResources}>
+      <MySandbox />
+    </ProtectedRoute>
+  }
 />
 
 
@@ -171,7 +204,8 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
       <Route path="student/certificates" element={<Certificates />} />
       <Route path = "employee/courses" element = {< AvailableCourses />} />
       <Route path = "student/assignments" element= {<AssignmentDashboard />} />
-<Route path = "student/sandbox" element={<MySandbox />} />
+<Route path = "/student/sandbox" element={<MySandbox />} />
+
 
       <Route
         path="student/completion"
@@ -182,14 +216,6 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
         }
       />
 
- <Route
-        path="student/sandbox"
-        element={
-          <ProtectedRoute allow={permissions.viewResources}>
-            <MySandbox />
-          </ProtectedRoute>
-        }
-      />
 
 
 
@@ -200,6 +226,7 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
       <Route path="student/certificates" element={<Certificates />} />
       <Route path = "employee/courses" element = {< AvailableCourses />} />
       <Route path = "student/assignments" element= {<AssignmentDashboard />} />
+
 
 
 
@@ -215,10 +242,13 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
 
 
 
+
+
       <Route path="lms/managecontent/:id" element={<ManageContentPage />} />
       <Route path="learning/course-player/:id" element={<CoursePlayerPage />} />
       <Route path="/lms/dashboard"        element={<CourseDashboardPage />} />
       <Route path="/course-player/:id"    element={<CoursePlayerPage />} />
+
 
 
       <Route
@@ -229,6 +259,7 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
           </ProtectedRoute>
         }
       />
+
 
 
 
@@ -292,16 +323,11 @@ console.log("viewEnrollments:", permissions.viewEnrollments);
 
       {/* Course Player (Public after enrollment logic) */}
 
-      <Route
-        path="learning/course-player/:id"
-        element={<CoursePlayerPage />}
-      />
+      <Route path="learning/course-player/:id" element={<CoursePlayerPage />} />
 
-      <Route
-        path="course-player/:id"
-        element={<CoursePlayerPage />}
-      />
+      <Route path="course-player/:id" element={<CoursePlayerPage />} />
     </Routes>
+    </>
   );
 };
 

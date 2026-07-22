@@ -174,6 +174,8 @@ departments!profiles_department_id_fkey(empDepartment)
             console.log("User ID:", userId);
 console.log("Profile:", profile);
 console.log("Error:", error);
+console.log("Profile:", profile);
+console.log("Roles:", profile.roles);
 
 
       if (error || !profile || !profile.roles) {

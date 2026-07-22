@@ -1,3 +1,4 @@
+
 .sidebar {
   width: 65px;               /* 👈 default collapsed width */
   min-width: 7px;
@@ -13,14 +14,17 @@
   left: 0;
   height: calc(100vh - 72px);
   overflow-x: hidden;        /* 👈 zaroori hai taaki text overflow na ho */
-  overflow-y: auto;
-  z-index: 999;
-border-top:none;
-  transition: width 0.25s ease;  /*  smooth expand/collapse */
+  overflow-y: auto;  
+  z-index: 1000;
+
+transition: left 0.3s ease  /* 👈 smooth expand/collapse */
+}
+.sidebar.open {
+  left: 0;              /* slides in when open */
 }
 
 .sidebar:hover {
-  width: 260px;               /* 👈 hover pe expand */
+  width: 26px;               /* 👈 hover pe expand */
   min-width: 260px;
 }
 
@@ -212,10 +216,6 @@ border-top:none;
 
   margin-left:-10px;
 }
-/* ==============================
-   Mobile Menu Button
-============================== */
-
 .menuButton {
   display: none;          /* Hidden by default (Desktop) */
   position: fixed;
@@ -326,4 +326,10 @@ border-top:none;
 
 }
 
+}
+.overlay {
+  position: fixed;
+  inset: 0;
+  /* background: rgba(0, 0, 0, 0.45); */
+  z-index: 999;
 }

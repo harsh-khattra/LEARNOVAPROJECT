@@ -9,13 +9,12 @@ import {
   FiUsers,
   FiShield,
   FiCreditCard,
- FiBookmark,
+  FiBookmark,
 } from "react-icons/fi";
 import { useState } from "react";
 
 import { useAuth } from "../../Context/AuthContext"; // Change path if needed
 import styles from "./LearningSidebar.module.css";
-
 
 interface MenuItem {
   name: string;
@@ -23,12 +22,14 @@ interface MenuItem {
   icon: React.ReactNode;
   roles: string[];
 }
+
 const LearningSidebar = () => {
- const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const { user } = useAuth();
   console.log("Sidebar User:", user);
   console.log("Sidebar Role:", JSON.stringify(user?.role));
+
   const menuItems: MenuItem[] = [
     {
       name: "Dashboard",
@@ -48,7 +49,7 @@ const LearningSidebar = () => {
       icon: <FiUsers />,
       roles: ["Admin", "Student"],
     },
-     {
+    {
       name: "Saved Resources",
       path: "/learning/student/sandbox",
       icon: <FiBookmark />,
@@ -78,7 +79,6 @@ const LearningSidebar = () => {
       icon: <FiMessageCircle />,
       roles: ["Admin", "Teacher", "Student"],
     },
-
     {
       name: "Completion",
       path: "/learning/student/completion",
@@ -97,65 +97,55 @@ const LearningSidebar = () => {
       icon: <FiCreditCard />,
       roles: ["Admin", "Teacher", "Student"],
     },
-
-
-
   ];
+
   const visibleMenu = menuItems.filter((item) =>
     item.roles.includes(user?.role ?? "")
   );
 
 
-
   return (
-  <>
-    <button
-      className={styles.menuButton}
-      onClick={() => setIsOpen(!isOpen)}
-    >
-      ☰
-    </button>
+    <>
+      <button className={styles.menuButton} onClick={() => setIsOpen(!isOpen)}>
+        ☰
+      </button>
 
-    {isOpen && (
-      <div
-        className={styles.overlay}
-        onClick={() => setIsOpen(false)}
-      />
-    )}
+      {isOpen && (
+        <div className={styles.overlay} onClick={() => setIsOpen(false)} />
+      )}
 
-    <aside
-      className={`${styles.sidebar} ${isOpen ? styles.open : ""}`}
-    >
-      <nav className={styles.nav}>
-        {visibleMenu.map((item) => (
-          <NavLink
-  key={item.path}
-  to={item.path}
-  onClick={() => setIsOpen(false)}
-            className={({ isActive }) =>
-              `${isActive ? styles.activeLink : styles.link} ${item.name === "My Profile" ? styles.spaced : ""
-              }`
-            }
-          >
-            <span className={styles.icon}>{item.icon}</span>
-            <span className={styles.label}>{item.name}</span>
-          </NavLink>
-        ))}
-      </nav>
+      <aside className={`${styles.sidebar} ${isOpen ? styles.open : ""}`}>
+        <nav className={styles.nav}>
+          {visibleMenu.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={() => setIsOpen(false)}
+              className={({ isActive }) =>
+                `${isActive ? styles.activeLink : styles.link} ${
+                  item.name === "My Profile" ? styles.spaced : ""
+                }`
+              }
+            >
+              <span className={styles.icon}>{item.icon}</span>
+              <span className={styles.label}>{item.name}</span>
+            </NavLink>
+          ))}
+        </nav>
 
-      {/* Profile section below the menu */}
-      {user && (
-  <div className={styles.profileSection}>
-    <div className={styles.profileIcon}>
-      <FiUser size={20} />
-    </div>
-    <div className={styles.profileText}>
-      <span className={styles.profileGreeting}>Hi, {user.role}</span>
-      <span className={styles.profileEmail}>{user.email}</span>
-    </div>
-  </div>
-)}
-    </aside>
+        {/* Profile section below the menu */}
+        {user && (
+          <div className={styles.profileSection}>
+            <div className={styles.profileIcon}>
+              <FiUser size={20} />
+            </div>
+            <div className={styles.profileText}>
+              <span className={styles.profileGreeting}>Hi, {user.role}</span>
+              <span className={styles.profileEmail}>{user.email}</span>
+            </div>
+          </div>
+        )}
+      </aside>
     </>
   );
 };

@@ -23,7 +23,8 @@
   flex-direction: column;
   gap: 28px;
 
-  margin-left: 260px;   /* ← add this, matched to actual sidebar width */
+
+  margin-left: 100px;   /* ← add this, matched to actual sidebar width */
 }
 
 @media (max-width: 860px) {
@@ -331,4 +332,27 @@
   .loadMoreBtn {
     transition: none;
   }
+}
+.catalog-control-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 20px;
+}
+
+.panel-left h2 {
+  font-size: 26px;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+  font-weight: 700;
+}
+
+.panel-left p {
+  font-size: 15px;
+  color: #64748b;
+  margin: 0;
 }
