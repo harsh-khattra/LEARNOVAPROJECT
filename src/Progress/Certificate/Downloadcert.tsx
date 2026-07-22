@@ -219,14 +219,7 @@ async function handleDownloadPdf() {
     <div className="dc-page" data-theme={theme}>
 
       {/* ── Back button ─────────────────────────────────────────────── */}
-      <button
-        type="button"
-        className="dc-back-btn"
-        onClick={() => navigate(-1)}
-        aria-label="Back to certificates"
-      >
-        ← Back to certificates
-      </button>
+    
 
       {/* ── Header ──────────────────────────────────────────────────── */}
       <header className="dc-header">

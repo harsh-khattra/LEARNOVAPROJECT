@@ -87,6 +87,7 @@
   flex-wrap: wrap;
   margin-bottom: 25px;
   justify-content: center;
+  
 }
 
 .cert-tab {
@@ -525,6 +526,7 @@
   .cert-tab {
     width: 100%;
     justify-content: center;
+    display: flex;
   }
 
   .cert-card-thumb {
@@ -541,3 +543,4 @@
   }
 
 }
+

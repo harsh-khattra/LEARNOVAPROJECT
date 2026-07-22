@@ -736,3 +736,288 @@
   outline-offset: 2px;
   border-radius: var(--dc-radius-sm);
 }
+
+/* =========================================================================
+   RESPONSIVE ADDITIONS — appended only, no existing rules modified
+   ========================================================================= */
+
+/* ---------- Large Tablets (1024px) ---------- */
+@media (max-width: 1024px) {
+
+  .dc-page {
+    padding: 22px 20px 40px;
+  }
+
+  .dc-header {
+    padding: 24px 24px;
+  }
+
+  .dc-heading {
+    font-size: 26px;
+  }
+
+  .dc-header-main {
+    max-width: 100%;
+  }
+
+  .dc-toolbar-status {
+    padding-left: 120px;
+  }
+
+  .dc-viewer {
+    padding: 28px;
+    min-height: 420px;
+  }
+
+  .dc-cert {
+    width: 100%;
+  }
+
+  .dc-panel {
+    padding: 18px;
+  }
+}
+
+/* ---------- Tablets (768px) ---------- */
+@media (max-width: 768px) {
+
+  .dc-page {
+    padding: 18px 16px 32px;
+  }
+
+  .dc-header {
+    flex-direction: column;
+    padding: 22px 20px;
+    gap: 18px;
+  }
+
+  .dc-header-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .dc-heading {
+    font-size: 22px;
+  }
+
+  .dc-subheading {
+    max-width: 100%;
+    font-size: 13.5px;
+  }
+
+  .dc-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .dc-toolbar-status {
+    padding-left: 0;
+  }
+
+  .dc-body {
+    margin-top: 14px;
+    gap: 16px;
+  }
+
+  .dc-viewer {
+    padding: 20px;
+    min-height: 340px;
+  }
+
+  .dc-cert-inner {
+    padding: 28px 22px 24px;
+  }
+
+  .dc-cert-name {
+    font-size: 34px;
+  }
+
+  .dc-cert-desc {
+    max-width: 100%;
+    font-size: 12px;
+  }
+
+  .dc-cert-course {
+    font-size: 16px;
+  }
+
+  .dc-cert-signrow {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 16px;
+  }
+
+  .dc-seal {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .dc-cert-footer {
+    justify-content: flex-start;
+  }
+
+  .dc-footer-link {
+    text-align: left;
+    margin-left: 0;
+  }
+}
+
+/* ---------- Mobile (576px) ---------- */
+@media (max-width: 576px) {
+
+  .dc-page {
+    padding: 14px 12px 28px;
+  }
+
+  .dc-header {
+    padding: 18px 16px;
+    border-radius: var(--dc-radius-md);
+  }
+
+  .dc-badge {
+    font-size: 11px;
+    padding: 5px 10px;
+    margin-bottom: 12px;
+  }
+
+  .dc-heading {
+    font-size: 19px;
+  }
+
+  .dc-subheading {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .dc-select-wrap select {
+    font-size: 13px;
+    padding: 10px 32px 10px 12px;
+  }
+
+  .dc-zoom {
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .dc-viewer {
+    padding: 14px;
+    min-height: 280px;
+    border-radius: var(--dc-radius-md);
+  }
+
+  .dc-cert {
+    padding: 8px;
+    max-width: 100%;
+  }
+
+  .dc-cert-inner {
+    padding: 20px 14px 18px;
+  }
+
+  .dc-cert-brand {
+    margin-bottom: 12px;
+  }
+
+  .dc-cert-eyebrow,
+  .dc-cert-lede {
+    font-size: 10px;
+  }
+
+  .dc-cert-name {
+    font-size: 26px;
+    padding-bottom: 6px;
+    margin: 4px 0 10px;
+  }
+
+  .dc-cert-course {
+    font-size: 14.5px;
+  }
+
+  .dc-cert-grade {
+    margin-bottom: 18px;
+  }
+
+  .dc-cert-signrow {
+    grid-template-columns: 1fr;
+    row-gap: 14px;
+    padding: 0 0 16px;
+  }
+
+  .dc-signature {
+    align-items: center;
+    text-align: center;
+  }
+
+  .dc-cert-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .dc-footer-item {
+    text-align: left;
+  }
+
+  .dc-footer-link {
+    margin-left: 0;
+  }
+
+  .dc-panel {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .dc-theme-row {
+    gap: 6px;
+  }
+
+  .dc-theme-swatch {
+    padding: 10px 4px;
+    font-size: 10px;
+  }
+
+  .dc-auth-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+/* ---------- Small Mobile (400px) ---------- */
+@media (max-width: 400px) {
+
+  .dc-page {
+    padding: 10px 10px 24px;
+  }
+
+  .dc-header {
+    padding: 16px 14px;
+  }
+
+  .dc-heading {
+    font-size: 17px;
+  }
+
+  .dc-subheading {
+    font-size: 12px;
+  }
+
+  .dc-cert-name {
+    font-size: 21px;
+  }
+
+  .dc-cert-desc {
+    font-size: 11.5px;
+  }
+
+  .dc-btn {
+    font-size: 12.5px;
+    padding: 11px 12px;
+  }
+
+  .dc-footer-chip,
+  .dc-footer-value {
+    font-size: 11px;
+  }
+}
