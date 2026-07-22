@@ -107,28 +107,6 @@ const LearningSidebar = () => {
 
 
 
-
-
-
-  // {
-  //   name: "Quiz",
-  //   path: "/learning/student/quiz",
-  //   icon: <FiUser />,
-  // },
-  // {
-  //   name: "Completion",
-  //   path: "/learning/student/completion",
-  //   icon: <FiUser />,
-  // },
-  // {
-  //   name: "Timespent",
-  //   path: "/learning/student/timespent",
-  //   icon: <FiUser />,
-  // }
-  // ];
-
-
-
   return (
   <>
     <button

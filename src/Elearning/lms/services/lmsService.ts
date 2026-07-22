@@ -41,6 +41,16 @@ export const lmsService = {
       throw error;
     }
   },
+  async fetchAllCourses(): Promise<Course[]> {
+  const { data, error } = await SupabaseClient
+    .from('courses')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  return data as Course[];
+},
 
 async fetchCourses(filter?: string) {
   const { data, error } = await SupabaseClient

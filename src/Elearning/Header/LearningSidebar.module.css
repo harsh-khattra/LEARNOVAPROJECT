@@ -41,12 +41,12 @@ border-top:none;
   border-radius: 12px;
   font-size: 16px;
   font-weight: 500;
-  white-space: nowrap;        /* 👈 text ek line mein rahe */
+  white-space: nowrap;        /* text ek line mein rahe */
   transition: all 0.2s ease;
 }
 
 .spaced {
-  margin-top: 0px; /* 👈 adjust as needed */
+  margin-top: 0px; /*  adjust as needed */
 }
 
 .link {
@@ -82,14 +82,14 @@ border-top:none;
   align-items: center;
   justify-content: center;
   min-width: 20px;
-  flex-shrink: 0;             /* 👈 collapse hone par icon chota na ho */
+  flex-shrink: 0;             /*  collapse hone par icon chota na ho */
 }
 
 .activeLink .icon {
   color: #2563eb;
 }
 
-/* 👇 Ye naya class hai — label ko collapsed state mein chupayega */
+/* Ye naya class hai — label ko collapsed state mein chupayega */
 .label {
   opacity: 0;
   transition: opacity 0.2s ease;

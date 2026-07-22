@@ -4,13 +4,14 @@ import { lmsService } from '../services/lmsService';
 import type { Course } from '../types/lms';
 import { CURRENT_USER, formatCoursePrice, getStatusBadgeStyles } from '../utils/lmsShared';
 import './courseDashboard.css';
+import { SupabaseClient } from '../../../Helper/Supabase';
 import Loader2 from '../../Header/Loader2';
 export const CourseDashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-
+const [userId, setUserId] = useState<string | null>(null);
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formTitle, setFormTitle] = useState('');
@@ -22,15 +23,18 @@ export const CourseDashboardPage: React.FC = () => {
   const isTeacher = CURRENT_USER.role === 'teacher' || CURRENT_USER.role === 'admin' || CURRENT_USER.role === 'employee';
 
   const loadDashboardData = async () => {
+ const { data: { user } } = await SupabaseClient.auth.getUser();
+
+  console.log("Supabase User:", user);
+  console.log("Supabase User ID:", user?.id);
+  console.log("CURRENT_USER:", CURRENT_USER);
+  console.log("CURRENT_USER ID:", CURRENT_USER.id);
+    
     try {
       setLoading(true);
       let data: Course[] = [];
       
-      if (isTeacher) {
-        data = await lmsService.fetchTeacherCourses(CURRENT_USER.id);
-      } else {
-        data = await lmsService.fetchCourses('all'); 
-      }
+   data = await lmsService.fetchAllCourses();
       setCourses(data);
     } catch (err) {
       console.error("Error loading courses:", err);
@@ -49,15 +53,20 @@ export const CourseDashboardPage: React.FC = () => {
 
     try {
       setSubmitting(true);
-      await lmsService.createCourse(
-        {
-          title: formTitle,
-          description: formDescription,
-          category: formCategory,
-          thumbnail_file: formFile
-        },
-        CURRENT_USER.id
-      );
+    if (!userId) {
+    alert("User not found");
+    return;
+}
+
+await lmsService.createCourse(
+    {
+        title: formTitle,
+        description: formDescription,
+        category: formCategory,
+        thumbnail_file: formFile
+    },
+    userId
+);
       
       setFormTitle('');
       setFormDescription('');
