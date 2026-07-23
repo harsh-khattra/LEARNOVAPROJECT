@@ -1,4 +1,5 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState } from 'react';
+import type { ChangeEvent } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
@@ -6,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { SupabaseClient } from '../../Helper/Supabase';
 import PageLoader from '../UI/PageLoader';
 import styles from './Signup.module.css';
-
+import logo from "../../assets/logo.png"
 interface StudentFormValues {
   name: string;
   email: string;
@@ -403,10 +404,9 @@ const SignUpPortal: React.FC = () => {
           <div className={styles['left-pane']}>
             <div className={styles['brand-title']}>
               <img
-                src="/src/assets/logo.png"
+                 src={logo} alt="Learnova Logo" 
                 width={34}
                 height={30}
-                alt="Logo"
                 style={{ marginRight: '2px' }}
               />
               LEARNOVA

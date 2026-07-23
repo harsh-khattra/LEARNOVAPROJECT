@@ -52,7 +52,7 @@ export const lmsService = {
   return data as Course[];
 },
 
-async fetchCourses(filter?: string) {
+async fetchCourses(_filter?: string) {
   const { data, error } = await SupabaseClient
     .from('courses')
     .select(`
@@ -368,7 +368,26 @@ async updateContent(assetId: string, updates: any) {
       .eq('id', chapterId);
     if (error) throw error;
   },
-  
+  async updateChapter(
+  chapterId: string,
+  updates: { title: string }
+) {
+  const { data, error } = await SupabaseClient
+    .from('chapters')
+    .update({
+      title: updates.title,
+    })
+    .eq('id', chapterId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating chapter:", error);
+    throw error;
+  }
+
+  return data;
+},
 
   async publishCourseAndSubmitAllVideos(courseId: string): Promise<void> {
     try {

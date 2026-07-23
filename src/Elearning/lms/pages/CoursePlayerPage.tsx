@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { lmsService } from '../services/lmsService';
 import './CoursePlayer.css'
 export const CoursePlayerPage: React.FC = () => {
   const { id } = useParams<{ id: string }>(); 
-  const navigate = useNavigate();
+ 
   
   const [course, setCourse] = useState<any>(null);
   const [activeVideo, setActiveVideo] = useState<any>(null); // Acts as active content (Video or PDF)

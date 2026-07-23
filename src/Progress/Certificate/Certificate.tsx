@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Loader2 from "../../Elearning/Header/Loader2";
-import CourseSkeleton from "../../Elearning/Header/CourseSkeleton";
+
 import "./Certificate.css";
 import { lmsService } from "../../Elearning/lms/services/lmsService";
 import type { Course as LmsCourse } from "../../Elearning/lms/types/lms";
@@ -108,7 +108,7 @@ export default function Certificate() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [studentName, setStudentName] = useState<string>("");
-  const [institute, setInstitute] = useState<string>("Learnova Institute");
+const institute = "Learnova Institute";
 
   /* ── Fetch real enrolled courses + progress from Supabase ──
      Same approach as EnrolledCourses.tsx: pull the course catalog + this
@@ -354,23 +354,7 @@ export default function Certificate() {
 }
 
 /* ---- Inline icons (no external icon dependency) ---- */
-function DotsIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="5" cy="12" r="1.5" />
-      <circle cx="12" cy="12" r="1.5" />
-      <circle cx="19" cy="12" r="1.5" />
-    </svg>
-  );
-}
 
-function PlayIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <polygon points="6 4 20 12 6 20 6 4" />
-    </svg>
-  );
-}
 
 function AwardIcon() {
   return (

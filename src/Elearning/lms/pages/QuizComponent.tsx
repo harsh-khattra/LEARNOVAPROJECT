@@ -54,7 +54,7 @@ export const QuizComponent: React.FC = () => {
 
       
       if (user) {
-        const { data: sData, error: sError } = await SupabaseClient
+        const { data: sData} = await SupabaseClient
           .from('quiz_submissions')
           .select('*')
           .eq('content_id', contentId)

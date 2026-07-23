@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Routes, Route } from 'react-router-dom';
 import { CourseDashboardPage } from '../pages/CourseDashboardPage';
 import { ManageContentPage } from '../pages/ManageContentPage';

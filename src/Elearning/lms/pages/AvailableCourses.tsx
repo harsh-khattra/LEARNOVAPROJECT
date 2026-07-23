@@ -208,10 +208,10 @@ const handleSaveToPlaylist = async (video: any) => {
 
 
                 isEnrolled={enrolledCourseIds.includes(course.id)}
-                onManageContent={(id: string) => {}} 
-                onPublish={(id: string) => {}}
-                onRevertToDraft={(id: string) => {}}
-                onDelete={(id: string) => {}}
+                onManageContent={(_id: string) => {}} 
+                onPublish={(_id: string) => {}}
+                onRevertToDraft={(_id: string) => {}}
+                onDelete={(_id: string) => {}}
 
 
                

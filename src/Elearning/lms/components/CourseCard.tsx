@@ -13,7 +13,7 @@ interface CourseCardProps {
 }
 export const CourseCard: React.FC<CourseCardProps> = ({
   course,
-  isTeacher,
+
   isEnrolled = false,
   onStartLearning
 }) => {

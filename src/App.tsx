@@ -1,5 +1,4 @@
-import { useLocation } from "react-router-dom";
-import { useAuth } from "./Context/AuthContext";
+
 import { Toaster } from "react-hot-toast";
 import { useState} from "react";
 import { IntlProvider } from "react-intl";

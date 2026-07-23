@@ -585,23 +585,23 @@ const TimeSpentAnalytics: React.FC = () => {
       : `${peakHour === 12 ? 12 : peakHour - 12} PM`;
 
   /* ── SIDEBAR NAV ── */
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    e.preventDefault();
-    const container = mainRef.current;
-    if (!container) return;
-    const target = container.querySelector<HTMLElement>(`#${id}`);
-    if (!target) return;
-    container.scrollTo({ top: target.offsetTop - container.offsetTop, behavior: "smooth" });
-  };
+  // const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+  //   e.preventDefault();
+  //   const container = mainRef.current;
+  //   if (!container) return;
+  //   const target = container.querySelector<HTMLElement>(`#${id}`);
+  //   if (!target) return;
+  //   container.scrollTo({ top: target.offsetTop - container.offsetTop, behavior: "smooth" });
+  // };
 
-  const navItems = [
-    { id: "overview", label: "Overview" },
-    { id: "trends", label: "Trends" },
-    { id: "courses", label: "Courses" },
-    { id: "calendar", label: "Calendar" },
-    { id: "sessions", label: "Sessions" },
-    { id: "insights", label: "Insights" },
-  ];
+  // const navItems = [
+  //   { id: "overview", label: "Overview" },
+  //   { id: "trends", label: "Trends" },
+  //   { id: "courses", label: "Courses" },
+  //   { id: "calendar", label: "Calendar" },
+  //   { id: "sessions", label: "Sessions" },
+  //   { id: "insights", label: "Insights" },
+  // ];
 
 
 

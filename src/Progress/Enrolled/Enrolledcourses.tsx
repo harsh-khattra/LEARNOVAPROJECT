@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+
 import CourseSkeleton from "../../Elearning/Header/CourseSkeleton";
 import "./Enrolledcourses.css";
 import { lmsService } from "../../Elearning/lms/services/lmsService";
@@ -177,7 +177,7 @@ export default function EnrolledCourses() {
    console.log("Enrolled Page Loaded");
    const [searchQuery, setSearchQuery] = useState('');
    
-  const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState<TabKey>("enrolled");
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1321,15 +1321,8 @@ function YouTubePlayer({
 }
 
 /* ---- Inline icons (no external icon dependency) ---- */
-function DotsIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="5" cy="12" r="1.5" />
-      <circle cx="12" cy="12" r="1.5" />
-      <circle cx="19" cy="12" r="1.5" />
-    </svg>
-  );
-}
+
+
 
 function PlayIcon() {
   return (
