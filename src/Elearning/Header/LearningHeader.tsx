@@ -18,7 +18,7 @@ const LearningHeader: React.FC = () => {
   if (!confirmed) return;
 
   logout();
-  navigate("/login");
+  navigate("/");
 };
 
   return (
