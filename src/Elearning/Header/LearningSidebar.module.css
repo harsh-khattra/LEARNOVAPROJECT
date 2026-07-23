@@ -330,6 +330,9 @@ transition: left 0.3s ease  /* 👈 smooth expand/collapse */
 .overlay {
   position: fixed;
   inset: 0;
-  /* background: rgba(0, 0, 0, 0.45); */
+  background: rgba(0, 0, 0, 0.3); /* Optional: dark background */
   z-index: 999;
+}
+.sidebar {
+  z-index: 1000;
 }
