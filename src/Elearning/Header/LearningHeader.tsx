@@ -21,7 +21,7 @@ const LearningHeader: React.FC = () => {
   logout();
   navigate("/");
 };
->>>>>>> 5355b19e5d1b2215f54216836093ecd661c790e1
+
 
   return (
     <header className={styles.header}>
