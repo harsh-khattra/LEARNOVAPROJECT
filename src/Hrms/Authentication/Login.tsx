@@ -53,7 +53,7 @@ if (error) {
 
   toast.success("Login successful!");
 
-  navigate("/learning/student/landingPage");
+  navigate("learning/student/landingPage");
       } catch (err) {
         console.error(err);
       }
