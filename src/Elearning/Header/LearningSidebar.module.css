@@ -1,7 +1,9 @@
-
+/* ==============================
+   Sidebar (single source of truth)
+============================== */
 .sidebar {
-  width: 65px;               /* 👈 default collapsed width */
-  min-width: 7px;
+  width: 65px;                /* default collapsed width */
+  min-width: 65px;
   background: #ffffff;
   border-right: 1px solid #e5e7eb;
   display: flex;
@@ -13,19 +15,23 @@
   top: 72px;
   left: 0;
   height: calc(100vh - 72px);
-  overflow-x: hidden;        /* 👈 zaroori hai taaki text overflow na ho */
-  overflow-y: auto;  
-  z-index: 1000;
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 999;                /* above overlay (998), below menuButton (1300) */
 
-transition: left 0.3s ease  /* 👈 smooth expand/collapse */
-}
-.sidebar.open {
-  left: 0;              /* slides in when open */
+  transform: translateX(0);    /* visible by default on desktop */
+  transition: width 0.3s ease, transform 0.3s ease;
 }
 
 .sidebar:hover {
-  width: 26px;               /* 👈 hover pe expand */
+  width: 260px;
   min-width: 260px;
+}
+
+/* .open is only meaningful on mobile (see media query below).
+   On desktop it does nothing extra. */
+.sidebar.open {
+  transform: translateX(0);
 }
 
 .nav {
@@ -45,12 +51,12 @@ transition: left 0.3s ease  /* 👈 smooth expand/collapse */
   border-radius: 12px;
   font-size: 16px;
   font-weight: 500;
-  white-space: nowrap;        /* text ek line mein rahe */
+  white-space: nowrap;
   transition: all 0.2s ease;
 }
 
 .spaced {
-  margin-top: 0px; /*  adjust as needed */
+  margin-top: 0px;
 }
 
 .link {
@@ -86,14 +92,14 @@ transition: left 0.3s ease  /* 👈 smooth expand/collapse */
   align-items: center;
   justify-content: center;
   min-width: 20px;
-  flex-shrink: 0;             /*  collapse hone par icon chota na ho */
+  flex-shrink: 0;
 }
 
 .activeLink .icon {
   color: #2563eb;
 }
 
-/* Ye naya class hai — label ko collapsed state mein chupayega */
+/* Label hidden in collapsed state, shown on hover (desktop) */
 .label {
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -102,7 +108,7 @@ transition: left 0.3s ease  /* 👈 smooth expand/collapse */
 
 .sidebar:hover .label {
   opacity: 1;
-  transition-delay: 0.1s;    /* thoda delay taaki icon expand ho, phir text aaye */
+  transition-delay: 0.1s;
 }
 
 .panelHeader {
@@ -121,50 +127,16 @@ transition: left 0.3s ease  /* 👈 smooth expand/collapse */
   gap: 10px;
 }
 
-
-.profileSection {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  margin-top: auto;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.profileIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: #e0e0e0;
-  color: #333;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.profileImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-/* .profileEmail {
-  font-size: 0.85rem;
-  color: #ccc;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-} */
- 
+/* ==============================
+   Profile section (single source of truth)
+============================== */
 .profileSection {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  margin: 8px 12px 12px;
+  margin: 0 12px 12px;
+  margin-top: auto;           /* push to bottom */
   border-top: 1px solid #e5e7eb;
   border-radius: 10px;
 }
@@ -179,6 +151,15 @@ transition: left 0.3s ease  /* 👈 smooth expand/collapse */
   border-radius: 50%;
   background: #eef2ff;
   color: #2563eb;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.profileImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .profileText {
@@ -201,27 +182,16 @@ transition: left 0.3s ease  /* 👈 smooth expand/collapse */
   white-space: nowrap;
   max-width: 160px;
 }
-.profileSection {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  margin: 0 12px 12px;      /* removed top margin, auto will handle spacing */
-  margin-top: auto;         /* 👈 this pushes it to the bottom */
-  border-top: 1px solid #e5e7eb;
-  border-radius: 10px;
-}
 
-.profileIcon{
-
-  margin-left:-10px;
-}
+/* ==============================
+   Mobile menu button
+============================== */
 .menuButton {
-  display: none;          /* Hidden by default (Desktop) */
+  display: none;              /* hidden on desktop */
   position: fixed;
   top: 15px;
   left: 12px;
-  z-index: 1300;
+  z-index: 1300;               /* always above sidebar + overlay */
 
   width: 42px;
   height: 42px;
@@ -235,104 +205,87 @@ transition: left 0.3s ease  /* 👈 smooth expand/collapse */
   font-size: 22px;
   cursor: pointer;
 
-  box-shadow: 0 5px 12px rgba(0,0,0,.15);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ==============================
+   Overlay (mobile backdrop only)
+============================== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 998;                /* below sidebar (999), below menuButton (1300) */
+  display: none;                /* only shown on mobile, see media query */
 }
 
 /* ==============================
    Tablet
 ============================== */
+@media (max-width: 992px) {
+  .sidebar {
+    width: 60px;
+    min-width: 60px;
+  }
 
-@media (max-width:992px){
-
-.sidebar{
-
-    width:60px;
-    min-width:60px;
-
-}
-
-.sidebar:hover{
-
-    width:220px;
-    min-width:220px;
-
-}
-
+  .sidebar:hover {
+    width: 220px;
+    min-width: 220px;
+  }
 }
 
 /* ==============================
    Mobile
 ============================== */
+@media (max-width: 768px) {
+  .menuButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-@media (max-width:768px){
+  .sidebar {
+    width: 240px;
+    min-width: 240px;
+    top: 0;
+    height: 100%;
+    transform: translateX(-100%);   /* hidden off-screen by default */
+  }
 
-.menuButton{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
+  .sidebar.open {
+    transform: translateX(0);        /* slides in when open */
+  }
 
-.sidebar{
+  .sidebar:hover {
+    width: 240px;
+    min-width: 240px;
+  }
 
-    width:240px;
-    min-width:240px;
+  .label {
+    opacity: 1;
+  }
 
-    left:-240px;
-
-    transition:left .3s ease;
-
-}
-
-.open{
-
-    left:0 !important;
-
-}
-
-.sidebar:hover{
-
-    width:240px;
-    min-width:240px;
-
-}
-
-.label{
-
-    opacity:1;
-
-}
-
+  .overlay {
+    display: block;                  /* backdrop only exists on mobile */
+  }
 }
 
 /* ==============================
    Small Phones
 ============================== */
+@media (max-width: 480px) {
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+  }
 
-@media (max-width:480px){
-
-.sidebar{
-
-    width:220px;
-    min-width:220px;
-
-    left:-220px;
-
+  .sidebar:hover {
+    width: 220px;
+    min-width: 220px;
+  }
 }
 
-.sidebar:hover{
-
-    width:220px;
-    min-width:220px;
-
-}
-
-}
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.3); /* Optional: dark background */
-  z-index: 999;
-}
-.sidebar {
-  z-index: 1000;
+.mainContent {
+  position: relative;
+  z-index: 1;
 }

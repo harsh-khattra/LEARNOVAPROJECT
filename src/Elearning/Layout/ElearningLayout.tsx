@@ -13,8 +13,8 @@ const ElearningLayout = () => {
         <LearningSidebar />
 
         <main className={styles.content}>
-          <Outlet />
-        </main>
+  <Outlet />
+</main>
       </div>
     </div>
   );
