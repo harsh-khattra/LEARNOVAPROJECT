@@ -12,7 +12,7 @@ const LearningHeader: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/login"); // adjust to your actual login route
+    navigate("/"); // adjust to your actual login route
   };
 
   return (
