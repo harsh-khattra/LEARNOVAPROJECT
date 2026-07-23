@@ -2,7 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import "./LandingPage.css";
-
+import logo2 from "../../src/assets/logo2.png"
 const LandingPage = () => {
   const navigate = useNavigate();
   const { isAuth } = useAuth();
@@ -17,17 +17,27 @@ const LandingPage = () => {
     <div className="landing-page">
 
       {/* ── Navbar ── */}
-      <nav className="lp-nav">
-        <div className="lp-nav-logo">LEARN<span>OVA</span></div>
-        <div className="lp-nav-right">
-         
-          {!isAuth && (
-            <button className="btn-primary" onClick={() => navigate("/login")}>
-              Sign in
-            </button>
-          )}
-        </div>
-      </nav>
+     <nav className="lp-nav">
+<div className="lp-nav-logo">
+  <img src={logo2} alt="Learnova Logo" className="lp-logo-img" />
+  <p style={{color:"black"}}>
+    LEARN<span>OVA</span>
+  </p>
+</div>
+  <div className="lp-nav-right">
+
+    {!isAuth && (
+      <div className="lp-nav-buttons">
+        <button className="btn-primary" onClick={() => navigate("/signup")}>
+          Sign up
+        </button>
+        <button className="btn-primary" onClick={() => navigate("/login")}>
+          Sign in
+        </button>
+      </div>
+    )}
+  </div>
+</nav>
 
       {/* ── Hero ── */}
       <div className="lp-hero">
@@ -51,7 +61,9 @@ const LandingPage = () => {
           <button className="card-cta cta-blue">Open HRMS →</button>
         </div>
 
-        <div className="lp-card" onClick={() => goTo("/learning/dashboard")}>
+
+        <div className="lp-card" onClick={() => goTo("learning/student/landingPage")}>
+
           <div className="lp-card-icon icon-teal">🎓</div>
           <h2>eLearning</h2>
           <p>Access courses, track your progress, join discussions, and earn certificates.</p>

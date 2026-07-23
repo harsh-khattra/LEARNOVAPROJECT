@@ -89,10 +89,7 @@ export const lmsService = {
   },
 
   async createCourse(course: { title: string; description: string; category: string; teacherId: string; file?: File | null }) {
-    let thumbnailUrl = null;
-    if (course.file) {
-      thumbnailUrl = await this.uploadStorageAsset(course.file, 'course-thumbnails');
-    }
+
 
     const { data, error } = await SupabaseClient
       .from('courses')

@@ -1,23 +1,37 @@
-.sidebar {
-  width: 260px;
-  min-width: 260px;
 
+.sidebar {
+  width: 65px;               /* 👈 default collapsed width */
+  min-width: 7px;
   background: #ffffff;
   border-right: 1px solid #e5e7eb;
-
   display: flex;
   flex-direction: column;
-
   padding-top: 20px;
-
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03);
+
+  position: fixed;
+  top: 72px;
+  left: 0;
+  height: calc(100vh - 72px);
+  overflow-x: hidden;        /* 👈 zaroori hai taaki text overflow na ho */
+  overflow-y: auto;  
+  z-index: 1000;
+
+transition: left 0.3s ease  /* 👈 smooth expand/collapse */
+}
+.sidebar.open {
+  left: 0;              /* slides in when open */
+}
+
+.sidebar:hover {
+  width: 26px;               /* 👈 hover pe expand */
+  min-width: 260px;
 }
 
 .nav {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-
+  gap: 15px;
   padding: 0 12px;
 }
 
@@ -26,17 +40,17 @@
   display: flex;
   align-items: center;
   gap: 14px;
-
   text-decoration: none;
-
   padding: 14px 18px;
-
   border-radius: 12px;
-
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
-
+  white-space: nowrap;        /* text ek line mein rahe */
   transition: all 0.2s ease;
+}
+
+.spaced {
+  margin-top: 0px; /*  adjust as needed */
 }
 
 .link {
@@ -49,64 +63,273 @@
 }
 
 .activeLink {
-  background: linear-gradient(
-    90deg,
-    #eff6ff 0%,
-    #dbeafe 100%
-  );
-
+  background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 100%);
   color: #2563eb;
-
   font-weight: 600;
-
   position: relative;
 }
 
 .activeLink::before {
   content: "";
-
   position: absolute;
-
   left: 0;
   top: 8px;
-
   width: 4px;
   height: calc(100% - 16px);
-
   border-radius: 0 4px 4px 0;
-
   background: #2563eb;
 }
 
 .icon {
   font-size: 18px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   min-width: 20px;
+  flex-shrink: 0;             /*  collapse hone par icon chota na ho */
 }
 
 .activeLink .icon {
   color: #2563eb;
 }
-/* ==========================================================================
-   💼 PANEL HEADER STYLES (Matching your Light Theme)
-   ========================================================================== */
+
+/* Ye naya class hai — label ko collapsed state mein chupayega */
+.label {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  transition-delay: 0s;
+}
+
+.sidebar:hover .label {
+  opacity: 1;
+  transition-delay: 0.1s;    /* thoda delay taaki icon expand ho, phir text aaye */
+}
 
 .panelHeader {
   padding: 0 24px 18px 24px;
-  border-bottom: 1px solid #e5e7eb; /* Same subtle border as your sidebar */
+  border-bottom: 1px solid #e5e7eb;
   margin-bottom: 14px;
 }
 
 .panelTitle {
   margin: 0;
   font-size: 15px;
-  font-weight: 600; /* Matching activeLink font weight */
-  color: #1e293b;   /* Modern dark text for headers */
+  font-weight: 600;
+  color: #1e293b;
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profileIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  color: #333;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.profileImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* .profileEmail {
+  font-size: 0.85rem;
+  color: #ccc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+} */
+ 
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin: 8px 12px 12px;
+  border-top: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.profileIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 50%;
+  background: #eef2ff;
+  color: #2563eb;
+}
+
+.profileText {
+  display: flex;
+  flex-direction: column;
+}
+
+.profileGreeting {
+  font-weight: 600;
+  font-size: 18px;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.profileEmail {
+  font-size: 16px;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 160px;
+}
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin: 0 12px 12px;      /* removed top margin, auto will handle spacing */
+  margin-top: auto;         /* 👈 this pushes it to the bottom */
+  border-top: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.profileIcon{
+
+  margin-left:-10px;
+}
+.menuButton {
+  display: none;          /* Hidden by default (Desktop) */
+  position: fixed;
+  top: 15px;
+  left: 12px;
+  z-index: 1300;
+
+  width: 42px;
+  height: 42px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: #fff;
+
+  font-size: 22px;
+  cursor: pointer;
+
+  box-shadow: 0 5px 12px rgba(0,0,0,.15);
+}
+
+/* ==============================
+   Tablet
+============================== */
+
+@media (max-width:992px){
+
+.sidebar{
+
+    width:60px;
+    min-width:60px;
+
+}
+
+.sidebar:hover{
+
+    width:220px;
+    min-width:220px;
+
+}
+
+}
+
+/* ==============================
+   Mobile
+============================== */
+
+@media (max-width:768px){
+
+.menuButton{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.sidebar{
+
+    width:240px;
+    min-width:240px;
+
+    left:-240px;
+
+    transition:left .3s ease;
+
+}
+
+.open{
+
+    left:0 !important;
+
+}
+
+.sidebar:hover{
+
+    width:240px;
+    min-width:240px;
+
+}
+
+.label{
+
+    opacity:1;
+
+}
+
+}
+
+/* ==============================
+   Small Phones
+============================== */
+
+@media (max-width:480px){
+
+.sidebar{
+
+    width:220px;
+    min-width:220px;
+
+    left:-220px;
+
+}
+
+.sidebar:hover{
+
+    width:220px;
+    min-width:220px;
+
+}
+
+}
+.overlay {
+  position: fixed;
+  inset: 0;
+  /* background: rgba(0, 0, 0, 0.45); */
+  z-index: 999;
 }

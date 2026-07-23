@@ -1,73 +1,120 @@
+:root {
+  --bg-page: #f1f5f9;
+  --bg-card: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --border-color: #cbd5e1;
+  --brand-green: #23a95d;
+  --brand-green-hover: #1b8d4c;
+  --error-bg: #fff1f2;
+  --error-text: #e11d48;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-page: #0f172a;
+    --bg-card: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --border-color: #334155;
+    --error-bg: #4c1d24;
+    --error-text: #fca5a5;
+  }
+}
+
 .container {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   background: var(--bg-page);
+  padding: 20px;
 }
 
 .form {
   background: var(--bg-card);
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  width: 320px;
+  padding: 40px 36px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  width: 100%;
+  max-width: 380px;
   display: flex;
   flex-direction: column;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .title {
   text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
   margin-bottom: 20px;
 }
 
 .label {
-  margin-bottom: 5px;
-  font-weight: 500;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-primary);
 }
 
 .input {
-  padding: 10px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  padding: 9px 18px;
   margin-bottom: 5px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  border-radius: 30px;
+  border: 1.5px solid var(--border-color);
   outline: none;
-  transition: border 0.2s ease;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .input:focus {
-  border-color: #4caf50;
+  border-color: var(--brand-green);
+  box-shadow: 0 0 0 4px rgba(35, 169, 93, 0.15);
 }
 
 .button {
-  padding: 10px;
-  background: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  padding: 14px 28px;
+  background: blue;
+  border: blue;
+  color: #ffffff;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: bold;
-  transition: background 0.2s ease;
+  transition: all 0.25s ease;
+  margin-top: 6px;
   margin-bottom: 5px;
 }
 
 .button:hover {
-  background: #43a047;
+background: rgb(13, 93, 143);;
+  /* background: var(--brand-green-hover);
+  border-color: var(--brand-green-hover);
+  box-shadow: 0 4px 12px rgba(35, 169, 93, 0.25); */
 }
 
 .error {
-  color: #b00020;
-  background-color: #ffe5e5;
-  padding: 6px 10px;
-  border-radius: 4px;
+  color: var(--error-text);
+  background-color: var(--error-bg);
+  padding: 10px 18px;
+  border-radius: 10px;
   font-size: 13px;
-  /* margin-top: 5px; */
   margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(225, 29, 72, 0.15);
 }
 
 .ortext {
-  margin: 16px 16px;
+  margin: 16px 0;
   text-align: center;
+  color: var(--text-secondary);
+  font-size: 13px;
 }
 
 .googleBtn,
@@ -76,7 +123,7 @@
   width: 100%;
   padding: 10px;
   border: none;
-  border-radius: 10px;
+  border-radius: 50px;
   font-size: 13px;
   font-weight: 400;
   cursor: pointer;
@@ -105,22 +152,54 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* GitHub */
 .githubBtn {
   background: #24292e;
 }
 
 .githubBtn:hover {
-  background: #1b1f23;
+  background: rgb(13, 93, 143);;
   box-shadow: 0 4px 12px rgba(36, 41, 46, 0.3);
 }
 
-/* Facebook */
 .facebookBtn {
   background: #1877f2;
 }
 
 .facebookBtn:hover {
-  background: #166fe5;
+  background:  rgb(13, 93, 143);;
   box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+}
+
+/* --- Same field system as Signup --- */
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.required-star {
+  color: var(--error-text);
+  margin-left: 2px;
+}
+
+.password-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-container .input {
+  padding-right: 50px;
+  width: 100%;
+}
+
+.toggle-pass-btn {
+  position: absolute;
+  right: 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

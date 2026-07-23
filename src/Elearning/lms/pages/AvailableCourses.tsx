@@ -1,200 +1,309 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { SupabaseClient } from '../../../Helper/Supabase';
 import { lmsService } from '../services/lmsService';
-import './AvailableCourse.css';
+import { SupabaseClient } from '../../../Helper/Supabase';
+import type { Course } from '../types/lms';
+import { CourseCard } from '../components/CourseCard';
+import Loader2 from '../../Header/Loader2';
+import Enrollment from '../../../Progress/Enrollment/Enroll'; 
+
+import './courseDashboard.css'
 
 
-const CourseCard: React.FC<{ course: any; isEnrolled: boolean; navigate: any }> = ({ course, isEnrolled, navigate }) => {
-  //  Har single card ka dropdown ab is local state se control hoga, isliye koi clash nahi hoga
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  return (
-    <div className={`course-catalog-card ${isEnrolled ? 'unlocked' : 'locked'}`}>
-      
-      {/* Lock / Unlocked Badge */}
-      <div className="card-badge-status">
-        {isEnrolled ? (
-          <span className="badge-open">✅ Unlocked</span>
-        ) : (
-          <span className="badge-lock">🔒 Enrolled Guard</span>
-        )}
-      </div>
 
-      <div className="course-card-thumbnail-box">
-        <img src={course.thumbnail_url || '/placeholder.jpg'} alt={course.title} />
-      </div>
 
-      <div className="course-card-body-details">
-        <span className="course-card-category">{course.category}</span>
-        <h3 className="course-card-title">{course.title}</h3>
-        <p className="course-card-desc">{course.description}</p>
-        
-        {/* Playlist Accordion Area */}
-        <div className="smooth-accordion-container">
-          <button 
-            type="button" 
-            className={`syllabus-trigger-btn ${isDropdownOpen ? 'active' : ''}`}
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)} // Simply toggle local state
-          >
-            <span>📋 View Course Playlist ({course.chapters?.length || 0} Modules)</span>
-            <span className="arrow-icon">{isDropdownOpen ? '▲' : '▼'}</span>
-          </button>
 
-          {/* Smooth Height Dropdown Wrapper */}
-          <div className={`smooth-dropdown-wrapper ${isDropdownOpen ? 'is-expanded' : ''}`}>
-            <div className="syllabus-content-inner-scroll">
-              {course.chapters && course.chapters.length > 0 ? (
-                course.chapters.map((chapter: any, index: number) => (
-                  <div key={chapter.id || index} className="syllabus-chapter-block">
-                    <h4 className="syllabus-chapter-title">
-                      M{index + 1}: {chapter.title}
-                    </h4>
-                    <ul className="syllabus-lessons-list">
-                      {chapter.contents && chapter.contents.length > 0 ? (
-                        chapter.contents.map((content: any, cIndex: number) => (
-                          <li key={content.id || cIndex} className="syllabus-lesson-item">
-                            <span className="lesson-name">📹 {content.title}</span>
-                            <span className={`lesson-lock-tag ${isEnrolled ? 'open' : 'locked'}`}>
-                              {isEnrolled ? '🔓 Play' : '🔒 Lock'}
-                            </span>
-                          </li>
-                        ))
-                      ) : (
-                        <li className="no-lessons-notice">No videos inside this module yet.</li>
-                      )}
-                    </ul>
-                  </div>
-                ))
-              ) : (
-                <p className="no-chapters-notice">No curriculum modules uploaded yet.</p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+import './availableCourses.css';
 
-      {/* Footer Enroll/Start Buttons */}
-      <div className="course-card-footer-actions">
-        {isEnrolled ? (
-          <button 
-            type="button"
-            className="btn-action-start"
-            onClick={() => navigate(`/learning/student/course-player/${course.id}`)}
-          >
-            Resume Learning ▶
-          </button>
-        ) : (
-          <button 
-            type="button"
-            className="btn-action-enroll"
-            onClick={() => navigate(`/learning/student/enroll/${course.id}`)}
-          >
-            Enroll in Course 🔒
-          </button>
-        )}
-      </div>
+// import './availableCourses.css';
 
-    </div>
-  );
-};
+
+
+
+
 
 
 
 export const AvailableCourses: React.FC = () => {
-  const navigate = useNavigate();
-  const [courses, setCourses] = useState<any[]>([]);
-  const [enrolledCourseIds, setEnrolledCourseIds] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>('');
+      const YT_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY; 
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  //  NEW STATES FOR YOUTUBE STREAM
+  const [ytVideos, setYtVideos] = useState<any[]>([]);
+  const [ytLoading, setYtLoading] = useState(false);
 
+  const [showEnrollModal, setShowEnrollModal] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [enrolledCourseIds, setEnrolledCourseIds] = useState<string[]>([]);
+
+  // 1. Initial Database Setup (Load local courses)
   useEffect(() => {
-    const loadCatalogData = async () => {
+    const loadStudentCatalog = async () => {
       try {
         setLoading(true);
-        const { data: { user }, error: authError } = await SupabaseClient.auth.getUser();
-        if (authError || !user) {
-          setError("User session missing. Please login again.");
-          return;
+        const data = await lmsService.fetchCourses('all');
+        const approvedCourses = data.filter((course) => course.status === 'published');
+        setCourses(approvedCourses);
+
+        // Logged-in user ke existing enrollments fetch karo
+        const {
+          data: { user },
+        } = await SupabaseClient.auth.getUser();
+
+        if (user) {
+          const enrolledIds = await lmsService.fetchEmployeeEnrollments(user.id);
+          setEnrolledCourseIds(enrolledIds);
         }
-        const currentEmployeeId = user.id;
-
-        const [allCourses, enrolledIds] = await Promise.all([
-          lmsService.fetchCourses(),
-          lmsService.fetchEmployeeEnrollments(currentEmployeeId)
-        ]);
-
-        setCourses(allCourses || []);
-        setEnrolledCourseIds(enrolledIds || []);
       } catch (err) {
-        console.error("Error loading catalog:", err);
-        setError("Failed to synchronize curriculum access logs.");
+        console.error("Error loading student course catalog:", err);
       } finally {
         setLoading(false);
       }
     };
-
-    loadCatalogData();
+    loadStudentCatalog();
   }, []);
 
-  const filteredCourses = courses.filter((course) => {
-    const matchesTitle = course.title?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = course.category?.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesTitle || matchesCategory;
-  });
+  // Yeh useEffect tabhi chalega jab searchQuery badlegi, par 600ms rukne ke baad!
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setYtVideos([]); // Agar search box khali hai toh data clear karo
+      return;
+    }
+ 
+    const fetchYouTubeData = async () => {
+      try {
+        setYtLoading(true);
+        const endpoint = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&q=${encodeURIComponent(searchQuery)}&type=video&key=${YT_API_KEY}`;
+        
+        const response = await fetch(endpoint);
+        const result = await response.json();
+        
+        if (result.items) {
+          setYtVideos(result.items);
+        }
+      } catch (error) {
+        console.error("Failed to stream supplemental YouTube tokens:", error);
+      } finally {
+        setYtLoading(false);
+      }
+    };
+  
+    //  Quota Saver: Timer triggers endpoint only if user stops typing for 600ms
+    const delayDebounceTimer = setTimeout(() => {
+      fetchYouTubeData();
+    }, 600);
 
-  if (loading) return <div className="catalog-loading">Verifying Course Access...</div>;
-  if (error) return <div className="catalog-error">⚠️ {error}</div>;
+    return () => clearTimeout(delayDebounceTimer);
+  }, [searchQuery]);
+
+  // Local filtering calculation
+  const filteredCourses = courses.filter(course =>
+    course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    course.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleStartLearning = (id: string) => {
+    const course = courses.find((c) => c.id === id) || null;
+    setSelectedCourse(course);
+    setShowEnrollModal(true);
+  };
+      // Function to save a video to the sandbox
+const handleSaveToPlaylist = async (video: any) => {
+  try {
+    const { data: { user } } = await SupabaseClient.auth.getUser();
+    
+    if (!user) {
+      alert("Please log in to save resources to your sandbox!");
+      return;
+    }
+
+    // Check for duplicates first
+    const { data: existing } = await SupabaseClient
+      .from('student_playlists')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('video_id', video.id.videoId)
+      .maybeSingle();
+
+    if (existing) {
+      alert("This resource is already in your Learnova Sandbox! 📚");
+      return;
+    }
+
+    // Save to database
+    const { error } = await SupabaseClient
+      .from('student_playlists')
+      .insert({
+        user_id: user.id,
+        video_id: video.id.videoId,
+        video_title: video.snippet.title,
+        thumbnail_url: video.snippet.thumbnails.medium.url,
+        channel_title: video.snippet.channelTitle
+      });
+
+    if (error) throw error;
+    alert("🎉 Successfully added to your Personal Sandbox!");
+
+  } catch (err) {
+    console.error("Failed to save resource:", err);
+  }
+};
+
+  const closeEnrollModal = () => {
+    setShowEnrollModal(false);
+    setSelectedCourse(null);
+  };
+
+  const handleEnrolledSuccess = (courseId: string) => {
+    setEnrolledCourseIds((prev) =>
+      prev.includes(courseId) ? prev : [...prev, courseId]
+    );
+  };
+
+ if (loading) {
+
+  return <Loader2 />;
+  
+}
 
   return (
-    <div className="courses-catalog-container">
-      
-      {/* Control Panel / Search Header */}
-      <div className="catalog-control-panel">
-        <div className="panel-left">
-          <h2>Available Training Curriculums</h2>
-          <p>Explore, search, and preview course contents before enrolling.</p>
+    <div className="dashboard-container">
+      <div className="hero-banner student-theme">
+        <div className="hero-body">
+          <h1 className="hero-title">🎓 Student Study Terminal</h1>
+          <p className="hero-subtitle">
+            Browse corporate academic courses approved by your organization's experts. Learn at your own pace.
+          </p>
+          <br/>
+          <div className="search-container">
+            <input 
+              type="text"
+              className="search-input"
+              placeholder="Type to search database & global open source streams..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
-        
-        <div className="panel-right search-box-wrapper">
-          <span className="search-icon">🔍</span>
-          <input 
-            type="text" 
-            placeholder="Search by course title or category..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="catalog-search-input"
-          />
-          {searchTerm && (
-            <button type="button" className="clear-search-btn" onClick={() => setSearchTerm('')}>✕</button>
+      </div>
+
+      <main className="main-content">
+   
+        <div className="workspace-header">
+          <h2 className="workspace-title">Available Academic Programs</h2>
+        </div>
+
+        <div className="course-grid">
+          {filteredCourses.length === 0 ? (
+            <div className="empty-state">No approved database courses match your criteria.</div>
+          ) : (
+            filteredCourses.map((course) => (
+              <CourseCard
+                key={course.id}
+                course={course}
+                isTeacher={false} 
+
+
+
+                isEnrolled={enrolledCourseIds.includes(course.id)}
+                onManageContent={(_id: string) => {}} 
+                onPublish={(_id: string) => {}}
+                onRevertToDraft={(_id: string) => {}}
+                onDelete={(_id: string) => {}}
+
+
+               
+
+
+                onStartLearning={handleStartLearning}
+              />
+            ))
           )}
         </div>
-      </div>
 
-      {/* Course Cards Grid Layout */}
-      <div className="courses-grid-layout">
-        {filteredCourses.length === 0 ? (
-          <div className="empty-catalog-notice">
-            <p>🔍 No courses found matching "{searchTerm}"</p>
+      
+    {searchQuery.trim() && (
+  <div className="youtube-supplemental-section">
+    <hr className="youtube-divider" />
+
+    <div className="workspace-header">
+      <h2 className="workspace-title youtube-title">
+        <span className="youtube-title-text">
+          🔴 Global Open-Source Learning Stream (YouTube)
+        </span>
+      </h2>
+
+      <p className="youtube-subtitle">
+        Top verified open resources for "{searchQuery}"
+      </p>
+    </div>
+
+    {ytLoading ? (
+      <div className="youtube-loading">
+        Fetching live streams from satellite channels... ⚡
+      </div>
+    ) : ytVideos.length === 0 ? (
+      <div className="youtube-empty">
+        No global open video metrics resolved.
+      </div>
+    ) : (
+      <div className="course-grid youtube-grid">
+        {ytVideos.map((video) => (
+          <div key={video.id.videoId} className="course-card-mock youtube-card">
+            <img
+              src={video.snippet.thumbnails.medium.url}
+              alt={video.snippet.title}
+              className="youtube-thumbnail"
+            />
+
+            <div className="youtube-card-content">
+              <div>
+                <h4 className="youtube-video-title">
+                  {video.snippet.title}
+                </h4>
+
+                <p className="youtube-channel">
+                  By: {video.snippet.channelTitle}
+                </p>
+              </div>
+
+             <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+  <button 
+    onClick={() => window.open(`https://www.youtube.com/watch?v=${video.id.videoId}`, '_blank')}
+    style={{ flex: 1, padding: '10px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+  >
+    Watch 📺
+  </button>
+  <button 
+    onClick={() => handleSaveToPlaylist(video)}
+    style={{ flex: 1, padding: '10px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+  >
+    Save 📁
+  </button>
+</div>
+            </div>
           </div>
-        ) : (
-          filteredCourses.map((course) => {
-            // Check enrollment logic dynamically
-            const isEnrolled = enrolledCourseIds.includes(course.id);
-
-            //  Call isolated component for clean, un-entangled state handling
-            return (
-              <CourseCard 
-                key={course.id} 
-                course={course} 
-                isEnrolled={isEnrolled} 
-                navigate={navigate} 
-              />
-            );
-          })
-        )}
+        ))}
       </div>
+    )}
+  </div>
+)}
+      </main>
+
+      {/* Enrollment Modal */}
+      {showEnrollModal && selectedCourse && (
+        <div className="modal-overlay" onClick={closeEnrollModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <Enrollment
+              course={selectedCourse}
+              onClose={closeEnrollModal}
+              onEnrolled={handleEnrolledSuccess}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
