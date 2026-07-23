@@ -10,10 +10,16 @@ const LearningHeader: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login"); // adjust to your actual login route
-  };
+ const handleLogout = () => {
+  const confirmed = window.confirm(
+    "Are you sure you want to logout?"
+  );
+
+  if (!confirmed) return;
+
+  logout();
+  navigate("/login");
+};
 
   return (
     <header className={styles.header}>

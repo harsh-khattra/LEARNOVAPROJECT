@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { SupabaseClient } from '../../../Helper/Supabase';
 import './mySandbox.css';
 import Loader2 from '../../Header/Loader2';
+import toast from 'react-hot-toast';
 interface SavedVideo {
   id: string;
   video_id: string;
@@ -48,14 +49,13 @@ export const MySandbox: React.FC = () => {
         .eq('id', idToRemove);
 
       if (error) throw error;
-      
+      toast.success("video deleted from sandbox.")
       // Update UI instantly by filtering out the removed item
       setSavedVideos(prev => prev.filter(video => video.id !== idToRemove));
     } catch (err) {
       console.error("Failed to remove item:", err);
     }
   };
-
 if (loading) {
 
   return <Loader2 />;
