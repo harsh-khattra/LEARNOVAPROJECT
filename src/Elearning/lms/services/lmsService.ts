@@ -391,21 +391,6 @@ async updateContent(assetId: string, updates: any) {
 
   // src/services/lmsService.ts ke andar baki functions ke sath niche yeh add karein:
 
-async fetchEmployeeEnrollments(employeeId: string): Promise<string[]> {
-  const { data, error } = await SupabaseClient
-    .from('course_enrollment') // Aapki nayi table ka naam
-    .select('course_id')
-    .eq('employee_id', employeeId);
-
-  if (error) {
-    console.error("Enrollment data fetch failed:", error);
-    throw error;
-  }
-
-  // Hum database se aaye data ko ek simple array format string me convert kar rahe hain
-  // e.g., ['course-id-1', 'course-id-2'] taaki component me check karna aasan ho.
-  return data ? data.map((enrollment: any) => enrollment.course_id) : [];
-},
 
   async publishCourseAndSubmitAllVideos(courseId: string): Promise<void> {
     try {
