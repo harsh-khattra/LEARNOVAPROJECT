@@ -8,7 +8,7 @@ import Enrollment from '../../../Progress/Enrollment/Enroll';
 
 import './courseDashboard.css'
 
-
+import toast from 'react-hot-toast';
 
 
 
@@ -89,7 +89,6 @@ export const AvailableCourses: React.FC = () => {
         setYtLoading(false);
       }
     };
-  
     //  Quota Saver: Timer triggers endpoint only if user stops typing for 600ms
     const delayDebounceTimer = setTimeout(() => {
       fetchYouTubeData();
@@ -97,7 +96,6 @@ export const AvailableCourses: React.FC = () => {
 
     return () => clearTimeout(delayDebounceTimer);
   }, [searchQuery]);
-
   // Local filtering calculation
   const filteredCourses = courses.filter(course =>
     course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -131,7 +129,6 @@ const handleSaveToPlaylist = async (video: any) => {
       alert("This resource is already in your Learnova Sandbox! 📚");
       return;
     }
-
     // Save to database
     const { error } = await SupabaseClient
       .from('student_playlists')
@@ -144,7 +141,7 @@ const handleSaveToPlaylist = async (video: any) => {
       });
 
     if (error) throw error;
-    alert("🎉 Successfully added to your Personal Sandbox!");
+    toast.success("Done! video saved in your sandbox.")
 
   } catch (err) {
     console.error("Failed to save resource:", err);

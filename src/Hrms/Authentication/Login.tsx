@@ -43,7 +43,8 @@ const Login = () => {
 
 if (error) {
   toast.error(error.message);
-} else {
+  return;
+} 
   const {
     data: { session },
   } = await SupabaseClient.auth.getSession();
@@ -52,17 +53,7 @@ if (error) {
 
   toast.success("Login successful!");
 
-  navigate("/learning/student/landingPage");
-}
-    
-        if (error) {
-          toast.error(error.message);
-        } else {
-
-          toast.success("Login successful!");
-          navigate("/");
-
-        }
+  navigate("learning/student/landingPage");
       } catch (err) {
         console.error(err);
       }

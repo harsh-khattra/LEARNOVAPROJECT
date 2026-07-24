@@ -14,15 +14,24 @@ import ElearningRoutes from "../Elearning/Router/ElearningRoutes";
 import type { Locale } from "../App";
 import type { Dispatch, SetStateAction } from "react";
 import SignUp from "../Hrms/Authentication/SignUp";
-
+import Loader2 from "../Elearning/Header/Loader2";
 interface AppRoutesProps {
   locale: Locale;
   setLocale: Dispatch<SetStateAction<Locale>>;
 }
 //navigate to / if no user logout
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuth } = useAuth();
-  return isAuth ? <>{children}</> : <Navigate to="/" replace />;
+  const { isAuth, loading } = useAuth();
+
+  if (loading) {
+    return <Loader2 />;
+  }
+
+  if (!isAuth) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 const AppRoutes = ({ locale, setLocale }: AppRoutesProps) => {
