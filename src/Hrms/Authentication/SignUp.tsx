@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import styles from "./Signup.module.css";
-import { SupabaseClient } from "../../Helper/Supabase";
-import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import { useRef, useState } from "react";
-import PageLoader from "../UI/PageLoader";
-=======
 import React, { useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { useFormik } from 'formik';
@@ -24,7 +14,6 @@ interface StudentFormValues {
   password: string;
   confirmPassword: string;
 }
->>>>>>> d7dc9995f2884525199971bdf65b787544b3febf
 
 interface TeacherFormValues {
   name: string;
@@ -34,12 +23,6 @@ interface TeacherFormValues {
   role: string;
   department: string;
   photo: File | null;
-<<<<<<< HEAD
-};
-
-const SignUp = () => {
-  const [preview, setPreview] = useState<string | null>(null);
-=======
 }
 
 const SignUpPortal: React.FC = () => {
@@ -48,15 +31,8 @@ const SignUpPortal: React.FC = () => {
   const [isStudent, setIsStudent] = useState<boolean>(true);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
->>>>>>> d7dc9995f2884525199971bdf65b787544b3febf
   const [loading, setLoading] = useState<boolean>(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-<<<<<<< HEAD
-  const navigate = useNavigate();
-
-  const formik = useFormik<FormValues>({
-=======
   const [studentPassVisible, setStudentPassVisible] = useState<boolean>(false);
   const [studentConfirmPassVisible, setStudentConfirmPassVisible] = useState<boolean>(false);
   const [teacherPassVisible, setTeacherPassVisible] = useState<boolean>(false);
@@ -123,7 +99,6 @@ const SignUpPortal: React.FC = () => {
   // ASSUMPTION: your `roles` table has a row where emprole = "Student" — adjust the string
   // below to match whatever value you actually use for the student role in Supabase.
   const studentFormik = useFormik<StudentFormValues>({
->>>>>>> d7dc9995f2884525199971bdf65b787544b3febf
     initialValues: {
       name: '',
       email: '',
@@ -262,12 +237,9 @@ const SignUpPortal: React.FC = () => {
     onSubmit: async (values) => {
       setLoading(true);
       try {
-<<<<<<< HEAD
-=======
         const { data: sessionData } = await SupabaseClient.auth.getSession();
         const adminSession = sessionData.session;
 
->>>>>>> d7dc9995f2884525199971bdf65b787544b3febf
         const { data, error } = await SupabaseClient.auth.signUp({
           email: values.email,
           password: values.password,
@@ -277,17 +249,12 @@ const SignUpPortal: React.FC = () => {
           toast.error(error.message);
           return;
         }
-
         const userId = data?.user?.id;
         if (!userId) {
           toast.error('Signup failed, try again.');
           return;
         }
 
-<<<<<<< HEAD
-        // Upload profile photo if provided
-        let imageUrl: string | null = null;
-=======
         const { data: roleData } = await SupabaseClient.from('roles')
           .select('id')
           .eq('emprole', values.role)
@@ -309,22 +276,16 @@ const SignUpPortal: React.FC = () => {
         }
 
         let imageUrl = null;
->>>>>>> d7dc9995f2884525199971bdf65b787544b3febf
 
         if (values.photo) {
           const fileExt = values.photo.name.split('.').pop();
           const fileName = `${userId}.${fileExt}`;
 
           const { error: uploadError } = await SupabaseClient.storage
-<<<<<<< HEAD
-            .from("profile_image")
-            .upload(fileName, values.photo, { upsert: true });
-=======
             .from('profile_image')
             .upload(fileName, values.photo, {
               upsert: true,
             });
->>>>>>> d7dc9995f2884525199971bdf65b787544b3febf
 
           if (uploadError) {
             toast.error('Image upload failed');
@@ -338,79 +299,22 @@ const SignUpPortal: React.FC = () => {
           imageUrl = publicUrlData.publicUrl;
         }
 
-<<<<<<< HEAD
-        // Department UUID fetch karo
-        const { data: deptData, error: deptError } = await SupabaseClient
-          .from("departments")
-          .select("id")
-          .eq("empDepartment", values.department)
-          .single();
-
-        if (deptError || !deptData) {
-          toast.error("Department not found");
-          return;
-        }
-
-        // Role UUID fetch karo
-        const { data: roleData, error: roleError } = await SupabaseClient
-          .from("roles")
-          .select("id")
-          .eq("emprole", values.role)
-          .single();
-
-        if (roleError || !roleData) {
-          toast.error("Role not found");
-          return;
-        }
-
-        // ✅ FIX: insert ki jagah upsert use karo - duplicate issue solve
-        const { data: profileData, error: profileError } = await SupabaseClient
-          .from("profiles")
-=======
         const { data: profileData, error: profileError } = await SupabaseClient
           .from('profiles')
->>>>>>> d7dc9995f2884525199971bdf65b787544b3febf
           .upsert([
             {
               id: userId,
               full_name: values.name,
               phone: values.phoneNumber,
-              email: values.email,
-              department_id: deptData.id,
-<<<<<<< HEAD
               role_id: roleData.id,
-=======
+              department_id: deptData.id,
               email: values.email,
->>>>>>> d7dc9995f2884525199971bdf65b787544b3febf
               avatar_url: imageUrl,
             },
-          ], { onConflict: 'id' })
+          ])
           .select()
           .single();
 
-<<<<<<< HEAD
-        if (profileError || !profileData) {
-          toast.error(profileError?.message || "Profile creation failed");
-          return;
-        }
-
-        toast.success("Employee added successfully!");
-
-        // Reset preview and file input
-        if (preview) {
-          URL.revokeObjectURL(preview);
-          setPreview(null);
-        }
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-        formik.resetForm();
-
-        navigate("/dashboard");
-      } catch (err) {
-        console.error(err);
-        toast.error("Something went wrong");
-=======
         if (profileError) {
           console.error('Profile insert error:', profileError);
           toast.error(profileError.message);
@@ -435,7 +339,6 @@ const SignUpPortal: React.FC = () => {
       } catch (err) {
         console.error(err);
         toast.error('Something went wrong');
->>>>>>> d7dc9995f2884525199971bdf65b787544b3febf
       } finally {
         setLoading(false);
       }
@@ -491,18 +394,6 @@ const SignUpPortal: React.FC = () => {
   );
 
   return (
-<<<<<<< HEAD
-    <div className={styles.container}>
-      {loading ? (
-        <PageLoader />
-      ) : (
-        <form onSubmit={formik.handleSubmit} className={styles.form}>
-          <h2 className={styles.title}>Add Employee</h2>
-
-          {/* Profile Photo Preview */}
-          {preview && (
-            <div className={styles.previewContainer}>
-=======
     <div className={styles['app-body']}>
       <div className={styles.container}>
         {/* Exact diagonal slice design from image_0f5198.png */}
@@ -512,7 +403,6 @@ const SignUpPortal: React.FC = () => {
           {/* Left branding pane with dynamic single outlined toggle */}
           <div className={styles['left-pane']}>
             <div className={styles['brand-title']}>
->>>>>>> d7dc9995f2884525199971bdf65b787544b3febf
               <img
                  src={logo} alt="Learnova Logo" 
                 width={34}
@@ -521,146 +411,6 @@ const SignUpPortal: React.FC = () => {
               />
               LEARNOVA
             </div>
-<<<<<<< HEAD
-          )}
-
-          {/* Photo Upload */}
-          <label className={styles.label}>Profile Photo</label>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.currentTarget.files?.[0];
-              if (file) {
-                if (file.size > 2 * 1024 * 1024) {
-                  toast.error("Max 2MB allowed");
-                  e.currentTarget.value = "";
-                  return;
-                }
-                formik.setFieldValue("photo", file);
-                if (preview) URL.revokeObjectURL(preview);
-                setPreview(URL.createObjectURL(file));
-              }
-            }}
-            className={styles.input}
-          />
-
-          {/* Name */}
-          <label htmlFor="name" className={styles.label}>Name</label>
-          <input
-            id="name"
-            type="text"
-            name="name"
-            placeholder="Enter full name"
-            value={formik.values.name}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className={styles.input}
-          />
-          {formik.touched.name && formik.errors.name && (
-            <div className={styles.error}>{formik.errors.name}</div>
-          )}
-
-          {/* Phone Number */}
-          <label htmlFor="phoneNumber" className={styles.label}>Phone Number</label>
-          <input
-            id="phoneNumber"
-            type="text"
-            inputMode="numeric"
-            name="phoneNumber"
-            placeholder="Enter phone number"
-            value={formik.values.phoneNumber}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className={styles.input}
-          />
-          {formik.touched.phoneNumber && formik.errors.phoneNumber && (
-            <div className={styles.error}>{formik.errors.phoneNumber}</div>
-          )}
-
-          {/* Email */}
-          <label htmlFor="email" className={styles.label}>Email</label>
-          <input
-            id="email"
-            type="email"
-            name="email"
-            placeholder="Enter email"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className={styles.input}
-          />
-          {formik.touched.email && formik.errors.email && (
-            <div className={styles.error}>{formik.errors.email}</div>
-          )}
-
-          {/* Password */}
-          <label htmlFor="password" className={styles.label}>Password</label>
-          <input
-            id="password"
-            type="password"
-            name="password"
-            placeholder="Enter password"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className={styles.input}
-          />
-          {formik.touched.password && formik.errors.password && (
-            <div className={styles.error}>{formik.errors.password}</div>
-          )}
-
-          {/* Department */}
-          <label htmlFor="department" className={styles.label}>Department</label>
-          <select
-            id="department"
-            name="department"
-            value={formik.values.department}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className={styles.input}
-          >
-            <option value="">Select Department</option>
-            <option value="TechOps">TechOps</option>
-            <option value="NetInfa">NetInfa</option>
-            <option value="AppDev">AppDev</option>
-            <option value="DevOps">DevOps</option>
-            <option value="DataLab">DataLab</option>
-            <option value="CloudSVc">CloudSVc</option>
-            <option value="ITStrac">ITStrac</option>
-            <option value="DigSol">DigSol</option>
-            <option value="HR">HR</option>
-          </select>
-          {formik.touched.department && formik.errors.department && (
-            <div className={styles.error}>{formik.errors.department}</div>
-          )}
-
-          {/* Role */}
-          <label htmlFor="role" className={styles.label}>Role</label>
-          <select
-            id="role"
-            name="role"
-            value={formik.values.role}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className={styles.input}
-          >
-            <option value="">Select Role</option>
-            <option value="Software Developer">Software Developer</option>
-            <option value="Backend Developer">Backend Developer</option>
-            <option value="Full Stack">Full Stack</option>
-            <option value="DevOps">DevOps</option>
-            <option value="Project Manager">Project Manager</option>
-            <option value="Technical supporter">Technical supporter</option>
-            <option value="Business Analyst">Business Analyst</option>
-            <option value="Frontend Developer">Frontend Developer</option>
-            <option value="UI Designer">UI Designer</option>
-          </select>
-          {formik.touched.role && formik.errors.role && (
-            <div className={styles.error}>{formik.errors.role}</div>
-          )}
-=======
 
             <div className={styles['banner-welcome-content']}>
               <h2 className={styles['banner-title']}>Welcome!</h2>
@@ -683,7 +433,6 @@ const SignUpPortal: React.FC = () => {
 
           {/* Right form submission dynamic viewports */}
           <div className={styles['right-pane']}>
->>>>>>> d7dc9995f2884525199971bdf65b787544b3febf
 
             {loading ? (
               <PageLoader />
@@ -1003,8 +752,4 @@ const SignUpPortal: React.FC = () => {
   );
 };
 
-<<<<<<< HEAD
-export default SignUp;
-=======
 export default SignUpPortal;
->>>>>>> d7dc9995f2884525199971bdf65b787544b3febf
