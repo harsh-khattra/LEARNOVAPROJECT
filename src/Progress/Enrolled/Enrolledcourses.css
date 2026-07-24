@@ -84,9 +84,11 @@
   margin-top: 10px;
   display: flex;
   gap: 8px;
-  flex-wrap: wrap;
+  /* flex-wrap: wrap; */
   margin-bottom: 25px;
   justify-content: center;
+  
+  
 }
 
 .cert-tab {
@@ -398,10 +400,23 @@
     font-size: 14px;
   }
 
-  .cert-tabs {
-    justify-content: center;
-    gap: 10px;
-  }
+.cert-tabs {
+    display: flex;
+    justify-content: space-between; /* ya center */
+    align-items: center;
+    flex-wrap: nowrap; /* Ek hi row me rakhega */
+    width: 100%;
+     /* margin: 0 16px;  */
+      padding: 0 16px;
+}
+
+.cert-tabs button,
+.cert-tabs .tab {
+    flex: 1;                 /* Sab equal width lenge */
+    text-align: center;
+    white-space: nowrap;     /* Text next line me nahi jayega */
+    padding: 10px 12px;
+}
 
   .cert-tab {
     padding: 10px 16px;
@@ -525,6 +540,7 @@
   .cert-tab {
     width: 100%;
     justify-content: center;
+    display: flex;
   }
 
   .cert-card-thumb {
@@ -541,3 +557,4 @@
   }
 
 }
+
