@@ -66,9 +66,8 @@ const DEFAULT_CERTIFICATES: CompletedCertificate[] = [
   },
 ];
 
-const ZOOM_MIN = 60;
-const ZOOM_MAX = 140;
-const ZOOM_STEP = 10;
+
+// const ZOOM_STEP = 10;
 
 /* ---------------------------------------------------------------------- */
 /*  Component                                                              */
@@ -122,7 +121,7 @@ const selectedId = initialCert?.id ?? "";
 const [downloading, setDownloading] = useState(false);
   const [activeInstitute] = useState(locationState.institute ?? institute);
 const theme: ThemeKey = "gold";
-  const [zoom, setZoom] = useState(100);
+  const [zoom] = useState(100);
   const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
 
   // If the certificate came from router state (not from the static list),
@@ -187,9 +186,7 @@ pdf.addImage(
     ? `learnova-verify.org/verify/${certificate.verificationSlug}`
     : "";
 
-  function handleZoom(delta: number) {
-    setZoom((prev) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, prev + delta)));
-  }
+ 
 
   async function handleCopyLink() {
     if (!certificate) return;
@@ -399,15 +396,7 @@ function SparkIcon() {
     </svg>
   );
 }
-function DownloadIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M12 3v12" />
-      <polyline points="7 10 12 15 17 10" />
-      <path d="M4 19h16" />
-    </svg>
-  );
-}
+
 function LinkIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
