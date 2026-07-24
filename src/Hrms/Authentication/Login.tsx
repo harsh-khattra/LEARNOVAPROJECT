@@ -9,7 +9,20 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("we arrive here ")
+
+
+      const checkSession = async () => {
+    const {
+      data: { session },
+    } = await SupabaseClient.auth.getSession();
+
+    console.log("Current Session:", session);
+  };
+
+  checkSession();
+
+
+    
   }, [])
   const formik = useFormik({
     initialValues: {
@@ -21,38 +34,44 @@ const Login = () => {
       password: Yup.string().min(6, "password must be atleast 6 chracter").required("password is required")
     }),
     onSubmit: async (values) => {
-      try {
-        const {  error } = await SupabaseClient.auth.signInWithPassword({
-          email: values.email,
-          password: values.password,
-        })
-        if (error) {
-          toast.error(error.message);
-        } else {
+      try 
+      {
+        const { error } = await SupabaseClient.auth.signInWithPassword({
+  email: values.email,
+  password: values.password,
+});
 
-          toast.success("Login successful!");
-          navigate("/");
+if (error) {
+  toast.error(error.message);
+  return;
+} 
+  const {
+    data: { session },
+  } = await SupabaseClient.auth.getSession();
 
-        }
+  console.log("Session:", session);
+
+  toast.success("Login successful!");
+
+  navigate("learning/student/landingPage");
       } catch (err) {
         console.error(err);
       }
     },
   });
 
-  const googleLogin = async () => {
+ const googleLogin = async () => {
+  const { error } = await SupabaseClient.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${window.location.origin}/auth/login-callback`,
+    },
+  });
 
-    const { error } = await SupabaseClient.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: 'http://localhost:5173/'
-      }
-    });
-
-    if (error) {
-      console.log(error.message);
-    }
-  };
+  if (error) {
+    toast.error(error.message);
+  }
+};
 
   const facebookLogin = async () => {
     const { error } = await SupabaseClient.auth.signInWithOAuth({

@@ -1,6 +1,9 @@
 /* ─── Layout ──────────────────────────────────────────── */
+
+/* ─── Layout ──────────────────────────────────────────── */
 .sidebar {
-  position: relative;
+  position: sticky;        /* relative se sticky kiya */
+  top: 0;                  /* yeh zaroori hai sticky ke liye */
   width: 80px;
   height: 100vh;
   background: #0d1117;
@@ -13,7 +16,6 @@
   flex-shrink: 0;
   z-index: 100;
 }
-
 .sidebar:hover {
   width: 210px;
 }

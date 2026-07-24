@@ -1,8 +1,8 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import PageLoader from "../UI/PageLoader";
 import { useAuth } from "../../Context/AuthContext";
-import { ProtectedRoute, PublicRoute } from "../../Helper/ProtectedRoute";
-import Login from "../Authentication/Login";
+import { ProtectedRoute} from "../../Helper/ProtectedRoute";
+
 import SignUp from "../Authentication/SignUp";
 import Dashboard from "../Dashboard/Dashboard";
 import Leave from "../leave/Leave";

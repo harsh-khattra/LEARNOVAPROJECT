@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
+import LoginCallback from "../Hrms/Authentication/LoginCallback";
+import AuthCallback from "../Hrms/Authentication/AuthCallback";
 
 import HrmsLayout from "../Hrms/Layout/HrmsLayout";
 import LearningLayout from "../Elearning/Layout/ElearningLayout";
@@ -11,14 +13,25 @@ import ElearningRoutes from "../Elearning/Router/ElearningRoutes";
 // import { ProtectedRoute } from "../Helper/ProtectedRoute";
 import type { Locale } from "../App";
 import type { Dispatch, SetStateAction } from "react";
+import SignUp from "../Hrms/Authentication/SignUp";
+import Loader2 from "../Elearning/Header/Loader2";
 interface AppRoutesProps {
   locale: Locale;
   setLocale: Dispatch<SetStateAction<Locale>>;
 }
 //navigate to / if no user logout
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuth } = useAuth();
-  return isAuth ? <>{children}</> : <Navigate to="/" replace />;
+  const { isAuth, loading } = useAuth();
+
+  if (loading) {
+    return <Loader2 />;
+  }
+
+  if (!isAuth) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 const AppRoutes = ({ locale, setLocale }: AppRoutesProps) => {
@@ -28,7 +41,9 @@ const AppRoutes = ({ locale, setLocale }: AppRoutesProps) => {
       {/* Public — no layout */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />  {/* just Login, not all HrmsRoutes */}
-
+      <Route path="/signup" element={<SignUp />} />
+       <Route path="/auth/callback" element={<AuthCallback />} />
+       <Route path="/auth/login-callback" element={<LoginCallback />} />
       {/* HRMS zone — layout wraps content via <Outlet /> */}
       <Route
         path="/hrms"
