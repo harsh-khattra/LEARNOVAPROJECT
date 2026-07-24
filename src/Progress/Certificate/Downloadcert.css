@@ -1021,3 +1021,54 @@
     font-size: 11px;
   }
 }
+
+/* Mobile Header Fix */
+@media (max-width: 768px) {
+  .dc-header {
+    padding: 16px;
+    min-height: auto;
+    gap: 12px;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .dc-header-main {
+    width: 100%;
+  }
+
+  .dc-badge {
+    margin-bottom: 8px;
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+
+  .dc-heading {
+    font-size: 20px;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+
+  .dc-subheading {
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .dc-header-glow {
+    display: none; /* Optional: removes extra decorative space */
+  }
+}
+
+@media (max-width: 480px) {
+  .dc-header {
+    padding: 14px;
+  }
+
+  .dc-heading {
+    font-size: 18px;
+  }
+
+  .dc-subheading {
+    font-size: 12px;
+  }
+}

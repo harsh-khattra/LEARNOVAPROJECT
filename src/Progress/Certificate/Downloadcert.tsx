@@ -140,22 +140,33 @@ async function handleDownloadPdf() {
   if (!certRef.current || !certificate) return;
   setDownloading(true);
   try {
-    const canvas = await html2canvas(certRef.current, {
-      scale: 2, // sharp/high-res output ke liye
-      backgroundColor: "#ffffff",
-      useCORS: true,
-    });
+const canvas = await html2canvas(certRef.current, {
+  scale: 3,
+  useCORS: true,
+  backgroundColor: "#ffffff",
+});
 
     const imgData = canvas.toDataURL("image/png");
 
     // Certificate ka aspect ratio landscape hota hai, isliye landscape PDF
-    const pdf = new jsPDF({
-      orientation: "landscape",
-      unit: "px",
-      format: [canvas.width, canvas.height],
-    });
+const pdf = new jsPDF({
+  orientation: canvas.width > canvas.height ? "landscape" : "portrait",
+  unit: "px",
+  format: [canvas.width, canvas.height],
+});
 
-    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+pdf.addImage(
+  imgData,
+  "PNG",
+  0,
+  0,
+  canvas.width,
+  canvas.height,
+  undefined,
+  "FAST"
+);
+
+
 
     const fileSafeName = displayName.replace(/\s+/g, "_");
     const fileSafeCourse = certificate.courseName.replace(/\s+/g, "_");
@@ -238,31 +249,7 @@ async function handleDownloadPdf() {
       </header>
 
       {/* ── Toolbar ─────────────────────────────────────────────────── */}
-      <div className="dc-toolbar">
-        <div className="dc-toolbar-status">
-          <span className="dc-dot" aria-hidden="true" />
-          Verification live connection: Secure SSL
-        </div>
-        <div className="dc-zoom">
-          <button
-            type="button"
-            aria-label="Zoom out"
-            onClick={() => handleZoom(-ZOOM_STEP)}
-            disabled={zoom <= ZOOM_MIN}
-          >
-            −
-          </button>
-          <span>{zoom}%</span>
-          <button
-            type="button"
-            aria-label="Zoom in"
-            onClick={() => handleZoom(ZOOM_STEP)}
-            disabled={zoom >= ZOOM_MAX}
-          >
-            +
-          </button>
-        </div>
-      </div>
+     
 
       {/* ── Body ────────────────────────────────────────────────────── */}
       <div className="dc-body">
@@ -287,13 +274,13 @@ async function handleDownloadPdf() {
         <aside className="dc-panel">
           {/* Actions */}
           <div className="dc-actions">
-            <button
+      <button
   type="button"
   className="dc-btn dc-btn-primary"
   onClick={handleDownloadPdf}
   disabled={downloading}
 >
-  <DownloadIcon /> {downloading ? "Generating PDF..." : "Download PDF certificate"}
+  Download PDF
 </button>
             <button
               type="button"

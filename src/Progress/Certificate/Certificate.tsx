@@ -83,9 +83,9 @@ function buildCertificateFromCourse(course: EnrolledCourse): CompletedCertificat
 }
 
 const TABS: { key: TabKey; label: string }[] = [
-  { key: "enrolled", label: "Enrolled" },
+  
   { key: "active", label: "Active" },
-  { key: "completed", label: "Completed" },
+
   { key: "certificates", label: "Certificates" },
 ];
 

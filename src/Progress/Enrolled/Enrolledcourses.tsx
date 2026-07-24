@@ -119,7 +119,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "enrolled", label: "Enrolled" },
   { key: "active", label: "Active" },
   { key: "completed", label: "Completed" },
-  { key: "certificates", label: "Certificates" },
+ 
 ];
 
 function filterCourses(courses: EnrolledCourse[], tab: TabKey): EnrolledCourse[] {
