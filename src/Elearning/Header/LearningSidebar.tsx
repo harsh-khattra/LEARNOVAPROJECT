@@ -11,7 +11,7 @@ import {
   FiCreditCard,
   FiBookmark,
 } from "react-icons/fi";
-import { useState ,useEffect} from "react";
+import { useState } from "react";
 
 import { useAuth } from "../../Context/AuthContext"; // Change path if needed
 import styles from "./LearningSidebar.module.css";
@@ -25,37 +25,6 @@ interface MenuItem {
 
 const LearningSidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
- useEffect(() => {
-  if (isOpen) {
-    const scrollY = window.scrollY;
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = "0";
-    document.body.style.right = "0";
-    document.body.style.width = "100%";
-    document.body.style.overflow = "hidden";
-    document.body.dataset.scrollY = String(scrollY);
-  } else {
-    const scrollY = Number(document.body.dataset.scrollY || 0);
-    document.body.style.position = "";
-    document.body.style.top = "";
-    document.body.style.left = "";
-    document.body.style.right = "";
-    document.body.style.width = "";
-    document.body.style.overflow = "";
-    window.scrollTo(0, scrollY);
-  }
-
-  return () => {
-    document.body.style.position = "";
-    document.body.style.top = "";
-    document.body.style.left = "";
-    document.body.style.right = "";
-    document.body.style.width = "";
-    document.body.style.overflow = "";
-  };
-}, [isOpen]);
 
   const { user } = useAuth();
   console.log("Sidebar User:", user);
@@ -130,33 +99,20 @@ const LearningSidebar = () => {
     },
   ];
 
-
-
   const visibleMenu = menuItems.filter((item) =>
     item.roles.includes(user?.role ?? "")
   );
 
-  const formatEmail = (email: string) => {
-  const index = email.indexOf("@gmail");
 
-  if (index !== -1) {
-    return email.substring(0, index + 6) + "...";
-  }
-
-  return email.length > 15 ? email.substring(0, 15) + "..." : email;
-};
   return (
     <>
       <button className={styles.menuButton} onClick={() => setIsOpen(!isOpen)}>
         ☰
       </button>
 
-    {isOpen && (
-  <div
-    className={styles.overlay}
-    onClick={() => setIsOpen(false)}
-  />
-)}
+      {isOpen && (
+        <div className={styles.overlay} onClick={() => setIsOpen(false)} />
+      )}
 
       <aside className={`${styles.sidebar} ${isOpen ? styles.open : ""}`}>
         <nav className={styles.nav}>
@@ -177,7 +133,7 @@ const LearningSidebar = () => {
           ))}
         </nav>
 
-        
+        {/* Profile section below the menu */}
         {user && (
           <div className={styles.profileSection}>
             <div className={styles.profileIcon}>
@@ -185,9 +141,7 @@ const LearningSidebar = () => {
             </div>
             <div className={styles.profileText}>
               <span className={styles.profileGreeting}>Hi, {user.role}</span>
-             <span className={styles.profileEmail}>
-  {formatEmail(user.email)}
-</span>
+              <span className={styles.profileEmail}>{user.email}</span>
             </div>
           </div>
         )}

@@ -352,7 +352,7 @@ async updateContent(assetId: string, updates: any) {
     return data;
   },
 
-  // 🗑️ Chapter aur Assets ke Delete functions bhi database connection ke liye add karein
+  // 🗑️Chapter aur Assets ke Delete functions bhi database connection ke liye add karein
   async deleteContentAsset(assetId: string) {
     const { error } = await SupabaseClient
       .from('contents')
@@ -388,6 +388,9 @@ async updateContent(assetId: string, updates: any) {
 
   return data;
 },
+
+  // src/services/lmsService.ts ke andar baki functions ke sath niche yeh add karein:
+
 
   async publishCourseAndSubmitAllVideos(courseId: string): Promise<void> {
     try {

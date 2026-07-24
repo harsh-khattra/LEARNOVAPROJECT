@@ -10,6 +10,7 @@ const LearningHeader: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
+
  const handleLogout = () => {
   const confirmed = window.confirm(
     "Are you sure you want to logout?"
@@ -20,6 +21,7 @@ const LearningHeader: React.FC = () => {
   logout();
   navigate("/");
 };
+
 
   return (
     <header className={styles.header}>
