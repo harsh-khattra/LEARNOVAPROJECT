@@ -27,6 +27,17 @@ const Enrollment: React.FC<EnrollmentProps> = ({
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  const shareUrl = window.location.href;
+
+const shareText = `Check out this course: ${course.title}`;
+
+const shareLinks = {
+  linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+  twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+    shareText
+  )}&url=${encodeURIComponent(shareUrl)}`,
+};
+
   const handleEnrollClick = async () => {
     setErrorMsg(null);
     setIsEnrolling(true);
@@ -87,9 +98,7 @@ const Enrollment: React.FC<EnrollmentProps> = ({
         {isEnrolling ? "Enrolling..." : "Enroll now"}
       </button>
 
-      <button className="btn-wishlist" disabled={isEnrolling}>
-        ♡ Add to wishlist
-      </button>
+      
 
       {errorMsg && (
         <p style={{ color: "red", marginTop: "8px" }}>
@@ -108,9 +117,31 @@ const Enrollment: React.FC<EnrollmentProps> = ({
 
       <div className="share-row">
         <span className="share-label">Share:</span>
-        <button className="share-btn linkedin">LinkedIn</button>
-        <button className="share-btn twitter">Twitter</button>
-        <button className="share-btn copy">Copy link</button>
+       <button
+  className="share-btn linkedin"
+  onClick={() =>
+    window.open(shareLinks.linkedin, "_blank", "noopener,noreferrer")
+  }
+>
+  LinkedIn
+</button>
+       <button
+  className="share-btn twitter"
+  onClick={() =>
+    window.open(shareLinks.twitter, "_blank", "noopener,noreferrer")
+  }
+>
+  Twitter
+</button>
+       <button
+  className="share-btn copy"
+  onClick={() => {
+    navigator.clipboard.writeText(shareUrl);
+    alert("Link copied!");
+  }}
+>
+  Copy link
+</button>
       </div>
     </div>
   );

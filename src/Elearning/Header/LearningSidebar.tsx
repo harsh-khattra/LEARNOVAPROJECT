@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink ,} from "react-router-dom";
 import {
   FiHome,
   FiBookOpen,
@@ -11,7 +11,7 @@ import {
   FiCreditCard,
   FiBookmark,
 } from "react-icons/fi";
-import { useState } from "react";
+import { useState,useRef ,useEffect} from "react";
 
 import { useAuth } from "../../Context/AuthContext"; // Change path if needed
 import styles from "./LearningSidebar.module.css";
@@ -25,10 +25,8 @@ interface MenuItem {
 
 const LearningSidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const { user } = useAuth();
-  console.log("Sidebar User:", user);
-  console.log("Sidebar Role:", JSON.stringify(user?.role));
+   const { user } = useAuth();
+   const sidebarRef = useRef<HTMLDivElement>(null);  
 
   const menuItems: MenuItem[] = [
     {
@@ -102,6 +100,32 @@ const LearningSidebar = () => {
   const visibleMenu = menuItems.filter((item) =>
     item.roles.includes(user?.role ?? "")
   );
+
+   useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, [isOpen]);
+  
+    useEffect(() => {
+    const el = sidebarRef.current;
+    if (!el) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.stopPropagation();
+    };
+
+    el.addEventListener("wheel", handleWheel, { passive: false });
+    return () => el.removeEventListener("wheel", handleWheel);
+  }, []);
 
 
   return (
