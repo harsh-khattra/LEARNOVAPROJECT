@@ -6,18 +6,82 @@
 /* Push everything below the fixed header */
 .body {
   display: flex;
-  margin-top: 63px;               /* Header height */
+  margin-top: 63px;
   min-height: calc(100vh - 72px);
 }
 
 .content {
   flex: 1;
-  /* padding: -10px; */
-  overflow-y: auto;   /* 👈 THIS is your scrolling container */
+  overflow-y: auto;
   overflow-x: hidden;
-  margin-left:-20px ;
-  margin-right:-20px ;
+  margin-left: -20px;
+  padding-top: 20px;
+  margin-right: -20px;
 }
 
+/* ===============================
+   Large Tablets (1024px and below)
+================================== */
+@media (max-width: 1024px) {
+  .body {
+    margin-top: 63px;
+  }
 
+  .content {
+    margin-left: 0;
+    margin-right: 0;
+    padding: 20px 16px;
+  }
+}
 
+/* ===============================
+   Tablets (768px and below)
+================================== */
+@media (max-width: 768px) {
+  .body {
+    flex-direction: column;
+    margin-top: 63px;
+    min-height: calc(100vh - 63px);
+  }
+
+  .content {
+    width: 100%;
+    margin: 0;
+    padding: 16px;
+    overflow-x: hidden;
+  }
+}
+
+/* ===============================
+   Mobile Devices (600px and below)
+================================== */
+@media (max-width: 600px) {
+  .content {
+    padding: 14px;
+    margin: 0;
+  }
+}
+
+/* ===============================
+   Small Phones (480px and below)
+================================== */
+@media (max-width: 480px) {
+  .body {
+    margin-top: 63px;
+  }
+
+  .content {
+    padding: 12px;
+    margin: 0;
+    min-width: 0;
+  }
+}
+
+/* ===============================
+   Very Small Phones (360px and below)
+================================== */
+@media (max-width: 360px) {
+  .content {
+    padding: 10px;
+  }
+}

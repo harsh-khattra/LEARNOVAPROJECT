@@ -11,6 +11,7 @@
   background-color: #ffffff;
   min-height: 100vh;
   color: #1a1a1a;
+  justify-content: flex-start;
 }
 
 /* --- 2. HERO GRADIENT BANNER PANEL --- */

@@ -1,5 +1,5 @@
 // src/LandingPage/LandingPage.tsx
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import "./LandingPage.css";
 
@@ -19,7 +19,7 @@ const LandingPage = () => {
 
   return (
     <div className="landing-page">
-      <NavLink to="/signup">Signup</NavLink>
+     
       {/* ── Navbar ── */}
      <nav className="lp-nav">
 <div className="lp-nav-logo">
