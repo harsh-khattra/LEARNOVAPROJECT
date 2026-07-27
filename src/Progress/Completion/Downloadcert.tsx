@@ -149,7 +149,7 @@ const Sidebar: React.FC = () => {
           </div>
 
           <p style={{ fontSize: "11px", color: "#6a6f73", lineHeight: 1.5, marginBottom: "10px" }}>
-            Full-stack web development from HTML & CSS to React, Node.js, and databases.
+            Full-stack web developmeant from HTML & CSS to React, Node.js, and databases.
           </p>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>

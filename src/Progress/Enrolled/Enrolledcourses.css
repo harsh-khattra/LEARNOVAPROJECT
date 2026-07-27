@@ -441,7 +441,9 @@
 @media (max-width: 576px) {
 
   .cert-page {
-    padding: 15px;
+    padding: 2px ;
+    margin-left: 10px ;
+    margin-right: 10px ;
   }
 
   .cert-banner {
@@ -518,7 +520,7 @@
 @media (max-width: 400px) {
 
   .cert-page {
-    padding: 12px;
+    padding: 2px;
   }
 
   .cert-banner {

@@ -11,33 +11,53 @@
   color: #1a1a1a;
 }
 
-/* ── Header ── */
 .card-header {
-  display: flex;
-  gap: 12px;
+    display: flex;
+  gap: 14px;
   align-items: flex-start;
   margin-bottom: 16px;
+  position: relative;
+  justify-content: flex-start;
 }
 
 .card-icon {
-  font-size: 28px;
-  background: #fff7e6;
-  border-radius: 8px;
-  padding: 8px 10px;
+   font-size: 26px;
+  background: linear-gradient(135deg, #ffb020, #ff7a1a);
+  border-radius: 10px;
+  padding: 10px 12px;
   flex-shrink: 0;
 }
 
 .card-title {
-  font-size: 15px;
-  font-weight: 700;
+    font-size: 22px;
+  font-weight: 800;
   margin: 0 0 4px;
   color: #1a1a1a;
+  line-height: 1.2;
+  text-align: left;
+  width: 100%;
+}
+
+.card-header-text {
+   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  flex: 1;
 }
 
 .card-subtitle {
-  font-size: 12px;
+   font-size: 13px;
   color: #555;
   margin: 0 0 6px;
+  text-align: left;
+}
+.card-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a73e8;
+  margin: 0 0 4px;
+  text-align: left;
 }
 
 .card-meta {
