@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { SupabaseClient } from "../../Helper/Supabase";
 import { lmsService } from "../../Elearning/lms/services/lmsService";
 import "./Enroll.css";
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface CourseInfo {
   id: string;
@@ -53,12 +56,17 @@ const shareLinks = {
         return;
       }
 
-      await lmsService.enrollEmployeeInCourse(user.id, course.id);
+     await lmsService.enrollEmployeeInCourse(user.id, course.id);
 
-      onEnrolled(course.id);
-      onClose();
+// toast.success("Enrollment successful! 🎉");
 
-      navigate("/learning/student/enroll");
+setTimeout(() => {
+  onEnrolled(course.id);
+  onClose();
+  navigate("/learning/student/enroll");
+}, 1500);
+toast.success("Enrollment successful! 🎉");
+
     } catch (err) {
       console.error("Enrollment failed:", err);
       setErrorMsg("Something went wrong. Please try again.");
@@ -68,6 +76,10 @@ const shareLinks = {
   };
 
   return (
+    <>
+
+     <ToastContainer position="top-right" autoClose={3000} />
+     <div className="modal-overlay" onClick={onClose}>
     <div className="card-wrapper">
       <button
         className="modal-close-btn"
@@ -144,7 +156,10 @@ const shareLinks = {
 </button>
       </div>
     </div>
-  );
+  
+  </div>
+  </>
+  )
 };
 
 export default Enrollment;

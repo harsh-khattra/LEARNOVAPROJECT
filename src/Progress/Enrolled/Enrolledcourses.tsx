@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import CourseSkeleton from "../../Elearning/Header/CourseSkeleton";
+import Loader2 from "../../Elearning/Header/Loader2";
 import "./Enrolledcourses.css";
 import { lmsService } from "../../Elearning/lms/services/lmsService";
 import type { Course } from "../../Elearning/lms/types/lms";
@@ -714,13 +714,7 @@ const visibleCourses = useMemo(() => {
 
  if (loading) {
   return (
-    <div className="dashboard-container">
-      <div className="course-grid">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <CourseSkeleton key={index} />
-        ))}
-      </div>
-    </div>
+    < Loader2 />
   );
 }
 

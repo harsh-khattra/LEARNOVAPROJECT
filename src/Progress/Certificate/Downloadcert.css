@@ -65,7 +65,7 @@
   background: var(--dc-bg);
   color: var(--dc-text-primary);
   font-family: var(--font-sans);
-  padding: 28px 32px 48px;
+  padding: 2px 32px 48px;
 }
 
 .dc-page[data-theme="dark"] {
