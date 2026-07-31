@@ -4,6 +4,7 @@ import type{ Question } from './types';
 import QuestionForm from './QuestionForm';
 import QuestionList from './QuestionList';
 import styles from './DiscussionModule.module.css';
+import Loader2 from '../Header/Loader2';
 
 export default function DiscussionModule() {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -63,6 +64,10 @@ export default function DiscussionModule() {
   const handleQuestionCreated = (question: Question) => {
     setQuestions((prev) => [question, ...prev]);
   };
+   if (loading)
+    return(
+    <Loader2 />
+    )
 
   return (
     <section className={styles.wrapper}>
