@@ -1,4 +1,4 @@
-import { useLocation, NavLink } from "react-router-dom";
+import {  NavLink } from "react-router-dom";
 import {
   FiHome,
   FiBookOpen,
@@ -28,10 +28,7 @@ const LearningSidebar = () => {
    const { user } = useAuth();
    const sidebarRef = useRef<HTMLDivElement>(null);  
 
-   const location = useLocation();
-   const isCertificatesActive =
-  location.pathname.startsWith("/learning/student/certificates");
-
+   
   
 
   const menuItems: MenuItem[] = [
