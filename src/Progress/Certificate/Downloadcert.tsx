@@ -127,6 +127,12 @@ const theme: ThemeKey = "gold";
   // If the certificate came from router state (not from the static list),
   // it might not exist inside `certificates`. So we resolve the certificate
   // to actually render from either the state object or the list lookup.
+
+  
+
+
+
+
   const certificate = useMemo(() => {
     if (locationState.certificate && locationState.certificate.id === selectedId) {
       return locationState.certificate;
@@ -287,13 +293,19 @@ pdf.addImage(
               <LinkIcon />
               {copyState === "copied" ? "Link copied ✓" : "Copy verification link"}
             </button>
-            <button
-              type="button"
-              className="dc-btn dc-btn-dark"
-              onClick={() => onAddToLinkedIn?.(certificate, displayName)}
-            >
-              <BriefcaseIcon /> Add to LinkedIn profile
-            </button>
+           <button
+  type="button"
+  className="dc-btn dc-btn-dark"
+  onClick={() => {
+    const url = `https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME`;
+
+    window.open(url, "_blank", "noopener,noreferrer");
+
+    onAddToLinkedIn?.(certificate, displayName);
+  }}
+>
+  <BriefcaseIcon /> Add to LinkedIn profile
+</button>
           </div>
 
           {/* Auth card */}

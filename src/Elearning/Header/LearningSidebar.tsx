@@ -1,4 +1,4 @@
-import { NavLink ,} from "react-router-dom";
+import { useLocation, NavLink } from "react-router-dom";
 import {
   FiHome,
   FiBookOpen,
@@ -27,6 +27,12 @@ const LearningSidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
    const { user } = useAuth();
    const sidebarRef = useRef<HTMLDivElement>(null);  
+
+   const location = useLocation();
+   const isCertificatesActive =
+  location.pathname.startsWith("/learning/student/certificates");
+
+  
 
   const menuItems: MenuItem[] = [
     {
@@ -142,18 +148,27 @@ const LearningSidebar = () => {
         <nav className={styles.nav}>
           {visibleMenu.map((item) => (
             <NavLink
-              key={item.path}
-              to={item.path}
-              onClick={() => setIsOpen(false)}
-              className={({ isActive }) =>
-                `${isActive ? styles.activeLink : styles.link} ${
-                  item.name === "My Profile" ? styles.spaced : ""
-                }`
-              }
-            >
-              <span className={styles.icon}>{item.icon}</span>
-              <span className={styles.label}>{item.name}</span>
-            </NavLink>
+  key={item.path}
+  to={item.path}
+  onClick={() => setIsOpen(false)}
+  className={({ isActive }) => {
+   const active =
+  isActive ||
+  (item.path === "/learning/student/certificates" &&
+    (location.pathname.startsWith("/learning/student/certificates") ||
+     location.pathname.startsWith("/learning/student/downloadcertificate")));
+
+ console.log(item.name, active, location.pathname);
+
+
+    return `${active ? styles.activeLink : styles.link} ${
+      item.name === "My Profile" ? styles.spaced : ""
+    }`;
+  }}
+>
+  <span className={styles.icon}>{item.icon}</span>
+  <span className={styles.label}>{item.name}</span>
+</NavLink>
           ))}
         </nav>
 
