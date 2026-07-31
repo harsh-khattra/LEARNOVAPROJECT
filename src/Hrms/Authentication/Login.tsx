@@ -5,9 +5,11 @@ import { SupabaseClient } from "../../Helper/Supabase";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useState } from "react";
+import Loader2 from "../../Elearning/Header/Loader2";
 const Login = () => {
   const navigate = useNavigate();
-
+const [loading,setLoading] = useState(false)
   useEffect(() => {
 
 
@@ -36,6 +38,7 @@ const Login = () => {
     onSubmit: async (values) => {
       try 
       {
+        setLoading(true);
         const { error } = await SupabaseClient.auth.signInWithPassword({
   email: values.email,
   password: values.password,
@@ -56,6 +59,8 @@ if (error) {
   navigate("learning/student/landingPage");
       } catch (err) {
         console.error(err);
+      }finally{
+        setLoading(false);
       }
     },
   });
@@ -103,6 +108,7 @@ if (error) {
   }
   return (
     <div className={styles.container}>
+      {loading && <Loader2/>}
       <form onSubmit={formik.handleSubmit} className={styles.form}>
         <h2 className={styles.title}>Login</h2>
 
