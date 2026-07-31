@@ -140,7 +140,7 @@ background: linear-gradient(135deg, var(--ln-blue-primary) 0%, #0040b3 100%);
 }
 
 /* 2️⃣ Heading Alignment (Available Academic Programs) */
-.main-content h2, .dashboard-container h2, .workspace-header h2 {
+.main-content h2,z .dashboard-container h2, .workspace-header h2 {
   margin-left: 450px !important; /* Heading ko grid ke sath exact align karne ke liye */
   margin-bottom: 3px !important; /* Heading aur cards ke beech ka gap */
   font-size: 26px;
@@ -386,25 +386,28 @@ background: linear-gradient(135deg, var(--ln-blue-primary) 0%, #0040b3 100%);
 /* --- 10. LIGHTWEIGHT INPUT MODAL OVERLAY SYSTEM --- */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.45); /* Soft background shadow dimming */
+
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 1000;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.5);
+
+  z-index: 99999;
+
+  pointer-events: auto;
+}
+.modal-overlay,
+.modal-card {
+  pointer-events: auto;
 }
 
 .modal-card {
-  background-color: #ffffff;
-  width: 100%;
-  max-width: 520px;
-  border-radius: 6px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  animation: fadeInModal 0.2s ease-out;
-  overflow: hidden;
+  position: relative;
+  z-index: 100000;
 }
 
 @keyframes fadeInModal {

@@ -64,11 +64,13 @@ export default function DiscussionModule() {
   const handleQuestionCreated = (question: Question) => {
     setQuestions((prev) => [question, ...prev]);
   };
-  if (loading)
+
+   if (loading)
     return(
     <Loader2 />
     )
-    
+
+
   return (
     <section className={styles.wrapper}>
       <header className={styles.header}>

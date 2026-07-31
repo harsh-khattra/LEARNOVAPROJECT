@@ -15,7 +15,7 @@
   position: fixed;
   top: var(--header-height, 72px);
   left: 0;
-  height: calc(100vh - var(--header-height, 72px));
+    height: calc(100dvh - var(--header-height, 72px));
   overflow-x: hidden;
   overflow-y: auto;
    
@@ -134,11 +134,12 @@
 ============================== */
 .profileSection {
   display: flex;
+   flex-shrink: 0;
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
   margin: 0 12px 12px;
-  margin-top: auto;           /* push to bottom */
+  margin-top: 100px;           /* push to bottom */
   border-top: 1px solid #e5e7eb;
   border-radius: 10px;
 }
