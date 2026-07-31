@@ -175,7 +175,7 @@ background: linear-gradient(135deg, var(--ln-blue-primary) 0%, #0040b3 100%);
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0,0,0,0.06);
   transition: background-color 0.2s ease;
-  margin-right: 100px;
+ 
 }
 
 .btn-create:hover {
@@ -1266,6 +1266,7 @@ img {
 
   .hero-banner {
     padding-bottom: 30px;
+    border-radius: 20px;
   }
 
   .hero-header {
