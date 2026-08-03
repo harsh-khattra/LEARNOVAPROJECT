@@ -15,6 +15,7 @@ import type { Locale } from "../App";
 import type { Dispatch, SetStateAction } from "react";
 import SignUp from "../Hrms/Authentication/SignUp";
 import Loader2 from "../Elearning/Header/Loader2";
+;
 interface AppRoutesProps {
   locale: Locale;
   setLocale: Dispatch<SetStateAction<Locale>>;
@@ -44,6 +45,7 @@ const AppRoutes = ({ locale, setLocale }: AppRoutesProps) => {
       <Route path="/signup" element={<SignUp />} />
        <Route path="/auth/callback" element={<AuthCallback />} />
        <Route path="/auth/login-callback" element={<LoginCallback />} />
+       <Route path ="student/landingPage" element ={ <LandingPage/ >}/>
       {/* HRMS zone — layout wraps content via <Outlet /> */}
       <Route
         path="/hrms"

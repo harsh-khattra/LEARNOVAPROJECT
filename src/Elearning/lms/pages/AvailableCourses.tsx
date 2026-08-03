@@ -156,7 +156,7 @@ const handleSaveToPlaylist = async (video: any) => {
       });
 
     if (error) throw error;
-    toast.success("Done! video saved in your sandbox.")
+    toast.success("Done! video saved in your saved resources.")
 
   } catch (err) {
     console.error("Failed to save resource:", err);

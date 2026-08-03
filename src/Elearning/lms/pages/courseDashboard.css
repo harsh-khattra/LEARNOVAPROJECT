@@ -175,13 +175,14 @@ background: linear-gradient(135deg, var(--ln-blue-primary) 0%, #0040b3 100%);
   cursor: pointer;
   box-shadow: 0 2px 5px rgba(0,0,0,0.06);
   transition: background-color 0.2s ease;
+ 
 }
 
 .btn-create:hover {
   background-color: #2085c3;
 }
 
-/* --- 5. 3-COLUMN COURSE BLUEPRINT GRID --- */
+/*  3-COLUMN COURSE BLUEPRINT GRID */
 .course-grid {
   display: grid !important;
   /* repeat(auto-fit) cards ko screen size ke hisaab se automatic stretch aur balance karega */
@@ -190,7 +191,7 @@ background: linear-gradient(135deg, var(--ln-blue-primary) 0%, #0040b3 100%);
   width: 100% !important;
   max-width: 1300px; /* Taki bohot badi screen par cards ajeeb se phail na jayein */
   margin-top: -5px !important;
-  margin-left: 200px;
+  margin-left: 230px;
 }
 
 .course-card {
@@ -445,6 +446,7 @@ background: linear-gradient(135deg, var(--ln-blue-primary) 0%, #0040b3 100%);
 
 .modal-form {
   padding: 24px;
+  background-color: white;
 }
 
 .form-group {

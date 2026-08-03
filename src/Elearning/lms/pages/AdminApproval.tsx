@@ -119,13 +119,13 @@ if (loading) {
                     onClick={() => handleApprove(item.id)} 
                     className={styles.approveBtn}
                   >
-                    ✅ Approve & Go Live
+                    ✅Live
                   </button>
                   <button 
                     onClick={() => handleReject(item.id)} 
                     className={styles.rejectBtn}
                   >
-                    ❌ Send Back to Draft
+                    ❌Draft
                   </button>
                 </div>
 
