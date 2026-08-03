@@ -99,11 +99,10 @@
    This is what makes the sidebar stay static while only the content scrolls. */
 
 .tsa-shell {
-  display: grid;
+    display: grid;
   grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
-  height: 100vh;
-  align-items: stretch;
-  overflow: hidden; /* prevents the whole page from scrolling as one block */
+  min-height: 100vh;
+  overflow: visible;
 }
 
 /* ---------------------------------- Sidebar --------------------------------- */
@@ -206,7 +205,16 @@
    sidebar. scrollTo() calls in the component target this element directly. */
 
 .tsa-main{
-    padding:24px;
+     display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  min-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  /* Equal padding */
+  padding: 24px;
 }
 
 @media (max-width:1024px){
@@ -217,13 +225,13 @@
 
 @media (max-width:768px){
     .tsa-main{
-        padding:16px;
+       padding: 20px;
     }
 }
 
 @media (max-width:480px){
     .tsa-main{
-        padding:12px;
+       padding: 16px;
     }
 }
 

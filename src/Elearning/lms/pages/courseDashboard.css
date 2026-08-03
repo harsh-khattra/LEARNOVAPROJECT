@@ -1268,6 +1268,7 @@ img {
 
   .hero-banner {
     padding-bottom: 30px;
+    border-radius: 20px;
   }
 
   .hero-header {

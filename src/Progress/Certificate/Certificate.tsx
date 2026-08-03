@@ -84,9 +84,9 @@ function buildCertificateFromCourse(course: EnrolledCourse): CompletedCertificat
 
 const TABS: { key: TabKey; label: string }[] = [
   
+ { key: "enrolled", label: "Enrolled" },
   { key: "active", label: "Active" },
-
-  { key: "certificates", label: "Certificates" },
+  { key: "completed", label: "Completed" },
 ];
 
 function filterCourses(courses: EnrolledCourse[], tab: TabKey): EnrolledCourse[] {

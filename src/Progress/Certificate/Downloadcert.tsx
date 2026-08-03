@@ -382,10 +382,16 @@ function CertificateCard({
             <span className="dc-footer-label">Credential ID</span>
             <span className="dc-footer-chip">{certificate.credentialId}</span>
           </div>
-          <div className="dc-footer-item">
-            <span className="dc-footer-label">Date issued</span>
-            <span className="dc-footer-value">{certificate.dateIssued}</span>
-          </div>
+         <div className="dc-footer-item">
+  <span className="dc-footer-label">Date issued</span>
+  <span className="dc-footer-value">
+    {new Date().toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    })}
+  </span>
+</div>
           <div className="dc-footer-item dc-footer-link">
             <span className="dc-footer-value">
               learnova-verify.org/verify/{certificate.verificationSlug}

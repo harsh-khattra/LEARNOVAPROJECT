@@ -68,12 +68,15 @@
 @media (max-width: 480px) {
   .body {
     margin-top: 63px;
+
   }
 
   .content {
-    padding: 12px;
-    margin: 0;
+    padding: 1px;
+      margin: 0;
     min-width: 0;
+   padding-top: 15px;
+   padding-right: 1px;
   }
 }
 
