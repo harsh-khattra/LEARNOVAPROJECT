@@ -455,6 +455,7 @@
 
   .cert-banner {
     padding: 30px 18px;
+    border-radius: 20px;
   }
 
   .cert-banner-text h1 {
@@ -535,6 +536,8 @@
 
   .cert-banner {
     padding: 24px 15px;
+   
+    
   }
 
   .cert-banner-text h1 {

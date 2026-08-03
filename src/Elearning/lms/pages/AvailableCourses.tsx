@@ -65,6 +65,21 @@ export const AvailableCourses: React.FC = () => {
     loadStudentCatalog();
   }, []);
 
+
+  useEffect(() => {
+  if (showEnrollModal) {
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+  }
+
+  return () => {
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+  };
+}, [showEnrollModal]);
   // Yeh useEffect tabhi chalega jab searchQuery badlegi, par 600ms rukne ke baad!
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -290,17 +305,22 @@ const handleSaveToPlaylist = async (video: any) => {
       </main>
 
       {/* Enrollment Modal */}
-      {showEnrollModal && selectedCourse && (
-        <div className="modal-overlay" onClick={closeEnrollModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <Enrollment
-              course={selectedCourse}
-              onClose={closeEnrollModal}
-              onEnrolled={handleEnrolledSuccess}
-            />
-          </div>
-        </div>
-      )}
+
+{showEnrollModal && selectedCourse && (
+  <div className="modal-overlay" onClick={closeEnrollModal}>
+    <div
+      className="modal-content"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <Enrollment
+        course={selectedCourse}
+        onClose={closeEnrollModal}
+        onEnrolled={handleEnrolledSuccess}
+      />
+    </div>
+  </div>
+)}
+    
     </div>
   );
 };
