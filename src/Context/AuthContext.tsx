@@ -269,13 +269,17 @@ console.log("AuthContext Mounted");
       console.log("SESSION:", session);
 
 
-        if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
-          if (session?.user) {
+   if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+  if (session?.user) {
 
-            Promise.resolve().then(() => {
-              fetchProfileAndRole(session.user.id);
-            });
-          } else {
+    // User is authenticated immediately
+    setIsAuth(true);
+
+    Promise.resolve().then(() => {
+      fetchProfileAndRole(session.user.id);
+    });
+
+  } else {
             setUser(null);
             setPermissions(defaultPermission);
             setIsAuth(false);

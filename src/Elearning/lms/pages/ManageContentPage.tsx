@@ -203,7 +203,7 @@ export const ManageContentPage: React.FC = () => {
     <div className="manage-content-container">
       <div className="page-header">
         <div>
-          <button className="back-btn" onClick={() => navigate('/learning/teacher/dashboard')}>
+          <button className="back-btn" onClick={() => navigate('/learning/teacher/courses')}>
             ◀ Back to Course Dashboard
           </button>
           <h1 className="page-title">Course Content Architect</h1>

@@ -446,6 +446,7 @@ background: linear-gradient(135deg, var(--ln-blue-primary) 0%, #0040b3 100%);
 
 .modal-form {
   padding: 24px;
+  background-color: white;
 }
 
 .form-group {

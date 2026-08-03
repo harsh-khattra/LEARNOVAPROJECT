@@ -3,12 +3,13 @@ import styles from "./Login.module.css";
 import *as Yup from "yup"
 import { SupabaseClient } from "../../Helper/Supabase";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useState } from "react";
 import Loader2 from "../../Elearning/Header/Loader2";
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 const [loading,setLoading] = useState(false)
   useEffect(() => {
 
@@ -54,9 +55,11 @@ if (error) {
 
   console.log("Session:", session);
 
-  toast.success("Login successful!");
+ toast.success("Login successful!");
 
-  navigate("learning/student/landingPage");
+const returnTo = location.state?.returnTo;
+
+navigate(returnTo || "/");
       } catch (err) {
         console.error(err);
       }finally{
