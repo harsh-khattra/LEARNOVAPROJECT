@@ -41,21 +41,31 @@ export const MySandbox: React.FC = () => {
     }
   };
 
-  const handleRemove = async (idToRemove: string) => {
-    try {
-      const { error } = await SupabaseClient
-        .from('student_playlists')
-        .delete()
-        .eq('id', idToRemove);
+const handleRemove = async (idToRemove: string) => {
+  const confirmed = window.confirm(
+    "Are you sure you want to remove this video from your Sandbox?"
+  );
 
-      if (error) throw error;
-      toast.success("video deleted from sandbox.")
-      // Update UI instantly by filtering out the removed item
-      setSavedVideos(prev => prev.filter(video => video.id !== idToRemove));
-    } catch (err) {
-      console.error("Failed to remove item:", err);
-    }
-  };
+  if (!confirmed) return;
+
+  try {
+    const { error } = await SupabaseClient
+      .from('student_playlists')
+      .delete()
+      .eq('id', idToRemove);
+
+    if (error) throw error;
+
+    setSavedVideos((prev) =>
+      prev.filter((video) => video.id !== idToRemove)
+    );
+
+    toast.success("Video removed from Sandbox.");
+  } catch (err) {
+    console.error("Failed to remove item:", err);
+    toast.error("Failed to remove video.");
+  }
+};
 if (loading) {
 
   return <Loader2 />;
