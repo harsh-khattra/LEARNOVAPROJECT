@@ -6,6 +6,7 @@ import "./App.css";
 import en from "./languages/messages/en.json";
 import ja from "./languages/messages/ja.json";
 import AppRoutes from "./Routes/AppRoutes";
+import InstallPWA from "./Elearning/Header/InstallPWA";
 
 export type Locale = "en" | "ja";
 
@@ -18,6 +19,7 @@ const App = () => {
     <IntlProvider locale={locale} messages={messages[locale]}>
          <AppRoutes locale={locale} setLocale={setLocale}/>      
       <Toaster position="top-right" reverseOrder={false} />
+      <InstallPWA/>
     </IntlProvider>
   );
 };
