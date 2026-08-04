@@ -47,7 +47,7 @@ const InstallPWA = () => {
       // Show banner after 5 seconds
       setTimeout(() => {
         setShowBanner(true);
-      }, 5000);
+      }, 3000);
     };
 
     const installedHandler = () => {
