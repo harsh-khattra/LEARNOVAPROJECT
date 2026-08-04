@@ -1,24 +1,104 @@
-.install-banner{
+.install-banner {
+  position: fixed;
 
-    position:fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
 
-    bottom:20px;
+  width: min(420px, calc(100% - 32px));
 
-    right:20px;
+  background: #fff;
 
-    width:340px;
+  border-radius: 14px;
 
-    background:white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 
-    border-radius:14px;
+  padding: 16px 20px;
 
-    box-shadow:0 8px 25px rgba(0,0,0,.18);
+  z-index: 99999;
 
-    padding:18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 
-    z-index:99999;
+  animation: slideDown 0.35s ease;
+}
 
-    animation:slideUp .3s ease;
+.install-content {
+  flex: 1;
+}
+
+.install-content h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.install-content p {
+  margin: 4px 0 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.install-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.install-btn {
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.25s;
+}
+
+.install-btn:hover {
+  background: #125cb2;
+}
+
+.later-btn {
+  background: #f3f3f3;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.later-btn:hover {
+  background: #e4e4e4;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (max-width: 600px) {
+  .install-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .install-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 .install-content h3{
