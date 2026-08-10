@@ -31,12 +31,7 @@ const LearningHeader: React.FC = () => {
       </div>
 
       <div className={styles.actions}>
-        <button
-          className={styles.switchBtn}
-          onClick={() => navigate("/hrms/dashboard")}
-        >
-          Switch to HRMS
-        </button>
+     
 
         <button className={styles.logoutBtnFull} onClick={handleLogout}>
           <FiLogOut />

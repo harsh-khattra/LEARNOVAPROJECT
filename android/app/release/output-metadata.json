@@ -4,7 +4,9 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.learnova.app",
+
+  "applicationId": "com.learnnova.app",
+
   "variantName": "release",
   "elements": [
     {

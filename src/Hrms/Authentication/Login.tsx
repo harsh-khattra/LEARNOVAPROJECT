@@ -56,10 +56,12 @@ console.log("Navigating to LMS...");
 
 const returnTo = location.state?.returnTo;
 
+
 navigate(returnTo || "/learning/student/LandingPage", {
   replace: true,
 });
  toast.success("Login successful!");
+
       } catch (err) {
         console.error(err);
       }finally{
