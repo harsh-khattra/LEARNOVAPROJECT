@@ -59,7 +59,9 @@ if (error) {
 
 const returnTo = location.state?.returnTo;
 
-navigate(returnTo || "/");
+setTimeout(() => {
+navigate(returnTo || "/learning/student/landingPage");
+}, 1000);
       } catch (err) {
         console.error(err);
       }finally{
