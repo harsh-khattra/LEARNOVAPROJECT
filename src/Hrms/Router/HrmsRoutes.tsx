@@ -14,7 +14,7 @@ import Privacy from "../../FacebookrequiredPages/Privacy";
 import DataDeletion from "../../FacebookrequiredPages/DataDeletion";
 import TermsofService from "../../FacebookrequiredPages/TermsofService";
 import Discussion from "../Discussion/Discussion";
-
+import { LandingPage } from "../../Elearning/lms/pages/LandingPage";
 const HrmsRoutes = () => {
   const { loading, isAuth, permissions } = useAuth();
 
@@ -47,6 +47,7 @@ const HrmsRoutes = () => {
             <SignUp />
            </ProtectedRoute>
         }
+        
       />
       <Route
         path="dashboard"                               
@@ -56,6 +57,15 @@ const HrmsRoutes = () => {
           </ProtectedRoute>
         }
       />
+       <Route
+        path="learning/student/LandingPage"
+        element={
+          <ProtectedRoute allowed={permissions.lmsDashboard}>
+            <LandingPage />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="leave"                                 
         element={

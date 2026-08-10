@@ -49,17 +49,17 @@ if (error) {
   toast.error(error.message);
   return;
 } 
-  const {
-    data: { session },
-  } = await SupabaseClient.auth.getSession();
+  
 
-  console.log("Session:", session);
 
- toast.success("Login successful!");
+console.log("Navigating to LMS...");
 
 const returnTo = location.state?.returnTo;
 
-navigate(returnTo || "/");
+navigate(returnTo || "/learning/student/LandingPage", {
+  replace: true,
+});
+ toast.success("Login successful!");
       } catch (err) {
         console.error(err);
       }finally{
