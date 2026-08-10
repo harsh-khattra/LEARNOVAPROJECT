@@ -45,41 +45,31 @@ const LandingPage = () => {
 
       {/* ── Hero ── */}
       <div className="lp-hero">
-        <div className="lp-badge">Your all-in-one workplace platform</div>
-        <h1>Everything your team needs,<br />in one place</h1>
-        <p>Manage your people and grow their skills — seamlessly switch between HR management and learning tools.</p>
+        <div className="lp-badge">Your Complete Learning Hub</div>
+        <h1>Master New Skills with <br />LEARNOVA</h1>
+        <p>Learn through structured courses, monitor your progress, collaborate in discussions, and achieve your goals with industry-ready content.</p>
       </div>
 
-      {/* ── Main cards ── */}
-      <div className="lp-cards">
-
-        <div className="lp-card" onClick={() => goTo("/hrms/dashboard")}>
-          <div className="lp-card-icon icon-blue">🏢</div>
-          <h2>HRMS</h2>
-          <p>Manage attendance, leaves and your entire workforce in one dashboard.</p>
-          <ul className="lp-card-features">
-            <li>Leave & attendance</li>
-            <li>Employee management</li>
-            <li>Discussions </li>
-          </ul>
-          <button className="card-cta cta-blue">Open HRMS →</button>
-        </div>
+    {/* ── Main card ── */}
 
 
-        <div className="lp-card" onClick={() => goTo("/learning/student/landingPage")}>
+  <div className="lp-card" onClick={() => goTo("/learning/student/LandingPage")}>
+    <div className="lp-card-icon icon-teal">🎓</div>
+    <h2>eLearning</h2>
+    <p>
+      Access courses, track your progress, join discussions, and earn certificates.
+    </p>
+    <ul className="lp-card-features">
+      <li>My courses & progress</li>
+      <li>Discussions & forums</li>
+      <li>Certificates</li>
+    </ul>
+    <button className="card-cta cta-teal">
+      Open eLearning →
+    </button>
+  </div>
 
-          <div className="lp-card-icon icon-teal">🎓</div>
-          <h2>eLearning</h2>
-          <p>Access courses, track your progress, join discussions, and earn certificates.</p>
-          <ul className="lp-card-features">
-            <li>My courses & progress</li>
-            <li>Discussions & forums</li>
-            <li>Certificates</li>
-          </ul>
-          <button className="card-cta cta-teal">Open eLearning →</button>
-        </div>
 
-      </div>
 
       {/* ── Footer ── */}
       <footer className="lp-footer">
