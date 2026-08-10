@@ -6,12 +6,12 @@ import svgr from "vite-plugin-svgr";
 export default defineConfig({
   plugins: [
     react(),
-
- svgr(),
+svgr(),
     VitePWA({
       registerType: "autoUpdate",
- workbox: {
-    maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MB
+  workbox: {
+    maximumFileSizeToCacheInBytes: 3 * 1024 * 1024
+
   },
       manifest: {
         name: "Learnova",

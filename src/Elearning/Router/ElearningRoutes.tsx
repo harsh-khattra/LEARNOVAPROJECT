@@ -75,15 +75,18 @@ const ElearningRoutes = () => {
 
 const { loading, isAuth, permissions } = useAuth();
 
-console.log("Loading:", loading);
+console.log("========== ELEARNING AUTH ==========");
+console.log("loading:", loading);
 console.log("isAuth:", isAuth);
-console.log("Permissions:", permissions);
+console.log("permissions:", permissions);
+console.log("lmsDashboard:", permissions.lmsDashboard);
+console.log("====================================");
   return (
     <>
     <ScrollToTop/>
     <Routes>
       {/* Unauthorized */}
-      <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="unauthorized" element={<Unauthorized />} />
 
       {/* ---------------- STUDENT ---------------- */}
 

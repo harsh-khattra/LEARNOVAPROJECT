@@ -70,7 +70,7 @@ const defaultPermission: Permissions = {
   discussion: false,
 
   // LMS
-  lmsDashboard: false,
+  lmsDashboard: true,
   viewCourses: false,
   uploadCourses: false,
   editCourses: false,
