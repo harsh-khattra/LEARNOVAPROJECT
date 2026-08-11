@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import svgr from "vite-plugin-svgr";
+
 export default defineConfig({
   plugins: [
     react(),
@@ -10,6 +11,7 @@ svgr(),
       registerType: "autoUpdate",
   workbox: {
     maximumFileSizeToCacheInBytes: 3 * 1024 * 1024
+
   },
       manifest: {
         name: "Learnova",

@@ -205,7 +205,7 @@ console.log("Roles:", profile.roles);
   leaveTable: role.can_view_leave_table,
   applyLeave: role.can_apply_leave,
   approveLeave: role.can_approve_leave,
-  discussion: role.can_view_discussion,
+  discussion: role.can_view_discussion, 
 
   // LMS
   lmsDashboard: role.can_view_lms_dashboard,
