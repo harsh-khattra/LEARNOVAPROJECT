@@ -4,12 +4,15 @@ import type { Course, CourseStatus, CreateCourseInput } from '../types/lms';
 
 const YOUTUBE_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
 
+export interface ExtendedCreateCourseInput extends CreateCourseInput {
+  youtube_playlist_id?: string;
+}
+
 export const lmsService = {
 
-  //  NEW: YouTube API v3 Playlist Fetcher Method
+  // Fetch videos from YouTube Playlist
   async fetchVideosFromPlaylist(playlistUrl: string) {
     try {
-      // 1. URL se Playlist ID nikalna
       const regExp = /[&?]list=([^&]+)/;
       const match = playlistUrl.match(regExp);
       if (!match || !match[1]) {
@@ -17,7 +20,6 @@ export const lmsService = {
       }
       const playlistId = match[1];
 
-      // 2. YouTube API ko hit karna saari videos ke liye
       const apiUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${YOUTUBE_API_KEY}`;
       
       const response = await fetch(apiUrl);
@@ -27,7 +29,6 @@ export const lmsService = {
         throw new Error(data.error.message);
       }
 
-      // 3. Data ko map karna humare table format ke mutabik
       return data.items.map((item: any, index: number) => ({
         title: item.snippet.title,
         description: item.snippet.description || 'No description available for this video.', 
@@ -41,55 +42,51 @@ export const lmsService = {
       throw error;
     }
   },
+
   async fetchAllCourses(): Promise<Course[]> {
-  const { data, error } = await SupabaseClient
-    .from('courses')
-    .select('*')
-    .order('created_at', { ascending: false });
+    const { data, error } = await SupabaseClient
+      .from('courses')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  if (error) throw error;
+    if (error) throw error;
+    return data as Course[];
+  },
 
-  return data as Course[];
-},
-
-async fetchCourses(_filter?: string) {
-  const { data, error } = await SupabaseClient
-    .from('courses')
-    .select(`
-      id,
-      title,
-      description,
-      thumbnail_url,
-      category,
-      status,
-      created_at,
-      created_by,
-      chapters (
+  async fetchCourses(_filter?: string) {
+    const { data, error } = await SupabaseClient
+      .from('courses')
+      .select(`
         id,
         title,
-        contents (
+        description,
+        thumbnail_url,
+        category,
+        status,
+        created_at,
+        created_by,
+        youtube_playlist_id,
+        chapters (
           id,
           title,
-          content_url,
-          type,
-          status,
-          description
+          contents (
+            id,
+            title,
+            content_url,
+            type,
+            status,
+            description
+          )
         )
-      )
-    `)
-    .eq('status', 'published');
+      `)
+      .eq('status', 'published');
 
-  if (error) {
-    console.error("Supabase relational query failed:", error);
-    throw error;
-  }
-  return data;
-},
-    
-  //   const { data, error } = await query.order('created_at', { ascending: false });
-  //   if (error) throw error;
-  //   return data as Course[];
-  // },
+    if (error) {
+      console.error("Supabase relational query failed:", error);
+      throw error;
+    }
+    return data;
+  },
 
   async fetchTeacherCourses(teacherId: string): Promise<Course[]> {
     const { data, error } = await SupabaseClient
@@ -120,8 +117,7 @@ async fetchCourses(_filter?: string) {
     return data.publicUrl;
   },
 
-  //  Single clean createCourse method using shared storage helper
-  async createCourse(input: CreateCourseInput, userId: string): Promise<Course> {
+  async createCourse(input: ExtendedCreateCourseInput, userId: string): Promise<Course> {
     let publicThumbnailUrl = null;
 
     if (input.thumbnail_file) {
@@ -141,7 +137,8 @@ async fetchCourses(_filter?: string) {
           category: input.category,
           thumbnail_url: publicThumbnailUrl, 
           status: 'draft', 
-          created_by: userId, // Matching your DB column identity schema
+          created_by: userId,
+          youtube_playlist_id: input.youtube_playlist_id || null
         },
       ])
       .select()
@@ -160,36 +157,78 @@ async fetchCourses(_filter?: string) {
     if (error) throw error;
   },
 
-  async deleteCourse(courseId: string): Promise<void> {
-    try {
-      // 1. Pehle course ka thumbnail URL nikalen taaki storage se image delete ho sake
-      const { data: courseData } = await SupabaseClient
-        .from('courses')
-        .select('thumbnail_url')
-        .eq('id', courseId)
-        .single();
+  // 🛠️ SAFE CASCADING DELETE: Deletes enrollments, contents, and chapters first to prevent foreign key errors (23503)
+async deleteCourse(courseId: string): Promise<void> {
+  try {
+    // 1. Delete student watch sessions for this course
+    const { error: watchError } = await SupabaseClient
+      .from('watch_sessions')
+      .delete()
+      .eq('course_id', courseId);
+    if (watchError) console.warn("watch_sessions cleanup warning:", watchError);
 
-      if (courseData?.thumbnail_url) {
-        const urlParts = courseData.thumbnail_url.split('/lms-assets/');
-        if (urlParts.length > 1) {
-          const filePath = urlParts[1];
-          // Storage se file saaf karein
-          await SupabaseClient.storage.from('lms-assets').remove([filePath]);
-        }
-      }
+    // 2. Delete student enrollments
+    const { error: enrollError } = await SupabaseClient
+      .from('course_enrollment')
+      .delete()
+      .eq('course_id', courseId);
+    if (enrollError) console.warn("Enrollment cleanup warning:", enrollError);
 
-      const { error: deleteError } = await SupabaseClient
-        .from('courses')
+    // 3. Fetch chapter IDs linked to this course
+    const { data: chapters } = await SupabaseClient
+      .from('chapters')
+      .select('id')
+      .eq('course_id', courseId);
+
+    // 4. Delete contents inside those chapters
+    if (chapters && chapters.length > 0) {
+      const chapterIds = chapters.map(ch => ch.id);
+      await SupabaseClient
+        .from('contents')
         .delete()
-        .eq('id', courseId);
-
-      if (deleteError) throw deleteError;
-
-    } catch (error) {
-      console.error("Error in clean cascading delete operation:", error);
-      throw error;
+        .in('chapter_id', chapterIds);
     }
-  },
+
+    // 5. Delete chapters
+    await SupabaseClient
+      .from('chapters')
+      .delete()
+      .eq('course_id', courseId);
+
+    // 6. Remove thumbnail image from bucket
+    const { data: courseData } = await SupabaseClient
+      .from('courses')
+      .select('thumbnail_url')
+      .eq('id', courseId)
+      .single();
+
+    if (courseData?.thumbnail_url) {
+      const urlParts = courseData.thumbnail_url.split('/lms-assets/');
+      if (urlParts.length > 1) {
+        await SupabaseClient.storage.from('lms-assets').remove([urlParts[1]]);
+      }
+    }
+    // Add this cleanup step inside lmsService.ts -> deleteCourse()
+const { error: certError } = await SupabaseClient
+  .from('certificates')
+  .delete()
+  .eq('course_id', courseId);
+
+if (certError) console.warn("Certificates cleanup warning:", certError);
+
+    // 7. Finally delete the parent course record
+    const { error: deleteError } = await SupabaseClient
+      .from('courses')
+      .delete()
+      .eq('id', courseId);
+
+    if (deleteError) throw deleteError;
+
+  } catch (error) {
+    console.error("Error in clean cascading delete operation:", error);
+    throw error;
+  }
+},
 
   async fetchCourseSyllabus(courseId: string) {
     const { data, error } = await SupabaseClient
@@ -210,16 +249,12 @@ async fetchCourses(_filter?: string) {
     return data;
   },
 
-// 🔄 1. Add Content Asset Method (Fixed Deprecation & Supports Frontend Keys)
   async addContentAsset(inputData: any) {
-    // Frontend se chahe 'status' aaye ya 'assetStatus', dono ko handle karega safely
     const chapterId = inputData.chapterId;
     const title = inputData.title;
     const type = inputData.type;
     const payload = inputData.payload;
     const currentStatus = inputData.assetStatus || inputData.status || 'draft';
-
-    console.log("📥 lmsService received content status to save:", currentStatus);
 
     const { data, error } = await SupabaseClient
       .from('contents')
@@ -229,23 +264,17 @@ async fetchCourses(_filter?: string) {
           title: title,
           type: type,
           content_url: payload, 
-          status: currentStatus // 🔥 Database ke 'status' column me secure value save hogi
+          status: currentStatus
         }
       ])
       .select();
 
-    if (error) {
-      console.error("❌ Error inside addContentAsset:", error);
-      throw error;
-    }
+    if (error) throw error;
     return data;
   },
 
-  // 🛡️ 2. Fetch Pending Assets for Admin (Fixed window.status error)
   async fetchPendingAssets() {
-    console.log(" Fetching all pending verification assets from DB...");
-    
-   const { data, error } = await SupabaseClient
+    const { data, error } = await SupabaseClient
       .from('contents') 
       .select(`
         *,
@@ -261,20 +290,12 @@ async fetchCourses(_filter?: string) {
       `) 
       .eq('status', 'pending');
 
-    if (error) {
-      console.error("Error fetching pending assets:", error);
-      throw error;
-    }
-
-    // Safely logging fetched data instead of naked 'status' keyword
-    console.log(` Successfully fetched ${data?.length || 0} pending assets for admin desk.`);
+    if (error) throw error;
     return data;
   },
   
- async updateContentAsset(assetId: string, updates: any) {
+  async updateContentAsset(assetId: string, updates: any) {
     const updatedStatus = updates.assetStatus || updates.status;
-
-    console.log(` Supabase executing update for ID (${assetId}) with status:`, updatedStatus);
 
     const { data, error } = await SupabaseClient
       .from('contents')
@@ -285,66 +306,47 @@ async fetchCourses(_filter?: string) {
         status: updatedStatus 
       })
       .eq('id', assetId)
-      .select(); //  YEH ZAROORI HAI! Iske bina Supabase updated data return nahi karta.
+      .select();
 
-    if (error) {
-      console.error(" Supabase Update Error:", error);
-      throw error;
-    }
-
-    //  BREAKPOINT LOG: Check karenge database ne sach me badla ya nahi
-    console.log("Database ka live return data:", data);
-
-    if (!data || data.length === 0) {
-      console.warn(" WARNING: Database me 0 rows update hui! Id nahi mili ya RLS ne block kiya.");
-    } else {
-      console.log(" Successfully updated in DB row:", data[0]);
-    }
-
+    if (error) throw error;
     return data;
   },
 
-async fetchEmployeeEnrollments(employeeId: string) {
-  const { data, error } = await SupabaseClient
-    .from('course_enrollment')
-    .select('*')                    // 👈 poori row, sirf course_id nahi
-    .eq('employee_id', employeeId);
+  async fetchEmployeeEnrollments(employeeId: string) {
+    const { data, error } = await SupabaseClient
+      .from('course_enrollment')
+      .select('*')
+      .eq('employee_id', employeeId);
 
-  if (error) {
-    console.error("Enrollment data fetch failed:", error);
-    throw error;
-  }
-   return data?.map(item => item.course_id) ?? [];
-   // 👈 ab objects ka array return hoga, strings nahi
-},
+    if (error) throw error;
+    return data?.map(item => item.course_id) ?? [];
+  },
 
-async enrollEmployeeInCourse(employeeId: string, courseId: string) {
-  const { data, error } = await SupabaseClient
-    .from('course_enrollment')
-    .insert([
-      {
-        employee_id: employeeId,
-        course_id: courseId,
-        progress_percentage: 0,
-      },
-    ])
-    .select()
-    .single();
+  async enrollEmployeeInCourse(employeeId: string, courseId: string) {
+    const { data, error } = await SupabaseClient
+      .from('course_enrollment')
+      .insert([
+        {
+          employee_id: employeeId,
+          course_id: courseId,
+          progress_percentage: 0,
+        },
+      ])
+      .select()
+      .single();
 
-  if (error) {
-    console.error("Enrollment insert failed:", error);
-    throw error;
-  }
-  return data;
-},
-async updateContent(assetId: string, updates: any) {
+    if (error) throw error;
+    return data;
+  },
+
+  async updateContent(assetId: string, updates: any) {
     const { data, error } = await SupabaseClient
       .from('contents')
       .update({
         title: updates.title,
         type: updates.type,
         content_url: updates.payload,
-        status: updates.status //  Admin approve karega toh 'published' ho jayega
+        status: updates.status
       })
       .eq('id', assetId);
 
@@ -352,7 +354,6 @@ async updateContent(assetId: string, updates: any) {
     return data;
   },
 
-  // 🗑️Chapter aur Assets ke Delete functions bhi database connection ke liye add karein
   async deleteContentAsset(assetId: string) {
     const { error } = await SupabaseClient
       .from('contents')
@@ -368,35 +369,21 @@ async updateContent(assetId: string, updates: any) {
       .eq('id', chapterId);
     if (error) throw error;
   },
-  async updateChapter(
-  chapterId: string,
-  updates: { title: string }
-) {
-  const { data, error } = await SupabaseClient
-    .from('chapters')
-    .update({
-      title: updates.title,
-    })
-    .eq('id', chapterId)
-    .select()
-    .single();
 
-  if (error) {
-    console.error("Error updating chapter:", error);
-    throw error;
-  }
+  async updateChapter(chapterId: string, updates: { title: string }) {
+    const { data, error } = await SupabaseClient
+      .from('chapters')
+      .update({ title: updates.title })
+      .eq('id', chapterId)
+      .select()
+      .single();
 
-  return data;
-},
-
-  // src/services/lmsService.ts ke andar baki functions ke sath niche yeh add karein:
-
+    if (error) throw error;
+    return data;
+  },
 
   async publishCourseAndSubmitAllVideos(courseId: string): Promise<void> {
     try {
-      console.log(` Bulk processing started for Course ID: ${courseId}`);
-
-      // 1. Pehle is Course ke saare Chapters ki IDs nikalenge
       const { data: chapters, error: chapterError } = await SupabaseClient
         .from('chapters')
         .select('id')
@@ -404,24 +391,17 @@ async updateContent(assetId: string, updates: any) {
 
       if (chapterError) throw chapterError;
 
-      // 2. Agar course mein chapters hain, toh unki saari DRAFT videos ko PENDING karenge
       if (chapters && chapters.length > 0) {
         const chapterIds = chapters.map(ch => ch.id);
-        
-        console.log(` Found ${chapterIds.length} chapters. Updating internal draft videos...`);
-
-        const { data: updatedVideos, error: contentError } = await SupabaseClient
+        const { error: contentError } = await SupabaseClient
           .from('contents')
           .update({ status: 'pending' })
-          .in('chapter_id', chapterIds) // Un saare chapters ke andar
-          .eq('status', 'draft')         // Sirf un videos ko jo abhi draft hain
-          .select();
+          .in('chapter_id', chapterIds)
+          .eq('status', 'draft');
 
         if (contentError) throw contentError;
-        console.log(` Successfully moved ${updatedVideos?.length || 0} videos to 'pending' for Admin review.`);
       }
 
-      // 3. Last mein, Course ka status khud 'published' (ya 'pending') set karenge
       const { error: courseError } = await SupabaseClient
         .from('courses')
         .update({ 
@@ -431,10 +411,8 @@ async updateContent(assetId: string, updates: any) {
         .eq('id', courseId);
 
       if (courseError) throw courseError;
-      console.log(" Course and all internal assets synchronized successfully!");
-
     } catch (error) {
-      console.error(" Error in bulk publishing operation:", error);
+      console.error("Error in bulk publishing operation:", error);
       throw error;
     }
   }
