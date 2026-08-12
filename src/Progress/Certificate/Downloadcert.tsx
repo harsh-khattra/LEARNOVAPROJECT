@@ -3,6 +3,8 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import "./Downloadcert.css";
 // import React, { useMemo, useState, useRef } from "react";
 import html2canvas from "html2canvas";
+import { Filesystem, Directory } from "@capacitor/filesystem";
+import { Capacitor } from "@capacitor/core";
 import jsPDF from "jspdf";
 
 /* ---------------------------------------------------------------------- */
@@ -174,8 +176,25 @@ pdf.addImage(
 
 
     const fileSafeName = displayName.replace(/\s+/g, "_");
-    const fileSafeCourse = certificate.courseName.replace(/\s+/g, "_");
-    pdf.save(`Certificate_${fileSafeName}_${fileSafeCourse}.pdf`);
+const fileSafeCourse = certificate.courseName.replace(/\s+/g, "_");
+
+const fileName = `Certificate_${fileSafeName}_${fileSafeCourse}.pdf`;
+
+if (Capacitor.isNativePlatform()) {
+  const pdfBase64 = pdf.output("datauristring").split(",")[1];
+
+  const result = await Filesystem.writeFile({
+    path: fileName,
+    data: pdfBase64,
+    directory: Directory.Documents,
+  });
+
+  console.log("Certificate saved:", result.uri);
+
+  alert("Certificate downloaded successfully!");
+} else {
+  pdf.save(fileName);
+}
 
     onDownloadPdf?.(certificate, displayName); // agar parent bhi kuch karna chahe, wo bhi chal jayega
   } catch (err) {
